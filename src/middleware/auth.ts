@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { SessionService } from '../services/session.service';
+import { sessionService } from '../services/session.service';
 
 declare module 'fastify' {
   interface FastifyRequest {
@@ -26,7 +26,6 @@ export async function authenticate(
     const payload = request.user as any;
 
     // Validate session is still active
-    const sessionService = new SessionService();
     const isValid = await sessionService.isSessionValid(payload.sessionId);
 
     if (!isValid) {
@@ -36,8 +35,8 @@ export async function authenticate(
       });
     }
 
-    // Update session activity
-    await sessionService.updateActivity(payload.sessionId);
+    // Update session activity (fire-and-forget to not block response)
+    sessionService.updateActivity(payload.sessionId).catch(() => {});
 
     // Attach user data to request
     request.user = {

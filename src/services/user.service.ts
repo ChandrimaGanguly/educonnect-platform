@@ -21,6 +21,7 @@ export interface User {
   verified_at?: Date;
   mfa_enabled: boolean;
   mfa_secret?: string;
+  mfa_backup_codes?: string;
   trust_score: number;
   reputation_points: number;
   privacy_settings: any;
@@ -162,26 +163,69 @@ export class UserService {
 
   /**
    * Enable MFA for user
+   * Stores hashed backup codes in the database for recovery
    */
   async enableMfa(userId: string): Promise<{ secret: string; backupCodes: string[] }> {
     const secret = generateMfaSecret();
     const backupCodes = generateBackupCodes();
 
+    // Hash backup codes before storing (they're one-time use)
+    const hashedBackupCodes = await Promise.all(
+      backupCodes.map(async (code) => ({
+        hash: await hashPassword(code),
+        used: false,
+      }))
+    );
+
     await this.db('users').where({ id: userId }).update({
       mfa_enabled: true,
       mfa_secret: secret,
+      mfa_backup_codes: JSON.stringify(hashedBackupCodes),
     });
 
     return { secret, backupCodes };
   }
 
   /**
+   * Verify and consume a backup code for MFA recovery
+   * Returns true if code was valid and consumed
+   */
+  async verifyBackupCode(userId: string, code: string): Promise<boolean> {
+    const user = await this.findById(userId);
+    if (!user || !user.mfa_backup_codes) {
+      return false;
+    }
+
+    const backupCodes = typeof user.mfa_backup_codes === 'string'
+      ? JSON.parse(user.mfa_backup_codes)
+      : user.mfa_backup_codes;
+
+    for (let i = 0; i < backupCodes.length; i++) {
+      if (!backupCodes[i].used) {
+        const isValid = await verifyPassword(code, backupCodes[i].hash);
+        if (isValid) {
+          // Mark code as used
+          backupCodes[i].used = true;
+          await this.db('users').where({ id: userId }).update({
+            mfa_backup_codes: JSON.stringify(backupCodes),
+          });
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  /**
    * Disable MFA for user
+   * Clears both the secret and backup codes
    */
   async disableMfa(userId: string): Promise<void> {
     await this.db('users').where({ id: userId }).update({
       mfa_enabled: false,
       mfa_secret: null,
+      mfa_backup_codes: null,
     });
   }
 

@@ -2,6 +2,7 @@ import { Knex } from 'knex';
 import { v4 as uuidv4 } from 'uuid';
 import { getDatabase } from '../database';
 import { generateAccessToken, generateRefreshToken } from '../utils/jwt';
+import { SESSION } from '../config/constants';
 
 export interface Session {
   id: string;
@@ -47,8 +48,8 @@ export class SessionService {
     const accessToken = generateAccessToken(data.userId, data.email, sessionId);
     const refreshToken = generateRefreshToken(data.userId, data.email, sessionId);
 
-    const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
-    const refreshExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+    const expiresAt = new Date(Date.now() + SESSION.ACCESS_TOKEN_EXPIRY_MS);
+    const refreshExpiresAt = new Date(Date.now() + SESSION.REFRESH_TOKEN_EXPIRY_MS);
 
     const [session] = await this.db('sessions')
       .insert({
@@ -110,8 +111,8 @@ export class SessionService {
     const newAccessToken = generateAccessToken(userId, email, sessionId);
     const newRefreshToken = generateRefreshToken(userId, email, sessionId);
 
-    const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
-    const refreshExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+    const expiresAt = new Date(Date.now() + SESSION.ACCESS_TOKEN_EXPIRY_MS);
+    const refreshExpiresAt = new Date(Date.now() + SESSION.REFRESH_TOKEN_EXPIRY_MS);
 
     const [session] = await this.db('sessions')
       .where({ id: sessionId })
@@ -202,3 +203,6 @@ export class SessionService {
     return result;
   }
 }
+
+// Export singleton instance for consistent usage
+export const sessionService = new SessionService();

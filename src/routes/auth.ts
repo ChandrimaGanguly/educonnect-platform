@@ -1,14 +1,12 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { UserService } from '../services/user.service';
-import { SessionService } from '../services/session.service';
+import { sessionService } from '../services/session.service';
 import { verifyPassword } from '../utils/password';
 import { verifyTotp, generateTotpUri } from '../utils/mfa';
-import { verifyToken } from '../utils/jwt';
 import {
   registrationSchema,
   loginSchema,
   passwordResetRequestSchema,
-  passwordResetSchema,
   mfaSetupSchema,
   mfaVerificationSchema,
   refreshTokenSchema,
@@ -16,9 +14,10 @@ import {
 import { authenticate } from '../middleware/auth';
 import { env } from '../config';
 
+// Singleton services
+const userService = new UserService();
+
 export async function authRoutes(server: FastifyInstance): Promise<void> {
-  const userService = new UserService();
-  const sessionService = new SessionService();
 
   /**
    * POST /register

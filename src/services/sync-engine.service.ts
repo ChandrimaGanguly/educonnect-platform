@@ -1,6 +1,6 @@
 import { Knex } from 'knex';
 import { getDatabase } from '../database/connection';
-import { env } from '../config';
+import { SYNC } from '../config/constants';
 
 /**
  * Sync Engine Service
@@ -71,9 +71,9 @@ export interface DeviceSyncState {
 
 export class SyncEngineService {
   private db: Knex;
-  private readonly MAX_RETRIES = 3;
-  private readonly RETRY_DELAY_MS = [1000, 5000, 15000]; // Exponential backoff
-  private readonly BATCH_SIZE = 50;
+  private readonly MAX_RETRIES = SYNC.MAX_RETRIES;
+  private readonly RETRY_DELAY_MS = SYNC.RETRY_DELAYS_MS;
+  private readonly BATCH_SIZE = SYNC.BATCH_SIZE;
 
   constructor() {
     this.db = getDatabase();
@@ -563,7 +563,7 @@ export class SyncEngineService {
   /**
    * Clear old completed sync items
    */
-  async cleanupCompletedItems(olderThanDays: number = 7): Promise<number> {
+  async cleanupCompletedItems(olderThanDays: number = SYNC.CLEANUP_DAYS): Promise<number> {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - olderThanDays);
 
