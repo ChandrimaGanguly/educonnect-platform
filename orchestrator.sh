@@ -321,11 +321,11 @@ Begin implementation now."
     log_info "Starting Claude Code instance (output: $log_file)"
 
     # Run Claude Code with dangerously-skip-permissions and print mode
-    # Using here-string to pass the prompt
+    # Pass prompt as argument (not stdin)
     if timeout "$TASK_TIMEOUT" "$CLAUDE_BIN" \
-        --dangerously-skip-permissions \
         --print \
-        <<< "$prompt" \
+        --permission-mode=bypassPermissions \
+        "$prompt" \
         > "$log_file" 2>&1; then
         log_success "Task $task_id completed successfully"
         return 0
