@@ -1,0 +1,217 @@
+# EduConnect Platform - Python Services Requirements
+# For ML/AI microservices, analytics, and content processing
+
+# ============================================================================
+# Core Web Framework (for Python-based microservices)
+# ============================================================================
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+pydantic==2.5.3
+python-multipart==0.0.6
+
+# ============================================================================
+# Database & Caching
+# ============================================================================
+psycopg2-binary==2.9.9  # PostgreSQL adapter
+redis==5.0.1  # Redis client
+SQLAlchemy==2.0.25  # ORM for database operations
+alembic==1.13.1  # Database migrations
+
+# ============================================================================
+# Machine Learning & AI - Matching Algorithm
+# ============================================================================
+scikit-learn==1.4.0  # ML algorithms for matching, clustering
+numpy==1.26.3  # Numerical computing
+pandas==2.1.4  # Data manipulation and analysis
+scipy==1.12.0  # Scientific computing for optimization
+
+# Optional: Deep learning for advanced matching
+# torch==2.1.2  # PyTorch for neural networks
+# tensorflow==2.15.0  # TensorFlow alternative
+
+# ============================================================================
+# Natural Language Processing - Content Generation & Analysis
+# ============================================================================
+transformers==4.36.2  # Hugging Face transformers for text generation
+sentence-transformers==2.2.2  # Semantic text embeddings
+spacy==3.7.2  # NLP pipeline for text processing
+nltk==3.8.1  # Natural language toolkit
+
+# Language detection
+langdetect==1.0.9
+lingua-language-detector==2.0.2
+
+# ============================================================================
+# Content Moderation
+# ============================================================================
+# Toxicity and hate speech detection
+detoxify==0.5.2
+# Image moderation
+Pillow==10.2.0
+# Content safety
+google-cloud-dlp==3.15.0  # Optional: Google Cloud DLP for PII detection
+
+# ============================================================================
+# Analytics & Data Science
+# ============================================================================
+matplotlib==3.8.2  # Plotting and visualization
+seaborn==0.13.1  # Statistical data visualization
+statsmodels==0.14.1  # Statistical modeling
+# Bias detection and fairness
+fairlearn==0.10.0
+aif360==0.5.0  # AI Fairness 360 for bias detection
+
+# ============================================================================
+# Recommendation Systems - Content & Mentor Matching
+# ============================================================================
+surprise==0.1  # Collaborative filtering library
+implicit==0.7.2  # Fast implicit feedback algorithms
+
+# ============================================================================
+# Text Processing & Assessment Generation
+# ============================================================================
+openai==1.7.2  # OpenAI API for content generation (optional)
+anthropic==0.8.1  # Anthropic Claude API (optional)
+markdown==3.5.2  # Markdown processing
+beautifulsoup4==4.12.3  # HTML/XML parsing
+bleach==6.1.0  # HTML sanitization
+
+# ============================================================================
+# Security & Cryptography
+# ============================================================================
+cryptography==42.0.0  # Cryptographic recipes and primitives
+PyJWT==2.8.0  # JSON Web Token implementation
+passlib[bcrypt]==1.7.4  # Password hashing
+python-jose[cryptography]==3.3.0  # JOSE implementation
+
+# ============================================================================
+# Async & Background Tasks
+# ============================================================================
+celery==5.3.6  # Distributed task queue
+flower==2.0.1  # Celery monitoring tool
+aioredis==2.0.1  # Async Redis client
+asyncpg==0.29.0  # Async PostgreSQL client
+
+# ============================================================================
+# HTTP & API Clients
+# ============================================================================
+httpx==0.26.0  # Async HTTP client
+requests==2.31.0  # HTTP library
+aiohttp==3.9.1  # Async HTTP client/server
+
+# ============================================================================
+# Data Validation & Serialization
+# ============================================================================
+marshmallow==3.20.2  # Object serialization
+jsonschema==4.20.0  # JSON Schema validation
+
+# ============================================================================
+# Monitoring & Logging
+# ============================================================================
+prometheus-client==0.19.0  # Prometheus metrics
+sentry-sdk==1.39.2  # Error tracking
+python-json-logger==2.0.7  # JSON logging
+structlog==24.1.0  # Structured logging
+
+# ============================================================================
+# Testing
+# ============================================================================
+pytest==7.4.4  # Testing framework
+pytest-asyncio==0.23.3  # Async test support
+pytest-cov==4.1.0  # Coverage plugin
+pytest-mock==3.12.0  # Mocking plugin
+faker==22.0.0  # Fake data generation for testing
+hypothesis==6.98.3  # Property-based testing
+
+# ============================================================================
+# Code Quality & Linting
+# ============================================================================
+black==24.1.1  # Code formatter
+flake8==7.0.0  # Linting
+mypy==1.8.0  # Static type checking
+isort==5.13.2  # Import sorting
+pylint==3.0.3  # Code analysis
+
+# ============================================================================
+# Utilities
+# ============================================================================
+python-dotenv==1.0.0  # Environment variable management
+pyyaml==6.0.1  # YAML parser
+python-dateutil==2.8.2  # Date/time utilities
+pytz==2024.1  # Timezone definitions
+click==8.1.7  # CLI creation
+tqdm==4.66.1  # Progress bars
+
+# ============================================================================
+# Image & Media Processing (for content optimization)
+# ============================================================================
+opencv-python-headless==4.9.0.80  # Computer vision (headless for servers)
+imageio==2.33.1  # Image I/O
+ffmpeg-python==0.2.0  # Video processing wrapper
+
+# ============================================================================
+# Low-Bandwidth Optimization
+# ============================================================================
+brotli==1.1.0  # Brotli compression
+python-magic==0.4.27  # File type identification
+
+# ============================================================================
+# Internationalization
+# ============================================================================
+babel==2.14.0  # Internationalization utilities
+googletrans==4.0.0rc1  # Translation API (optional, community translations)
+
+# ============================================================================
+# Document Processing (for certificate generation, content parsing)
+# ============================================================================
+reportlab==4.0.9  # PDF generation
+PyPDF2==3.0.1  # PDF manipulation
+python-docx==1.1.0  # Word document processing
+openpyxl==3.1.2  # Excel file processing
+
+# ============================================================================
+# Rate Limiting & Throttling
+# ============================================================================
+slowapi==0.1.9  # Rate limiting for FastAPI
+limits==3.8.0  # Rate limiting utilities
+
+# ============================================================================
+# Feature Flags & A/B Testing
+# ============================================================================
+unleash-client==5.11.1  # Feature toggle client
+split-sdk==2.1.0  # Split.io SDK for A/B testing
+
+# ============================================================================
+# Geolocation (for regional content delivery)
+# ============================================================================
+geoip2==4.7.0  # GeoIP2 database reader
+geopy==2.4.1  # Geocoding library
+
+# ============================================================================
+# Email
+# ============================================================================
+sendgrid==6.11.0  # SendGrid email service
+jinja2==3.1.3  # Template engine for emails
+
+# ============================================================================
+# Search & Indexing
+# ============================================================================
+elasticsearch==8.11.1  # Elasticsearch client
+whoosh==2.7.4  # Pure Python search engine (lightweight alternative)
+
+# ============================================================================
+# Graph Processing (for trust networks, social graphs)
+# ============================================================================
+networkx==3.2.1  # Network analysis
+python-igraph==0.11.3  # Fast graph library
+
+# ============================================================================
+# Webhook & Event Processing
+# ============================================================================
+svix==1.17.0  # Webhook delivery platform
+
+# ============================================================================
+# Data Export & Reporting
+# ============================================================================
+xlsxwriter==3.1.9  # Excel writing
+tabulate==0.9.0  # Pretty-print tabular data

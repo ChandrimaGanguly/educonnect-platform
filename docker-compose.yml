@@ -1,0 +1,303 @@
+version: '3.9'
+
+services:
+  # ==========================================================================
+  # Core Infrastructure
+  # ==========================================================================
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: educonnect-postgres
+    environment:
+      POSTGRES_DB: educonnect
+      POSTGRES_USER: educonnect
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U educonnect"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - educonnect
+
+  redis:
+    image: redis:7-alpine
+    container_name: educonnect-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - educonnect
+
+  # ==========================================================================
+  # Main Node.js Backend (Core Platform)
+  # ==========================================================================
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: educonnect-backend
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      DATABASE_URL: postgresql://educonnect:${DB_PASSWORD:-changeme}@postgres:5432/educonnect
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET:-your-jwt-secret-change-in-production}
+      PORT: 3000
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./src:/app/src
+      - ./uploads:/app/uploads
+    networks:
+      - educonnect
+    restart: unless-stopped
+
+  # ==========================================================================
+  # Python ML/AI Services
+  # ==========================================================================
+
+  matching-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.python
+      args:
+        SERVICE_NAME: matching
+    container_name: educonnect-matching
+    ports:
+      - "8001:8000"
+    environment:
+      SERVICE_NAME: matching
+      DATABASE_URL: postgresql://educonnect:${DB_PASSWORD:-changeme}@postgres:5432/educonnect
+      REDIS_URL: redis://redis:6379
+      MODEL_CACHE_DIR: /models
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./python-services/matching:/app
+      - ml_models:/models
+    networks:
+      - educonnect
+    restart: unless-stopped
+
+  analytics-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.python
+      args:
+        SERVICE_NAME: analytics
+    container_name: educonnect-analytics
+    ports:
+      - "8002:8000"
+    environment:
+      SERVICE_NAME: analytics
+      DATABASE_URL: postgresql://educonnect:${DB_PASSWORD:-changeme}@postgres:5432/educonnect
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./python-services/analytics:/app
+      - analytics_data:/data
+    networks:
+      - educonnect
+    restart: unless-stopped
+
+  checkpoint-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.python
+      args:
+        SERVICE_NAME: checkpoint
+    container_name: educonnect-checkpoint
+    ports:
+      - "8003:8000"
+    environment:
+      SERVICE_NAME: checkpoint
+      DATABASE_URL: postgresql://educonnect:${DB_PASSWORD:-changeme}@postgres:5432/educonnect
+      REDIS_URL: redis://redis:6379
+      MODEL_CACHE_DIR: /models
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./python-services/checkpoint:/app
+      - ml_models:/models
+    networks:
+      - educonnect
+    restart: unless-stopped
+
+  moderation-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.python
+      args:
+        SERVICE_NAME: moderation
+    container_name: educonnect-moderation
+    ports:
+      - "8004:8000"
+    environment:
+      SERVICE_NAME: moderation
+      DATABASE_URL: postgresql://educonnect:${DB_PASSWORD:-changeme}@postgres:5432/educonnect
+      REDIS_URL: redis://redis:6379
+      MODEL_CACHE_DIR: /models
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./python-services/moderation:/app
+      - ml_models:/models
+    networks:
+      - educonnect
+    restart: unless-stopped
+
+  # ==========================================================================
+  # Background Workers
+  # ==========================================================================
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: educonnect-worker
+    command: npm run worker
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      DATABASE_URL: postgresql://educonnect:${DB_PASSWORD:-changeme}@postgres:5432/educonnect
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./src:/app/src
+    networks:
+      - educonnect
+    restart: unless-stopped
+
+  celery-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.python
+    container_name: educonnect-celery
+    command: celery -A app.celery worker --loglevel=info
+    environment:
+      DATABASE_URL: postgresql://educonnect:${DB_PASSWORD:-changeme}@postgres:5432/educonnect
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./python-services/shared:/app
+    networks:
+      - educonnect
+    restart: unless-stopped
+
+  # ==========================================================================
+  # Monitoring & Observability (Optional)
+  # ==========================================================================
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: educonnect-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    networks:
+      - educonnect
+    profiles:
+      - monitoring
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: educonnect-grafana
+    ports:
+      - "3001:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+    networks:
+      - educonnect
+    profiles:
+      - monitoring
+
+  # ==========================================================================
+  # Development Tools (Optional)
+  # ==========================================================================
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: educonnect-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@educonnect.local}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    networks:
+      - educonnect
+    profiles:
+      - development
+
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: educonnect-redis-commander
+    environment:
+      REDIS_HOSTS: local:redis:6379
+    ports:
+      - "8081:8081"
+    depends_on:
+      - redis
+    networks:
+      - educonnect
+    profiles:
+      - development
+
+# ==========================================================================
+# Networks
+# ==========================================================================
+
+networks:
+  educonnect:
+    driver: bridge
+
+# ==========================================================================
+# Volumes
+# ==========================================================================
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  ml_models:
+    driver: local
+  analytics_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local

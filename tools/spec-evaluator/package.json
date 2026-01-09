@@ -1,0 +1,43 @@
+{
+  "name": "openspec-evaluator",
+  "version": "1.0.0",
+  "description": "OpenSpec specification evaluation tool for analyzing requirement documents",
+  "main": "dist/index.js",
+  "bin": {
+    "spec-eval": "./bin/spec-eval.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest",
+    "test:coverage": "vitest --coverage",
+    "lint": "eslint src/**/*.ts",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "requirements",
+    "specification",
+    "openspec",
+    "evaluation",
+    "quality-assurance"
+  ],
+  "author": "EduConnect Platform",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "chalk": "^5.3.0",
+    "markdown-it": "^14.0.0",
+    "js-yaml": "^4.1.0",
+    "glob": "^10.3.10",
+    "ora": "^8.0.1"
+  },
+  "devDependencies": {
+    "@types/markdown-it": "^13.0.7",
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

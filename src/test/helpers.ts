@@ -1,0 +1,88 @@
+/**
+ * Test helper utilities
+ */
+import { FastifyInstance } from 'fastify';
+import { buildApp } from '../app';
+import { getDatabase, closeDatabase } from '../database';
+import { closeRedis } from '../config/redis';
+
+/**
+ * Create a test Fastify instance
+ */
+export async function createTestApp(): Promise<FastifyInstance> {
+  return await buildApp();
+}
+
+/**
+ * Clean up test resources
+ */
+export async function cleanupTestApp(app: FastifyInstance): Promise<void> {
+  await app.close();
+  await closeDatabase();
+  await closeRedis();
+}
+
+/**
+ * Clean database tables for testing
+ */
+export async function cleanDatabase(): Promise<void> {
+  const db = getDatabase();
+
+  // Disable foreign key checks temporarily
+  await db.raw('SET session_replication_role = replica');
+
+  // Truncate tables
+  const tables = ['sessions', 'communities', 'users'];
+  for (const table of tables) {
+    await db(table).truncate();
+  }
+
+  // Re-enable foreign key checks
+  await db.raw('SET session_replication_role = DEFAULT');
+}
+
+/**
+ * Create a test user
+ */
+export async function createTestUser(overrides = {}) {
+  const db = getDatabase();
+
+  const defaultUser = {
+    email: 'test@example.com',
+    username: 'testuser',
+    password_hash: '$2b$12$test.hash.value',
+    full_name: 'Test User',
+    status: 'active',
+    ...overrides,
+  };
+
+  const [user] = await db('users').insert(defaultUser).returning('*');
+  return user;
+}
+
+/**
+ * Create a test community
+ */
+export async function createTestCommunity(createdBy: string, overrides = {}) {
+  const db = getDatabase();
+
+  const defaultCommunity = {
+    name: 'Test Community',
+    slug: 'test-community',
+    description: 'A test community',
+    type: 'public',
+    status: 'active',
+    created_by: createdBy,
+    ...overrides,
+  };
+
+  const [community] = await db('communities').insert(defaultCommunity).returning('*');
+  return community;
+}
+
+/**
+ * Generate a test JWT token
+ */
+export function generateTestToken(app: FastifyInstance, payload: any): string {
+  return app.jwt.sign(payload);
+}

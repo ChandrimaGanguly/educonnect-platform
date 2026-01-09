@@ -1,0 +1,50 @@
+# Node
+node_modules
+npm-debug.log
+dist
+.env
+.env.local
+*.log
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv
+pip-log.txt
+pip-delete-this-directory.txt
+
+# IDEs
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+
+# Documentation
+*.md
+docs/
+
+# Tests
+coverage/
+.coverage
+htmlcov/
+*.cover
+.pytest_cache/
+.tox/
+
+# Other
+uploads/
+models/
