@@ -16,9 +16,10 @@ CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
 # Configuration
-ROADMAP_FILE="ROADMAP.md"
-STATUS_DIR="./status"
-LOG_DIR="./logs/orchestrator"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROADMAP_FILE="$SCRIPT_DIR/ROADMAP.md"
+STATUS_DIR="$SCRIPT_DIR/status"
+LOG_DIR="$SCRIPT_DIR/logs/orchestrator"
 CLAUDE_BIN="claude"
 MAX_PARALLEL_AGENTS=4
 TASK_TIMEOUT=3600 # 1 hour per task

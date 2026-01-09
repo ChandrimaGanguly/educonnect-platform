@@ -3,3 +3,4 @@ export * from './logger';
 export * from './redis';
 export * from './cache';
 export * from './session';
+export * from './storage';
