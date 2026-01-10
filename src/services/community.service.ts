@@ -1,6 +1,14 @@
 import { Knex } from 'knex';
 import { getDatabase } from '../database';
 import { nanoid } from 'nanoid';
+import {
+  ContentGuidelines,
+  CommunityFeatures,
+  CommunitySettings,
+  CommunityMetadata,
+  MemberNotificationPreferences,
+  MemberMetadata,
+} from '../types/domain';
 
 export interface Community {
   id: string;
@@ -20,7 +28,7 @@ export interface Community {
   max_members?: number;
   allow_public_content: boolean;
   require_content_approval: boolean;
-  content_guidelines?: any;
+  content_guidelines?: ContentGuidelines;
   primary_language: string;
   supported_languages: string[];
   region?: string;
@@ -28,11 +36,11 @@ export interface Community {
   trust_score: number;
   verified: boolean;
   verified_at?: Date;
-  features: any;
-  settings: any;
+  features: CommunityFeatures;
+  settings: CommunitySettings;
   created_by: string;
   primary_admin?: string;
-  metadata?: any;
+  metadata?: CommunityMetadata;
   tags: string[];
   external_links?: string;
   created_at: Date;
@@ -53,8 +61,8 @@ export interface CommunityMember {
   join_reason?: string;
   contribution_count: number;
   last_active_at: Date;
-  notification_preferences: any;
-  metadata?: any;
+  notification_preferences: MemberNotificationPreferences;
+  metadata?: MemberMetadata;
   joined_at: Date;
   created_at: Date;
   updated_at: Date;
@@ -97,8 +105,8 @@ export interface CreateCommunityData {
   type?: 'public' | 'private' | 'invite_only';
   primary_language?: string;
   tags?: string[];
-  features?: any;
-  settings?: any;
+  features?: Partial<CommunityFeatures>;
+  settings?: Partial<CommunitySettings>;
 }
 
 export interface UpdateCommunityData {
@@ -115,10 +123,10 @@ export interface UpdateCommunityData {
   max_members?: number;
   allow_public_content?: boolean;
   require_content_approval?: boolean;
-  content_guidelines?: any;
+  content_guidelines?: Partial<ContentGuidelines>;
   tags?: string[];
-  features?: any;
-  settings?: any;
+  features?: Partial<CommunityFeatures>;
+  settings?: Partial<CommunitySettings>;
 }
 
 export class CommunityService {
@@ -132,33 +140,41 @@ export class CommunityService {
 
   /**
    * Create a new community
+   * Uses transaction to ensure community and owner membership are created atomically
    */
   async createCommunity(userId: string, data: CreateCommunityData): Promise<Community> {
     const slug = data.slug || this.generateSlug(data.name);
 
-    const [community] = await this.db('communities')
-      .insert({
-        name: data.name,
-        slug,
-        description: data.description,
-        welcome_message: data.welcome_message,
-        type: data.type || 'public',
-        primary_language: data.primary_language || 'en',
-        tags: data.tags || [],
-        features: data.features || {},
-        settings: data.settings || {},
-        created_by: userId,
-        primary_admin: userId,
-      })
-      .returning('*');
+    return await this.db.transaction(async (trx) => {
+      const [community] = await trx('communities')
+        .insert({
+          name: data.name,
+          slug,
+          description: data.description,
+          welcome_message: data.welcome_message,
+          type: data.type || 'public',
+          primary_language: data.primary_language || 'en',
+          tags: data.tags || [],
+          features: data.features || {},
+          settings: data.settings || {},
+          created_by: userId,
+          primary_admin: userId,
+        })
+        .returning('*');
 
-    // Automatically add creator as owner
-    await this.addMember(community.id, userId, {
-      membership_type: 'owner',
-      auto_approve: true,
+      // Automatically add creator as owner (within same transaction)
+      await trx('community_members')
+        .insert({
+          user_id: userId,
+          community_id: community.id,
+          membership_type: 'owner',
+          status: 'active',
+          approved: true,
+          approved_at: trx.fn.now(),
+        });
+
+      return community;
     });
-
-    return community;
   }
 
   /**

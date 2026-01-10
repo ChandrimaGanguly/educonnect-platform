@@ -1,12 +1,28 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { communityTrustService, TrustLevel, TrustStatus } from '../services/community-trust';
 import { auditService } from '../services/audit';
+import { CommunityService } from '../services/community.service';
+import { authenticate } from '../middleware/auth';
+
+// Singleton service
+const communityService = new CommunityService();
 
 /**
  * Community Trust Network Routes
  *
  * API endpoints for managing inter-community trust relationships
  */
+
+/**
+ * Helper to verify user is admin/owner of a community
+ */
+async function verifyUserIsCommunityAdmin(
+  userId: string,
+  communityId: string
+): Promise<boolean> {
+  const hasRole = await communityService.hasRole(communityId, userId, ['admin', 'owner']);
+  return hasRole;
+}
 
 interface CreateTrustBody {
   fromCommunityId: string;
@@ -39,6 +55,7 @@ interface SuspendTrustBody {
 export async function communityTrustRoutes(server: FastifyInstance): Promise<void> {
   // Create trust relationship
   server.post('/community-trust', {
+    preHandler: [authenticate],
     schema: {
       description: 'Initiate a trust relationship between two communities',
       tags: ['community-trust'],
@@ -69,11 +86,15 @@ export async function communityTrustRoutes(server: FastifyInstance): Promise<voi
     },
   }, async (request: FastifyRequest<{ Body: CreateTrustBody }>, reply: FastifyReply) => {
     try {
-      // TODO: Verify user is admin of fromCommunity
-      const userId = (request.user as any)?.id;
+      const { userId } = request.user!;
 
-      if (!userId) {
-        return reply.code(401).send({ error: 'Unauthorized' });
+      // Verify user is admin of the source community
+      const isAdmin = await verifyUserIsCommunityAdmin(userId, request.body.fromCommunityId);
+      if (!isAdmin) {
+        return reply.code(403).send({
+          error: 'Forbidden',
+          message: 'You must be an admin of the source community to create trust relationships',
+        });
       }
 
       const trust = await communityTrustService.createTrustRelationship({
@@ -99,6 +120,7 @@ export async function communityTrustRoutes(server: FastifyInstance): Promise<voi
 
   // Approve trust relationship
   server.post('/community-trust/:trustId/approve', {
+    preHandler: [authenticate],
     schema: {
       description: 'Approve a pending trust relationship',
       tags: ['community-trust'],
@@ -128,11 +150,7 @@ export async function communityTrustRoutes(server: FastifyInstance): Promise<voi
     Body: ApproveTrustBody;
   }>, reply: FastifyReply) => {
     try {
-      const userId = (request.user as any)?.id;
-
-      if (!userId) {
-        return reply.code(401).send({ error: 'Unauthorized' });
-      }
+      const { userId } = request.user!;
 
       const trust = await communityTrustService.approveTrustRelationship({
         trustId: request.params.trustId,
@@ -154,6 +172,7 @@ export async function communityTrustRoutes(server: FastifyInstance): Promise<voi
 
   // Update trust relationship
   server.patch('/community-trust/:trustId', {
+    preHandler: [authenticate],
     schema: {
       description: 'Update trust relationship settings',
       tags: ['community-trust'],
@@ -184,11 +203,7 @@ export async function communityTrustRoutes(server: FastifyInstance): Promise<voi
     Body: UpdateTrustBody;
   }>, reply: FastifyReply) => {
     try {
-      const userId = (request.user as any)?.id;
-
-      if (!userId) {
-        return reply.code(401).send({ error: 'Unauthorized' });
-      }
+      const { userId } = request.user!;
 
       const trust = await communityTrustService.updateTrustRelationship({
         trustId: request.params.trustId,
@@ -210,6 +225,7 @@ export async function communityTrustRoutes(server: FastifyInstance): Promise<voi
 
   // Suspend trust relationship
   server.post('/community-trust/:trustId/suspend', {
+    preHandler: [authenticate],
     schema: {
       description: 'Suspend a trust relationship temporarily',
       tags: ['community-trust'],
@@ -239,11 +255,7 @@ export async function communityTrustRoutes(server: FastifyInstance): Promise<voi
     Body: SuspendTrustBody;
   }>, reply: FastifyReply) => {
     try {
-      const userId = (request.user as any)?.id;
-
-      if (!userId) {
-        return reply.code(401).send({ error: 'Unauthorized' });
-      }
+      const { userId } = request.user!;
 
       const trust = await communityTrustService.suspendTrustRelationship(
         request.params.trustId,
@@ -265,6 +277,7 @@ export async function communityTrustRoutes(server: FastifyInstance): Promise<voi
 
   // Revoke trust relationship
   server.post('/community-trust/:trustId/revoke', {
+    preHandler: [authenticate],
     schema: {
       description: 'Revoke a trust relationship permanently',
       tags: ['community-trust'],
@@ -294,11 +307,7 @@ export async function communityTrustRoutes(server: FastifyInstance): Promise<voi
     Body: RevokeTrustBody;
   }>, reply: FastifyReply) => {
     try {
-      const userId = (request.user as any)?.id;
-
-      if (!userId) {
-        return reply.code(401).send({ error: 'Unauthorized' });
-      }
+      const { userId } = request.user!;
 
       const trust = await communityTrustService.revokeTrustRelationship({
         trustId: request.params.trustId,
@@ -320,6 +329,7 @@ export async function communityTrustRoutes(server: FastifyInstance): Promise<voi
 
   // End probation
   server.post('/community-trust/:trustId/end-probation', {
+    preHandler: [authenticate],
     schema: {
       description: 'End probationary period for a trust relationship',
       tags: ['community-trust'],
@@ -341,11 +351,7 @@ export async function communityTrustRoutes(server: FastifyInstance): Promise<voi
     Params: { trustId: string };
   }>, reply: FastifyReply) => {
     try {
-      const userId = (request.user as any)?.id;
-
-      if (!userId) {
-        return reply.code(401).send({ error: 'Unauthorized' });
-      }
+      const { userId } = request.user!;
 
       const trust = await communityTrustService.endProbation(request.params.trustId, userId);
 

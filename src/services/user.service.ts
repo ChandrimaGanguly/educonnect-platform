@@ -2,6 +2,11 @@ import { Knex } from 'knex';
 import { getDatabase } from '../database';
 import { hashPassword, verifyPassword } from '../utils/password';
 import { generateMfaSecret, generateBackupCodes } from '../utils/mfa';
+import {
+  PrivacySettings,
+  NotificationPreferences,
+  UserMetadata,
+} from '../types/domain';
 
 export interface User {
   id: string;
@@ -24,9 +29,9 @@ export interface User {
   mfa_backup_codes?: string;
   trust_score: number;
   reputation_points: number;
-  privacy_settings: any;
-  notification_preferences: any;
-  metadata?: any;
+  privacy_settings: PrivacySettings;
+  notification_preferences: NotificationPreferences;
+  metadata?: UserMetadata;
   last_login_at?: Date;
   password_changed_at?: Date;
   created_at: Date;
@@ -48,8 +53,8 @@ export interface UpdateUserData {
   locale?: string;
   timezone?: string;
   phone_number?: string;
-  privacy_settings?: any;
-  notification_preferences?: any;
+  privacy_settings?: Partial<PrivacySettings>;
+  notification_preferences?: Partial<NotificationPreferences>;
 }
 
 export class UserService {

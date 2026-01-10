@@ -1,5 +1,11 @@
 import { Knex } from 'knex';
 import { getDatabase } from '../database';
+import {
+  RoleMetadata,
+  PermissionMetadata,
+  PermissionConditions,
+  UserRoleMetadata,
+} from '../types/domain';
 
 export interface Role {
   id: string;
@@ -11,7 +17,7 @@ export interface Role {
   is_default: boolean;
   is_system_role: boolean;
   priority: number;
-  metadata?: any;
+  metadata?: RoleMetadata;
   created_at: Date;
   updated_at: Date;
 }
@@ -24,7 +30,7 @@ export interface Permission {
   resource: string;
   action: string;
   scope: 'platform' | 'community' | 'both';
-  metadata?: any;
+  metadata?: PermissionMetadata;
   created_at: Date;
   updated_at: Date;
 }
@@ -33,7 +39,7 @@ export interface RolePermission {
   id: string;
   role_id: string;
   permission_id: string;
-  conditions?: any;
+  conditions?: PermissionConditions;
   created_at: Date;
 }
 
@@ -45,7 +51,7 @@ export interface UserRole {
   assigned_at: Date;
   expires_at?: Date;
   assignment_reason?: string;
-  metadata?: any;
+  metadata?: UserRoleMetadata;
   created_at: Date;
   updated_at: Date;
 }
@@ -59,7 +65,7 @@ export interface CommunityUserRole {
   assigned_at: Date;
   expires_at?: Date;
   assignment_reason?: string;
-  metadata?: any;
+  metadata?: UserRoleMetadata;
   created_at: Date;
   updated_at: Date;
 }
@@ -247,7 +253,7 @@ export class RbacService {
   /**
    * Assign permission to role
    */
-  async assignPermissionToRole(roleId: string, permissionId: string, conditions?: any): Promise<RolePermission> {
+  async assignPermissionToRole(roleId: string, permissionId: string, conditions?: PermissionConditions): Promise<RolePermission> {
     const [rolePermission] = await this.db('role_permissions')
       .insert({
         role_id: roleId,
@@ -372,12 +378,13 @@ export class RbacService {
    * Get user's platform roles
    */
   async getUserPlatformRoles(userId: string): Promise<Role[]> {
+    const now = new Date();
     const roles = await this.db('roles')
       .join('user_roles', 'roles.id', 'user_roles.role_id')
       .where('user_roles.user_id', userId)
       .where(function() {
         this.whereNull('user_roles.expires_at')
-          .orWhere('user_roles.expires_at', '>', this.client.raw('NOW()'));
+          .orWhere('user_roles.expires_at', '>', now);
       })
       .select('roles.*');
 
@@ -388,13 +395,14 @@ export class RbacService {
    * Get user's community roles
    */
   async getUserCommunityRoles(userId: string, communityId: string): Promise<Role[]> {
+    const now = new Date();
     const roles = await this.db('roles')
       .join('community_user_roles', 'roles.id', 'community_user_roles.role_id')
       .where('community_user_roles.user_id', userId)
       .where('community_user_roles.community_id', communityId)
       .where(function() {
         this.whereNull('community_user_roles.expires_at')
-          .orWhere('community_user_roles.expires_at', '>', this.client.raw('NOW()'));
+          .orWhere('community_user_roles.expires_at', '>', now);
       })
       .select('roles.*');
 
