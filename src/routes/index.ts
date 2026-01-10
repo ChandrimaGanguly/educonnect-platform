@@ -3,6 +3,10 @@ import { healthRoutes } from './health';
 import { authRoutes } from './auth';
 import { communityTrustRoutes } from './community-trust';
 import { notificationRoutes } from './notifications';
+import { accessibilityRoutes } from './accessibility';
+import { contentReviewRoutes } from './content-review';
+import { contentAuthoringRoutes } from './content-authoring';
+import { contentRoutes } from './content';
 
 export async function registerRoutes(server: FastifyInstance): Promise<void> {
   // Health check routes
@@ -16,6 +20,18 @@ export async function registerRoutes(server: FastifyInstance): Promise<void> {
 
   // Notification routes
   await server.register(notificationRoutes, { prefix: '/api/v1' });
+
+  // Accessibility routes
+  await server.register(accessibilityRoutes, { prefix: '/api/v1' });
+
+  // Content review routes
+  await server.register(contentReviewRoutes, { prefix: '/api/v1/content-review' });
+
+  // Content authoring routes
+  await server.register(contentAuthoringRoutes, { prefix: '/api/v1/content' });
+
+  // Multi-format content routes
+  await server.register(contentRoutes, { prefix: '/api/v1/multi-format-content' });
 
   server.log.info('Routes registered successfully');
 }
