@@ -61,15 +61,28 @@ describe('SessionService', () => {
         id: 'mock-session-uuid',
         user_id: sessionData.userId,
         is_active: true,
+        session_token: 'mock_access_token',
+        refresh_token: 'mock_refresh_token',
+        expires_at: new Date(),
+        refresh_expires_at: new Date(),
+        ip_address: '127.0.0.1',
+        user_agent: 'Test Browser',
+        device_info: null,
+        created_at: new Date(),
+        updated_at: new Date(),
       };
 
-      mockQueryBuilder.returning.mockResolvedValue([mockSession]);
+      mockQueryBuilder.returning.mockResolvedValueOnce([mockSession]);
 
       const result = await sessionService.createSession(sessionData);
 
       expect(result.accessToken).toBe('mock_access_token');
       expect(result.refreshToken).toBe('mock_refresh_token');
-      expect(result.session).toEqual(mockSession);
+      expect(result.session).toMatchObject({
+        id: 'mock-session-uuid',
+        user_id: sessionData.userId,
+        is_active: true,
+      });
       expect(mockQueryBuilder.insert).toHaveBeenCalledWith(
         expect.objectContaining({
           id: 'mock-session-uuid',
@@ -239,8 +252,21 @@ describe('SessionService', () => {
 
   describe('refreshSession', () => {
     it('should generate new tokens and update session', async () => {
-      const mockSession = { id: 'session-123' };
-      mockQueryBuilder.returning.mockResolvedValue([mockSession]);
+      const mockSession = {
+        id: 'session-123',
+        user_id: 'user-123',
+        session_token: 'mock_access_token',
+        refresh_token: 'mock_refresh_token',
+        expires_at: new Date(),
+        refresh_expires_at: new Date(),
+        is_active: true,
+        ip_address: null,
+        user_agent: null,
+        device_info: null,
+        created_at: new Date(),
+        updated_at: new Date(),
+      };
+      mockQueryBuilder.returning.mockResolvedValueOnce([mockSession]);
 
       const result = await sessionService.refreshSession(
         'session-123',
