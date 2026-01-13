@@ -272,7 +272,7 @@ describe('LearningObjectiveService', () => {
     describe('getObjectives', () => {
       it('should filter by parent_id', async () => {
         mockQueryBuilder.count.mockResolvedValue([{ count: '2' }]);
-        mockQueryBuilder.offset.mockResolvedValue([]);
+        mockQueryBuilder.then = jest.fn((resolve) => resolve([]));
 
         await service.getObjectives({
           community_id: 'comm-123',
@@ -284,7 +284,7 @@ describe('LearningObjectiveService', () => {
 
       it('should return root objectives when parent_id is null', async () => {
         mockQueryBuilder.count.mockResolvedValue([{ count: '1' }]);
-        mockQueryBuilder.offset.mockResolvedValue([]);
+        mockQueryBuilder.then = jest.fn((resolve) => resolve([]));
 
         await service.getObjectives({
           community_id: 'comm-123',
@@ -296,7 +296,7 @@ describe('LearningObjectiveService', () => {
 
       it('should filter by cognitive level', async () => {
         mockQueryBuilder.count.mockResolvedValue([{ count: '1' }]);
-        mockQueryBuilder.offset.mockResolvedValue([]);
+        mockQueryBuilder.then = jest.fn((resolve) => resolve([]));
 
         await service.getObjectives({
           community_id: 'comm-123',
@@ -308,7 +308,7 @@ describe('LearningObjectiveService', () => {
 
       it('should search in title and description', async () => {
         mockQueryBuilder.count.mockResolvedValue([{ count: '1' }]);
-        mockQueryBuilder.offset.mockResolvedValue([]);
+        mockQueryBuilder.then = jest.fn((resolve) => resolve([]));
 
         await service.getObjectives({
           community_id: 'comm-123',
@@ -429,9 +429,8 @@ describe('LearningObjectiveService', () => {
 
     describe('bulkLinkObjectives', () => {
       it('should link multiple objectives', async () => {
-        mockQueryBuilder.select.mockResolvedValue([]);
+        mockQueryBuilder.then = jest.fn((resolve) => resolve([]));
         mockQueryBuilder.returning.mockResolvedValue([]);
-        mockQueryBuilder.orderBy.mockResolvedValue([]);
 
         await service.bulkLinkObjectives(
           'user-123',
@@ -444,8 +443,10 @@ describe('LearningObjectiveService', () => {
       });
 
       it('should skip already linked objectives', async () => {
-        mockQueryBuilder.select.mockResolvedValue([{ objective_id: 'obj-1' }]);
-        mockQueryBuilder.orderBy.mockResolvedValue([]);
+        let thenCallCount = 0;
+        mockQueryBuilder.then = jest.fn((resolve) => {
+          return resolve(thenCallCount++ === 0 ? [{ objective_id: 'obj-1' }] : []);
+        });
 
         await service.bulkLinkObjectives(
           'user-123',
