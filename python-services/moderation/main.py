@@ -24,7 +24,7 @@ app = FastAPI(
     title="EduConnect Moderation Service",
     description="Content safety and moderation service",
     version="0.1.0",
-    debug=settings.debug
+    debug=settings.debug,
 )
 
 

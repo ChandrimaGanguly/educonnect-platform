@@ -24,7 +24,7 @@ app = FastAPI(
     title="EduConnect Matching Service",
     description="ML-based mentor-learner matching service",
     version="0.1.0",
-    debug=settings.debug
+    debug=settings.debug,
 )
 
 

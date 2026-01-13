@@ -70,7 +70,7 @@ def sample_user_data():
     return {
         "email": "test@example.com",
         "username": "testuser",
-        "full_name": "Test User"
+        "full_name": "Test User",
     }
 
 
@@ -81,5 +81,5 @@ def sample_community_data():
         "name": "Test Community",
         "slug": "test-community",
         "description": "A test community for unit tests",
-        "type": "public"
+        "type": "public",
     }

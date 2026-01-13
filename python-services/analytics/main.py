@@ -24,7 +24,7 @@ app = FastAPI(
     title="EduConnect Analytics Service",
     description="Data processing and analytics service",
     version="0.1.0",
-    debug=settings.debug
+    debug=settings.debug,
 )
 
 

@@ -23,7 +23,7 @@ app = FastAPI(
     title="EduConnect Checkpoint Service",
     description="Assessment generation and scoring service",
     version="0.1.0",
-    debug=settings.debug
+    debug=settings.debug,
 )
 
 
