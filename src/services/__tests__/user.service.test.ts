@@ -39,7 +39,7 @@ describe('UserService', () => {
       orWhere: jest.fn().mockReturnThis(),
       first: jest.fn().mockResolvedValue(null),
       returning: jest.fn().mockResolvedValue([]),
-      count: jest.fn().mockResolvedValue([{ count: 0 }]),
+      count: jest.fn().mockReturnThis(),
     };
 
     // Setup mock database
