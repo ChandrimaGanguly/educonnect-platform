@@ -135,9 +135,7 @@ describe('ContentAuthoringService', () => {
     describe('getUserDrafts', () => {
       it('should return user drafts with pagination', async () => {
         mockQueryBuilder.count.mockResolvedValue([{ count: '5' }]);
-        mockQueryBuilder.orderBy.mockReturnThis();
-        mockQueryBuilder.limit.mockReturnThis();
-        mockQueryBuilder.offset.mockResolvedValue([mockDraftRow]);
+        mockQueryBuilder.then = jest.fn((resolve) => resolve([mockDraftRow]));
 
         const result = await service.getUserDrafts('user-123', 'comm-123', {
           limit: 20,
@@ -150,7 +148,7 @@ describe('ContentAuthoringService', () => {
 
       it('should filter by status', async () => {
         mockQueryBuilder.count.mockResolvedValue([{ count: '2' }]);
-        mockQueryBuilder.offset.mockResolvedValue([mockDraftRow]);
+        mockQueryBuilder.then = jest.fn((resolve) => resolve([mockDraftRow]));
 
         await service.getUserDrafts('user-123', 'comm-123', {
           status: 'editing',
@@ -292,7 +290,7 @@ describe('ContentAuthoringService', () => {
 
     describe('getDraftBlocks', () => {
       it('should return blocks ordered by order_index', async () => {
-        mockQueryBuilder.orderBy.mockResolvedValue([mockBlockRow]);
+        mockQueryBuilder.then = jest.fn((resolve) => resolve([mockBlockRow]));
 
         const result = await service.getDraftBlocks('draft-123');
 
@@ -368,7 +366,7 @@ describe('ContentAuthoringService', () => {
     describe('getVersionHistory', () => {
       it('should return version history', async () => {
         mockQueryBuilder.count.mockResolvedValue([{ count: '3' }]);
-        mockQueryBuilder.offset.mockResolvedValue([mockVersionRow]);
+        mockQueryBuilder.then = jest.fn((resolve) => resolve([mockVersionRow]));
 
         const result = await service.getVersionHistory('lesson', 'lesson-123');
 
