@@ -169,7 +169,6 @@ export async function contentRoutes(fastify: FastifyInstance): Promise<void> {
       if (!request.user) {
         return reply.status(401).send({ error: 'Authentication required' });
       }
-      return;
     },
     handler: async (request: FastifyRequest<{ Body: CreateContentBody }>, reply: FastifyReply) => {
       const userId = request.user?.userId;
@@ -274,7 +273,6 @@ export async function contentRoutes(fastify: FastifyInstance): Promise<void> {
       if (!request.user) {
         return reply.status(401).send({ error: 'Authentication required' });
       }
-      return;
     },
     handler: async (request, reply) => {
       const userId = request.user?.userId;
@@ -302,7 +300,6 @@ export async function contentRoutes(fastify: FastifyInstance): Promise<void> {
       if (!request.user) {
         return reply.status(401).send({ error: 'Authentication required' });
       }
-      return;
     },
     handler: async (request, reply) => {
       const userId = request.user?.userId;
@@ -325,7 +322,6 @@ export async function contentRoutes(fastify: FastifyInstance): Promise<void> {
       if (!request.user) {
         return reply.status(401).send({ error: 'Authentication required' });
       }
-      return;
     },
     handler: async (request, reply) => {
       const userId = request.user?.userId;
@@ -348,7 +344,6 @@ export async function contentRoutes(fastify: FastifyInstance): Promise<void> {
       if (!request.user) {
         return reply.status(401).send({ error: 'Authentication required' });
       }
-      return;
     },
     handler: async (request, reply) => {
       const { id } = request.params;
@@ -415,7 +410,6 @@ export async function contentRoutes(fastify: FastifyInstance): Promise<void> {
       if (!request.user) {
         return reply.status(401).send({ error: 'Authentication required' });
       }
-      return;
     },
     handler: async (request, reply) => {
       const userId = request.user?.userId;
@@ -541,7 +535,6 @@ export async function contentRoutes(fastify: FastifyInstance): Promise<void> {
       if (!request.user) {
         return reply.status(401).send({ error: 'Authentication required' });
       }
-      return;
     },
     handler: async (
       request: FastifyRequest<{
@@ -615,7 +608,6 @@ export async function contentRoutes(fastify: FastifyInstance): Promise<void> {
       if (!request.user) {
         return reply.status(401).send({ error: 'Authentication required' });
       }
-      return;
     },
     handler: async (request, reply) => {
       const userId = request.user?.userId;
@@ -693,7 +685,6 @@ export async function contentRoutes(fastify: FastifyInstance): Promise<void> {
       if (!request.user) {
         return reply.status(401).send({ error: 'Authentication required' });
       }
-      return;
     },
     handler: async (request, reply) => {
       const userId = request.user?.userId;
@@ -887,7 +878,6 @@ export async function contentRoutes(fastify: FastifyInstance): Promise<void> {
       if (!request.user) {
         return reply.status(401).send({ error: 'Authentication required' });
       }
-      return;
     },
     handler: async (request, reply) => {
       const userId = request.user?.userId;
@@ -922,7 +912,6 @@ export async function contentRoutes(fastify: FastifyInstance): Promise<void> {
       if (!request.user) {
         return reply.status(401).send({ error: 'Authentication required' });
       }
-      return;
     },
     handler: async (request, reply) => {
       const userId = request.user?.userId;
