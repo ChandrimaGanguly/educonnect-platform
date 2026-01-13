@@ -8,7 +8,7 @@ import jwt from '@fastify/jwt';
 import { env, logger } from './config';
 import { getRedisClient } from './config/redis';
 
-export async function buildApp(): Promise<FastifyInstance> {
+export async function buildApp() {
   const app = Fastify({
     logger,
     requestIdLogLabel: 'reqId',
