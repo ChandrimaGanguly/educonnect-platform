@@ -43,6 +43,7 @@ describe('AccessibilityService', () => {
       increment: jest.fn().mockReturnThis(),
       count: jest.fn().mockReturnThis(),
       select: jest.fn().mockReturnThis(),
+      then: jest.fn((resolve) => resolve([])), // Make it thenable
     };
 
     // Create mock database
@@ -512,11 +513,16 @@ describe('AccessibilityService', () => {
       });
 
       it('should pass for images with alt text', async () => {
+        // Mock for check creation (insert)
+        mockQueryBuilder.returning.mockResolvedValueOnce([mockCheckRow]);
+        mockQueryBuilder.first.mockResolvedValue(null);
+        // Mock for check update (updateCheckStatus)
         mockQueryBuilder.returning.mockResolvedValueOnce([{
           ...mockCheckRow,
           status: 'passed',
+          compliance_score: 100,
+          issues_found: 0,
         }]);
-        mockQueryBuilder.first.mockResolvedValue(null);
 
         const html = '<html><body><img src="test.jpg" alt="A test image"></body></html>';
 
@@ -812,9 +818,9 @@ describe('AccessibilityService', () => {
   describe('Compliance Reports', () => {
     describe('generateComplianceReport', () => {
       it('should generate report with full compliance', async () => {
-        // Mock checks query
-        mockQueryBuilder.orderBy.mockResolvedValueOnce([
-          {
+        const queryResults = [
+          // checks query (getChecksForContent)
+          [{
             id: 'check-1',
             lesson_id: 'lesson-123',
             check_type: 'alt_text',
@@ -827,16 +833,21 @@ describe('AccessibilityService', () => {
             is_automated: true,
             created_at: new Date(),
             updated_at: new Date(),
-          },
-        ]);
-        // Mock issues queries
-        mockQueryBuilder.orderBy.mockResolvedValueOnce([]);
-        // Mock alt text
-        mockQueryBuilder.orderBy.mockResolvedValueOnce([{ id: 'alt-1' }]);
-        // Mock captions
-        mockQueryBuilder.orderBy.mockResolvedValueOnce([{ id: 'cap-1' }]);
-        // Mock transcripts
-        mockQueryBuilder.orderBy.mockResolvedValueOnce([{ id: 'trans-1' }]);
+          }],
+          // issues query (getIssuesForCheck)
+          [],
+          // alt text query
+          [{ id: 'alt-1' }],
+          // captions query
+          [{ id: 'cap-1' }],
+          // transcripts query
+          [{ id: 'trans-1' }],
+        ];
+
+        let callCount = 0;
+        mockQueryBuilder.then = jest.fn((resolve) => {
+          return resolve(queryResults[callCount++] || []);
+        });
         mockQueryBuilder.first.mockResolvedValue(null);
 
         const report = await service.generateComplianceReport({
