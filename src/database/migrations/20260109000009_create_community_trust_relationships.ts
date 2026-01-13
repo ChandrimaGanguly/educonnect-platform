@@ -19,7 +19,7 @@ export async function up(knex: Knex): Promise<void> {
     table.uuid('approved_by').nullable().references('id').inTable('users').onDelete('RESTRICT');
 
     // Security and compliance
-    table.boolean('security_compliance_verified').notNullable().defaultTo(false');
+    table.boolean('security_compliance_verified').notNullable().defaultTo(false);
     table.timestamp('compliance_verified_at').nullable();
     table.uuid('compliance_verified_by').nullable().references('id').inTable('users').onDelete('SET NULL');
 

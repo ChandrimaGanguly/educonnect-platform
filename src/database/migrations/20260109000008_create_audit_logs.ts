@@ -11,8 +11,8 @@ export async function up(knex: Knex): Promise<void> {
     table.string('actor_user_agent', 500).nullable();
 
     // Action details
-    table.string('action', 100').notNullable(); // create, update, delete, login, etc.
-    table.string('entity_type', 100').notNullable(); // user, community, content, etc.
+    table.string('action', 100).notNullable(); // create, update, delete, login, etc.
+    table.string('entity_type', 100).notNullable(); // user, community, content, etc.
     table.uuid('entity_id').nullable();
     table.text('entity_name').nullable(); // Human-readable name
 
