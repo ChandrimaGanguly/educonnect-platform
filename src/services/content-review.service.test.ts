@@ -670,7 +670,8 @@ describe('ContentReviewService', () => {
         mockQueryBuilder.first
           .mockResolvedValueOnce({ ...testReview, status: 'in_progress' })
           .mockResolvedValueOnce(testReviewer)
-          .mockResolvedValueOnce(testSubmission);
+          .mockResolvedValueOnce(testSubmission)
+          .mockResolvedValueOnce(testSubmission); // For getSubmissionById in updateSubmissionStatus
         mockQueryBuilder.returning
           .mockResolvedValueOnce([{
             ...testReview,
@@ -1256,23 +1257,21 @@ describe('ContentReviewService', () => {
   describe('Automated Checks', () => {
     describe('runAutomatedChecks', () => {
       it('should run both plagiarism and accessibility checks', async () => {
-        // First mock for createSubmission getSubmissionById
+        // Mock for getSubmissionById and getPlagiarismCheck/getAccessibilityCheck calls
         mockQueryBuilder.first
           .mockResolvedValueOnce(testSubmission)
           .mockResolvedValueOnce({ id: 'plag-check', submission_id: testSubmissionId })
           .mockResolvedValueOnce(testSubmission)
           .mockResolvedValueOnce({ id: 'acc-check', submission_id: testSubmissionId })
-          .mockResolvedValueOnce(testSubmission);
+          .mockResolvedValueOnce(testSubmission)
+          .mockResolvedValueOnce({ id: 'plag-check', overall_similarity_score: 10 }) // For orderBy().first()
+          .mockResolvedValueOnce({ id: 'acc-check', passed: true }); // For orderBy().first()
 
         mockQueryBuilder.returning
           .mockResolvedValueOnce([{ id: 'plag-check', status: 'pending' }])
           .mockResolvedValueOnce([{ id: 'acc-check', status: 'pending' }])
           .mockResolvedValueOnce([{ id: 'plag-check', status: 'completed', overall_similarity_score: 10 }])
           .mockResolvedValueOnce([{ id: 'acc-check', status: 'completed', passed: true }]);
-
-        mockQueryBuilder.orderBy
-          .mockResolvedValueOnce({ id: 'plag-check', overall_similarity_score: 10 })
-          .mockResolvedValueOnce({ id: 'acc-check', passed: true });
 
         const result = await service.runAutomatedChecks(testSubmissionId);
 
