@@ -147,10 +147,10 @@ describe('ContentReviewService', () => {
       whereRaw: jest.fn().mockReturnThis(),
       andWhere: jest.fn().mockReturnThis(),
       orWhere: jest.fn().mockReturnThis(),
-      first: jest.fn(),
+      first: jest.fn().mockResolvedValue(null),
       select: jest.fn().mockReturnThis(),
-      returning: jest.fn(),
-      count: jest.fn(),
+      returning: jest.fn().mockResolvedValue([]),
+      count: jest.fn().mockResolvedValue([{ count: 0 }]),
       increment: jest.fn().mockReturnThis(),
       decrement: jest.fn().mockReturnThis(),
       limit: jest.fn().mockReturnThis(),
@@ -169,6 +169,7 @@ describe('ContentReviewService', () => {
       now: jest.fn().mockReturnValue('NOW()'),
     } as any;
     mockDb.raw = jest.fn().mockResolvedValue([]) as any;
+    mockDb.transaction = jest.fn(async (callback) => await callback(mockDb)) as any;
 
     (getDatabase as jest.Mock).mockReturnValue(mockDb);
 
