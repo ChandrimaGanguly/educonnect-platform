@@ -47,7 +47,9 @@ describe('AccessibilityService', () => {
 
     // Create mock database
     mockDb = jest.fn(() => mockQueryBuilder);
-    mockDb.raw = jest.fn();
+    mockDb.raw = jest.fn((sql) => ({ toSQL: () => ({ sql }) }));
+    mockDb.fn = { now: () => 'NOW()' };
+    mockDb.transaction = jest.fn().mockImplementation(async (fn) => fn(mockDb));
 
     (getDatabase as jest.Mock).mockReturnValue(mockDb);
 
