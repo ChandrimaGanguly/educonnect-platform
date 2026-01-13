@@ -28,6 +28,7 @@ describe('MultiFormatContentService', () => {
   let mockDb: Record<string, jest.Mock> & {
     fn?: { now: () => string };
     transaction?: jest.Mock;
+    raw?: jest.Mock;
   };
 
   const mockUserId = '123e4567-e89b-12d3-a456-426614174000';
@@ -55,6 +56,7 @@ describe('MultiFormatContentService', () => {
     mockDb = createChainableMock();
     mockDb.fn = { now: () => 'NOW()' };
     mockDb.transaction = jest.fn().mockImplementation(async (fn) => fn(mockDb));
+    mockDb.raw = jest.fn((sql) => ({ toSQL: () => ({ sql }) }));
 
     // Make getDatabase return a function that returns the mock
     (getDatabase as jest.Mock).mockReturnValue((table: string) => {
@@ -835,6 +837,7 @@ describe('ContentTranscodingService', () => {
   let mockDb: Record<string, jest.Mock> & {
     fn?: { now: () => string };
     transaction?: jest.Mock;
+    raw?: jest.Mock;
   };
 
   beforeEach(() => {
@@ -856,6 +859,8 @@ describe('ContentTranscodingService', () => {
 
     mockDb = createChainableMock();
     mockDb.fn = { now: () => 'NOW()' };
+    mockDb.transaction = jest.fn().mockImplementation(async (fn) => fn(mockDb));
+    mockDb.raw = jest.fn((sql) => ({ toSQL: () => ({ sql }) }));
 
     (getDatabase as jest.Mock).mockReturnValue((table: string) => {
       return mockDb;
