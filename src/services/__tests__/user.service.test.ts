@@ -37,14 +37,16 @@ describe('UserService', () => {
       update: jest.fn().mockReturnThis(),
       where: jest.fn().mockReturnThis(),
       orWhere: jest.fn().mockReturnThis(),
-      first: jest.fn(),
-      returning: jest.fn(),
-      count: jest.fn().mockReturnThis(),
+      first: jest.fn().mockResolvedValue(null),
+      returning: jest.fn().mockResolvedValue([]),
+      count: jest.fn().mockResolvedValue([{ count: 0 }]),
     };
 
     // Setup mock database
     mockDb = jest.fn(() => mockQueryBuilder);
     mockDb.fn = { now: jest.fn(() => 'NOW()') };
+    mockDb.raw = jest.fn((sql) => ({ toSQL: () => ({ sql }) }));
+    mockDb.transaction = jest.fn(async (callback) => await callback(mockDb));
     (getDatabase as jest.Mock).mockReturnValue(mockDb);
 
     userService = new UserService();

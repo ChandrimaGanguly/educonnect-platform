@@ -34,13 +34,15 @@ describe('SessionService', () => {
       update: jest.fn().mockReturnThis(),
       where: jest.fn().mockReturnThis(),
       whereNot: jest.fn().mockReturnThis(),
-      first: jest.fn(),
-      returning: jest.fn(),
+      first: jest.fn().mockResolvedValue(null),
+      returning: jest.fn().mockResolvedValue([]),
       orderBy: jest.fn().mockReturnThis(),
     };
 
     mockDb = jest.fn(() => mockQueryBuilder);
     mockDb.fn = { now: jest.fn(() => 'NOW()') };
+    mockDb.raw = jest.fn((sql) => ({ toSQL: () => ({ sql }) }));
+    mockDb.transaction = jest.fn(async (callback) => await callback(mockDb));
     (getDatabase as jest.Mock).mockReturnValue(mockDb);
 
     sessionService = new SessionService();
