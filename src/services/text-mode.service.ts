@@ -663,7 +663,17 @@ export class TextModeService {
         this.db.raw('COALESCE(SUM(audio_bytes_saved), 0)::bigint as audio_saved'),
         this.db.raw('COALESCE(SUM(image_bytes_saved), 0)::bigint as image_saved'),
         this.db.raw('COALESCE(SUM(interactive_bytes_saved), 0)::bigint as interactive_saved')
-      );
+      ) as Array<{
+        total_consumed: number;
+        total_saved: number;
+        items_viewed: number;
+        selective_loads: number;
+        time_seconds: number;
+        video_saved: number;
+        audio_saved: number;
+        image_saved: number;
+        interactive_saved: number;
+      }>;
 
     const totalConsumed = Number(stats?.total_consumed || 0);
     const totalSaved = Number(stats?.total_saved || 0);
@@ -935,14 +945,14 @@ export class TextModeService {
         this.db.raw('COUNT(*) as total_users'),
         this.db.raw('COUNT(*) FILTER (WHERE enabled = true) as active_users'),
         this.db.raw('COALESCE(SUM(data_saved_bytes), 0)::bigint as total_saved')
-      );
+      ) as Array<{ total_users: number; active_users: number; total_saved: number }>;
 
     const [altStats] = await this.db('content_text_alternatives')
       .select(
         this.db.raw('COUNT(*) as total_alternatives'),
         this.db.raw('COUNT(*) FILTER (WHERE is_verified = true) as verified'),
         this.db.raw('COALESCE(AVG(size_reduction_percentage), 0) as avg_reduction')
-      );
+      ) as Array<{ total_alternatives: number; verified: number; avg_reduction: number }>;
 
     return {
       total_users_with_text_mode: Number(userStats?.total_users || 0),

@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { config } from '../config';
+import { env } from '../config';
 import { nanoid } from 'nanoid';
 
 export interface JwtPayload {
@@ -20,8 +20,8 @@ export function generateAccessToken(userId: string, email: string, sessionId: st
     type: 'access',
   };
 
-  return jwt.sign(payload, config.jwt.secret, {
-    expiresIn: config.jwt.accessTokenExpiry,
+  return jwt.sign(payload, env.JWT_SECRET, {
+    expiresIn: env.JWT_EXPIRES_IN,
   });
 }
 
@@ -36,8 +36,8 @@ export function generateRefreshToken(userId: string, email: string, sessionId: s
     type: 'refresh',
   };
 
-  return jwt.sign(payload, config.jwt.secret, {
-    expiresIn: config.jwt.refreshTokenExpiry,
+  return jwt.sign(payload, env.JWT_SECRET, {
+    expiresIn: env.JWT_REFRESH_EXPIRES_IN,
   });
 }
 
@@ -45,7 +45,7 @@ export function generateRefreshToken(userId: string, email: string, sessionId: s
  * Verify and decode token
  */
 export function verifyToken(token: string): JwtPayload {
-  return jwt.verify(token, config.jwt.secret) as JwtPayload;
+  return jwt.verify(token, env.JWT_SECRET) as JwtPayload;
 }
 
 /**

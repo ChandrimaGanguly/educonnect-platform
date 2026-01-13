@@ -111,7 +111,7 @@ export class SyncEngineService {
 
     // Update device sync state
     await this.updateDeviceSyncState(params.userId, params.deviceId, {
-      pending_items: this.db.raw('pending_items + 1'),
+      pending_items: this.db.raw('pending_items + 1') as unknown as number,
     });
 
     return this.deserializeSyncQueueItem(item);
@@ -169,8 +169,8 @@ export class SyncEngineService {
             });
 
           await this.updateDeviceSyncState(item.user_id, item.device_id, {
-            pending_items: this.db.raw('GREATEST(pending_items - 1, 0)'),
-            last_sync_at: this.db.fn.now(),
+            pending_items: this.db.raw('GREATEST(pending_items - 1, 0)') as unknown as number,
+            last_sync_at: this.db.fn.now() as unknown as Date,
           });
         } else {
           failed++;
@@ -545,7 +545,7 @@ export class SyncEngineService {
     }
 
     const result = await query.first();
-    return parseInt(result?.count || '0', 10);
+    return parseInt(String(result?.count || 0), 10);
   }
 
   /**

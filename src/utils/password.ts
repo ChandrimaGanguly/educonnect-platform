@@ -1,11 +1,11 @@
 import bcrypt from 'bcrypt';
-import { config } from '../config';
+import { env } from '../config';
 
 /**
  * Hash a password using bcrypt
  */
 export async function hashPassword(password: string): Promise<string> {
-  return bcrypt.hash(password, config.security.bcryptRounds);
+  return bcrypt.hash(password, env.BCRYPT_ROUNDS);
 }
 
 /**

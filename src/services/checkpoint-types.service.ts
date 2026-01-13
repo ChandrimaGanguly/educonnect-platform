@@ -967,7 +967,7 @@ export class CheckpointTypesService {
       .where('cq.is_bonus', false)
       .select(this.db.raw('SUM(COALESCE(cq.points_override, aq.points)) as total_points'));
 
-    const totalPoints = (result[0] as { total_points: number })?.total_points || 0;
+    const totalPoints = (result[0] as unknown as { total_points: number })?.total_points || 0;
 
     await this.db('checkpoints')
       .where({ id: checkpointId })
