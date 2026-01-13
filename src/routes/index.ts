@@ -7,6 +7,8 @@ import { accessibilityRoutes } from './accessibility';
 import { contentReviewRoutes } from './content-review';
 import { contentAuthoringRoutes } from './content-authoring';
 import { contentRoutes } from './content';
+import { checkpointScoringRoutes } from './checkpoint-scoring';
+import { textModeRoutes } from './text-mode';
 
 export async function registerRoutes(server: FastifyInstance): Promise<void> {
   // Health check routes
@@ -32,6 +34,12 @@ export async function registerRoutes(server: FastifyInstance): Promise<void> {
 
   // Multi-format content routes
   await server.register(contentRoutes, { prefix: '/api/v1/multi-format-content' });
+
+  // Checkpoint scoring routes
+  await server.register(checkpointScoringRoutes, { prefix: '/api/v1/checkpoints' });
+
+  // Text-first content mode routes
+  await server.register(textModeRoutes, { prefix: '/api/v1' });
 
   server.log.info('Routes registered successfully');
 }
