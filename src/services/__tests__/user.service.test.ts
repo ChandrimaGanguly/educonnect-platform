@@ -18,8 +18,8 @@ jest.mock('../../utils/password', () => ({
 
 // Mock MFA utils
 jest.mock('../../utils/mfa', () => ({
-  generateMfaSecret: jest.fn(() => 'MOCK_MFA_SECRET'),
-  generateBackupCodes: jest.fn(() => ['CODE1-CODE2', 'CODE3-CODE4']),
+  generateMfaSecret: () => 'MOCK_MFA_SECRET',
+  generateBackupCodes: () => ['CODE1-CODE2', 'CODE3-CODE4'],
 }));
 
 describe('UserService', () => {
