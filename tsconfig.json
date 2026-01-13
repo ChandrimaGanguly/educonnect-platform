@@ -23,13 +23,5 @@
     "types": ["node", "jest"]
   },
   "include": ["src/**/*", "knexfile.ts"],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "**/*.test.ts",
-    "**/*.spec.ts",
-    "src/routes/content-authoring.ts",
-    "src/routes/content-review.ts",
-    "src/routes/admin/cleanup.ts"
-  ]
+  "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"]
 }
