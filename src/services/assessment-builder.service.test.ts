@@ -575,7 +575,7 @@ describe('AssessmentBuilderService', () => {
     describe('getQuestions', () => {
       it('should filter by difficulty', async () => {
         mockQueryBuilder.count.mockResolvedValue([{ count: '2' }]);
-        mockQueryBuilder.offset.mockResolvedValue([]);
+        mockQueryBuilder.then = jest.fn((resolve) => resolve([]));
 
         await service.getQuestions({
           community_id: 'comm-123',
@@ -587,7 +587,7 @@ describe('AssessmentBuilderService', () => {
 
       it('should filter by tags', async () => {
         mockQueryBuilder.count.mockResolvedValue([{ count: '1' }]);
-        mockQueryBuilder.offset.mockResolvedValue([]);
+        mockQueryBuilder.then = jest.fn((resolve) => resolve([]));
 
         await service.getQuestions({
           community_id: 'comm-123',
