@@ -178,7 +178,7 @@ limits==3.8.0  # Rate limiting utilities
 # ============================================================================
 # Feature Flags & A/B Testing
 # ============================================================================
-unleash-client==5.11.1  # Feature toggle client
+UnleashClient==6.4.1  # Feature toggle client (official SDK)
 split-sdk==2.1.0  # Split.io SDK for A/B testing
 
 # ============================================================================
