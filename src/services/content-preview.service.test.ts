@@ -37,6 +37,7 @@ describe('ContentPreviewService', () => {
       offset: jest.fn().mockReturnThis(),
       count: jest.fn().mockReturnThis(),
       select: jest.fn().mockReturnThis(),
+      then: jest.fn((resolve) => resolve([])),
     };
 
     mockDb = jest.fn(() => mockQueryBuilder);

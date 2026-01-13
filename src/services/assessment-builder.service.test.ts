@@ -37,6 +37,7 @@ describe('AssessmentBuilderService', () => {
       offset: jest.fn().mockReturnThis(),
       count: jest.fn().mockReturnThis(),
       clone: jest.fn().mockReturnThis(),
+      then: jest.fn((resolve) => resolve([])),
     };
 
     mockDb = jest.fn(() => mockQueryBuilder);

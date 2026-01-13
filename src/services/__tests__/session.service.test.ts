@@ -12,13 +12,13 @@ jest.mock('../../database', () => ({
 
 // Mock JWT utils
 jest.mock('../../utils/jwt', () => ({
-  generateAccessToken: jest.fn(() => 'mock_access_token'),
-  generateRefreshToken: jest.fn(() => 'mock_refresh_token'),
+  generateAccessToken: () => 'mock_access_token',
+  generateRefreshToken: () => 'mock_refresh_token',
 }));
 
 // Mock uuid
 jest.mock('uuid', () => ({
-  v4: jest.fn(() => 'mock-session-uuid'),
+  v4: () => 'mock-session-uuid',
 }));
 
 describe('SessionService', () => {
@@ -70,6 +70,7 @@ describe('SessionService', () => {
         device_info: null,
         created_at: new Date(),
         updated_at: new Date(),
+        last_activity_at: new Date(),
       };
 
       mockQueryBuilder.returning.mockResolvedValueOnce([mockSession]);
@@ -265,6 +266,7 @@ describe('SessionService', () => {
         device_info: null,
         created_at: new Date(),
         updated_at: new Date(),
+        last_activity_at: new Date(),
       };
       mockQueryBuilder.returning.mockResolvedValueOnce([mockSession]);
 

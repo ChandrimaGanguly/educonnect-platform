@@ -38,6 +38,7 @@ describe('ContentAuthoringService', () => {
       count: jest.fn().mockReturnThis(),
       clone: jest.fn().mockReturnThis(),
       raw: jest.fn(),
+      then: jest.fn((resolve) => resolve([])),
     };
 
     mockDb = jest.fn(() => mockQueryBuilder);
