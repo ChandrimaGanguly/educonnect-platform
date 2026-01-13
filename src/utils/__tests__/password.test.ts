@@ -1,6 +1,14 @@
 /**
  * Password Utility Tests
  */
+
+// Mock config before importing password
+jest.mock('../../config', () => ({
+  env: {
+    BCRYPT_ROUNDS: 10,
+  },
+}));
+
 import { hashPassword, verifyPassword } from '../password';
 
 describe('Password Utilities', () => {
