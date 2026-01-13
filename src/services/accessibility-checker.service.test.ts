@@ -36,6 +36,7 @@ describe('AccessibilityCheckerService', () => {
       offset: jest.fn().mockReturnThis(),
       count: jest.fn().mockReturnThis(),
       clone: jest.fn().mockReturnThis(),
+      then: jest.fn((resolve) => resolve([])),
     };
 
     mockDb = jest.fn(() => mockQueryBuilder);
@@ -56,11 +57,13 @@ describe('AccessibilityCheckerService', () => {
     };
 
     it('should check draft with no issues', async () => {
+      let thenCallCount = 0;
       mockQueryBuilder.first.mockResolvedValue(mockDraft);
       mockQueryBuilder.orderBy.mockResolvedValue([]); // blocks
-      mockQueryBuilder.where
-        .mockResolvedValueOnce([]) // embeds
-        .mockResolvedValueOnce([]); // questions
+      mockQueryBuilder.then = jest.fn((resolve) => {
+        const results = [[], [], []]; // embeds, questions, and default
+        return resolve(results[thenCallCount++] || []);
+      });
       mockQueryBuilder.returning.mockResolvedValue([{
         id: 'check-123',
         draft_id: 'draft-123',
@@ -103,9 +106,6 @@ describe('AccessibilityCheckerService', () => {
           order_index: 0,
         },
       ]);
-      mockQueryBuilder.where
-        .mockResolvedValueOnce([])
-        .mockResolvedValueOnce([]);
       mockQueryBuilder.returning.mockResolvedValue([{
         id: 'check-123',
         draft_id: 'draft-123',
@@ -146,9 +146,6 @@ describe('AccessibilityCheckerService', () => {
           order_index: 0,
         },
       ]);
-      mockQueryBuilder.where
-        .mockResolvedValueOnce([])
-        .mockResolvedValueOnce([]);
       mockQueryBuilder.returning.mockResolvedValue([{
         id: 'check-123',
         draft_id: 'draft-123',
@@ -187,9 +184,6 @@ describe('AccessibilityCheckerService', () => {
           order_index: 0,
         },
       ]);
-      mockQueryBuilder.where
-        .mockResolvedValueOnce([])
-        .mockResolvedValueOnce([]);
       mockQueryBuilder.returning.mockResolvedValue([{
         id: 'check-123',
         draft_id: 'draft-123',
@@ -232,9 +226,6 @@ describe('AccessibilityCheckerService', () => {
           order_index: 1,
         },
       ]);
-      mockQueryBuilder.where
-        .mockResolvedValueOnce([])
-        .mockResolvedValueOnce([]);
       mockQueryBuilder.returning.mockResolvedValue([{
         id: 'check-123',
         draft_id: 'draft-123',
@@ -271,9 +262,6 @@ describe('AccessibilityCheckerService', () => {
           order_index: 0,
         },
       ]);
-      mockQueryBuilder.where
-        .mockResolvedValueOnce([])
-        .mockResolvedValueOnce([]);
       mockQueryBuilder.returning.mockResolvedValue([{
         id: 'check-123',
         draft_id: 'draft-123',
@@ -360,9 +348,6 @@ describe('AccessibilityCheckerService', () => {
           order_index: 0,
         },
       ]);
-      mockQueryBuilder.where
-        .mockResolvedValueOnce([])
-        .mockResolvedValueOnce([]);
       mockQueryBuilder.returning.mockResolvedValue([{
         id: 'check-123',
         overall_score: 100,
@@ -396,9 +381,6 @@ describe('AccessibilityCheckerService', () => {
           order_index: 0,
         },
       ]);
-      mockQueryBuilder.where
-        .mockResolvedValueOnce([])
-        .mockResolvedValueOnce([]);
       mockQueryBuilder.returning.mockResolvedValue([{
         id: 'check-123',
         overall_score: 95,
@@ -440,9 +422,6 @@ describe('AccessibilityCheckerService', () => {
           order_index: 0,
         },
       ]);
-      mockQueryBuilder.where
-        .mockResolvedValueOnce([])
-        .mockResolvedValueOnce([]);
       mockQueryBuilder.returning.mockResolvedValue([{
         id: 'check-123',
         overall_score: 85,
@@ -486,9 +465,6 @@ describe('AccessibilityCheckerService', () => {
           order_index: 0,
         },
       ]);
-      mockQueryBuilder.where
-        .mockResolvedValueOnce([])
-        .mockResolvedValueOnce([]);
       mockQueryBuilder.returning.mockResolvedValue([{
         id: 'check-123',
         overall_score: 100,
@@ -527,9 +503,6 @@ describe('AccessibilityCheckerService', () => {
           order_index: 0,
         },
       ]);
-      mockQueryBuilder.where
-        .mockResolvedValueOnce([])
-        .mockResolvedValueOnce([]);
       mockQueryBuilder.returning.mockResolvedValue([{
         id: 'check-123',
         overall_score: 85,
@@ -571,9 +544,6 @@ describe('AccessibilityCheckerService', () => {
           order_index: 0,
         },
       ]);
-      mockQueryBuilder.where
-        .mockResolvedValueOnce([])
-        .mockResolvedValueOnce([]);
       mockQueryBuilder.returning.mockResolvedValue([{
         id: 'check-123',
         overall_score: 70,
@@ -605,9 +575,6 @@ describe('AccessibilityCheckerService', () => {
     it('should check embedded media accessibility', async () => {
       mockQueryBuilder.first.mockResolvedValue({ id: 'draft-123', title: 'Test' });
       mockQueryBuilder.orderBy.mockResolvedValue([]);
-      mockQueryBuilder.where
-        .mockResolvedValueOnce([
-          {
             id: 'embed-1',
             media_type: 'video',
             has_captions: false,
@@ -648,9 +615,6 @@ describe('AccessibilityCheckerService', () => {
     it('should return AAA for perfect score', async () => {
       mockQueryBuilder.first.mockResolvedValue({ id: 'draft-123', title: 'Test' });
       mockQueryBuilder.orderBy.mockResolvedValue([]);
-      mockQueryBuilder.where
-        .mockResolvedValueOnce([])
-        .mockResolvedValueOnce([]);
       mockQueryBuilder.returning.mockResolvedValue([{
         id: 'check-123',
         overall_score: 100,
@@ -684,9 +648,6 @@ describe('AccessibilityCheckerService', () => {
           order_index: 0,
         },
       ]);
-      mockQueryBuilder.where
-        .mockResolvedValueOnce([])
-        .mockResolvedValueOnce([]);
       mockQueryBuilder.returning.mockResolvedValue([{
         id: 'check-123',
         overall_score: 75,
