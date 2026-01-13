@@ -7,7 +7,7 @@ import fastifyRateLimit from '@fastify/rate-limit';
 import fastifyMultipart from '@fastify/multipart';
 import fastifyCompress from '@fastify/compress';
 import fastifySwagger from '@fastify/swagger';
-import { config } from '../config';
+import { env } from '../config';
 
 export async function registerPlugins(server: FastifyInstance): Promise<void> {
   // Security headers
@@ -24,8 +24,8 @@ export async function registerPlugins(server: FastifyInstance): Promise<void> {
 
   // CORS
   await server.register(fastifyCors, {
-    origin: config.cors.origin,
-    credentials: config.cors.credentials,
+    origin: env.NODE_ENV === 'production' ? ['https://educonnect.org'] : true,
+    credentials: true,
   });
 
   // Compression
@@ -35,21 +35,21 @@ export async function registerPlugins(server: FastifyInstance): Promise<void> {
 
   // JWT
   await server.register(fastifyJwt, {
-    secret: config.jwt.secret,
+    secret: env.JWT_SECRET,
     sign: {
-      expiresIn: config.jwt.accessTokenExpiry,
+      expiresIn: env.JWT_EXPIRES_IN,
     },
   });
 
   // Redis
   await server.register(fastifyRedis, {
-    url: config.redis.url,
+    url: env.REDIS_URL,
   });
 
   // Rate limiting
   await server.register(fastifyRateLimit, {
-    max: config.rateLimit.global.max,
-    timeWindow: config.rateLimit.global.timeWindow,
+    max: env.RATE_LIMIT_MAX,
+    timeWindow: env.RATE_LIMIT_WINDOW,
     redis: server.redis,
   });
 
@@ -70,7 +70,7 @@ export async function registerPlugins(server: FastifyInstance): Promise<void> {
       },
       servers: [
         {
-          url: `http://localhost:${config.port}`,
+          url: `http://localhost:${env.PORT}`,
           description: 'Development server',
         },
       ],
