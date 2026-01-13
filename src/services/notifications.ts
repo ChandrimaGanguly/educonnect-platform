@@ -423,7 +423,7 @@ class NotificationService {
     }
 
     const result = await query.count('* as count').first();
-    return parseInt(result?.count || '0', 10);
+    return parseInt(String(result?.count || 0), 10);
   }
 
   /**
@@ -439,7 +439,7 @@ class NotificationService {
       .count('* as count')
       .first();
 
-    return parseInt(result?.count || '0', 10);
+    return parseInt(String(result?.count || 0), 10);
   }
 
   /**

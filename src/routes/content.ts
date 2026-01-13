@@ -164,10 +164,11 @@ export async function contentRoutes(fastify: FastifyInstance): Promise<void> {
         },
       },
     },
-    preHandler: async (request, reply) => {
+    preHandler: async (request, reply): Promise<void> => {
       // Authentication check
       if (!request.user) {
-        return reply.status(401).send({ error: 'Authentication required' });
+        reply.status(401).send({ error: 'Authentication required' });
+        return;
       }
     },
     handler: async (request: FastifyRequest<{ Body: CreateContentBody }>, reply: FastifyReply) => {
@@ -269,9 +270,10 @@ export async function contentRoutes(fastify: FastifyInstance): Promise<void> {
         },
       },
     },
-    preHandler: async (request, reply) => {
+    preHandler: async (request, reply): Promise<void> => {
       if (!request.user) {
-        return reply.status(401).send({ error: 'Authentication required' });
+        reply.status(401).send({ error: 'Authentication required' });
+        return;
       }
     },
     handler: async (request, reply) => {
@@ -296,9 +298,10 @@ export async function contentRoutes(fastify: FastifyInstance): Promise<void> {
       description: 'Publish content item',
       tags: ['Content Items'],
     },
-    preHandler: async (request, reply) => {
+    preHandler: async (request, reply): Promise<void> => {
       if (!request.user) {
-        return reply.status(401).send({ error: 'Authentication required' });
+        reply.status(401).send({ error: 'Authentication required' });
+        return;
       }
     },
     handler: async (request, reply) => {
@@ -318,9 +321,10 @@ export async function contentRoutes(fastify: FastifyInstance): Promise<void> {
       description: 'Archive content item',
       tags: ['Content Items'],
     },
-    preHandler: async (request, reply) => {
+    preHandler: async (request, reply): Promise<void> => {
       if (!request.user) {
-        return reply.status(401).send({ error: 'Authentication required' });
+        reply.status(401).send({ error: 'Authentication required' });
+        return;
       }
     },
     handler: async (request, reply) => {
@@ -340,9 +344,10 @@ export async function contentRoutes(fastify: FastifyInstance): Promise<void> {
       description: 'Delete content item',
       tags: ['Content Items'],
     },
-    preHandler: async (request, reply) => {
+    preHandler: async (request, reply): Promise<void> => {
       if (!request.user) {
-        return reply.status(401).send({ error: 'Authentication required' });
+        reply.status(401).send({ error: 'Authentication required' });
+        return;
       }
     },
     handler: async (request, reply) => {
@@ -406,9 +411,10 @@ export async function contentRoutes(fastify: FastifyInstance): Promise<void> {
         },
       },
     },
-    preHandler: async (request, reply) => {
+    preHandler: async (request, reply): Promise<void> => {
       if (!request.user) {
-        return reply.status(401).send({ error: 'Authentication required' });
+        reply.status(401).send({ error: 'Authentication required' });
+        return;
       }
     },
     handler: async (request, reply) => {
@@ -531,9 +537,10 @@ export async function contentRoutes(fastify: FastifyInstance): Promise<void> {
         },
       },
     },
-    preHandler: async (request, reply) => {
+    preHandler: async (request, reply): Promise<void> => {
       if (!request.user) {
-        return reply.status(401).send({ error: 'Authentication required' });
+        reply.status(401).send({ error: 'Authentication required' });
+        return;
       }
     },
     handler: async (
@@ -604,9 +611,10 @@ export async function contentRoutes(fastify: FastifyInstance): Promise<void> {
         },
       },
     },
-    preHandler: async (request, reply) => {
+    preHandler: async (request, reply): Promise<void> => {
       if (!request.user) {
-        return reply.status(401).send({ error: 'Authentication required' });
+        reply.status(401).send({ error: 'Authentication required' });
+        return;
       }
     },
     handler: async (request, reply) => {
@@ -681,9 +689,10 @@ export async function contentRoutes(fastify: FastifyInstance): Promise<void> {
         },
       },
     },
-    preHandler: async (request, reply) => {
+    preHandler: async (request, reply): Promise<void> => {
       if (!request.user) {
-        return reply.status(401).send({ error: 'Authentication required' });
+        reply.status(401).send({ error: 'Authentication required' });
+        return;
       }
     },
     handler: async (request, reply) => {
@@ -874,9 +883,10 @@ export async function contentRoutes(fastify: FastifyInstance): Promise<void> {
       description: 'Get user bandwidth profile',
       tags: ['Bandwidth Profile'],
     },
-    preHandler: async (request, reply) => {
+    preHandler: async (request, reply): Promise<void> => {
       if (!request.user) {
-        return reply.status(401).send({ error: 'Authentication required' });
+        reply.status(401).send({ error: 'Authentication required' });
+        return;
       }
     },
     handler: async (request, reply) => {
@@ -908,9 +918,10 @@ export async function contentRoutes(fastify: FastifyInstance): Promise<void> {
         },
       },
     },
-    preHandler: async (request, reply) => {
+    preHandler: async (request, reply): Promise<void> => {
       if (!request.user) {
-        return reply.status(401).send({ error: 'Authentication required' });
+        reply.status(401).send({ error: 'Authentication required' });
+        return;
       }
     },
     handler: async (request, reply) => {

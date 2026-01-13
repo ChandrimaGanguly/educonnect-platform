@@ -163,7 +163,7 @@ export class ContentTranscodingService {
         optimized_for_network: variant.optimizedForNetwork,
         status: 'completed',
         progress: 100,
-        config: variant.config,
+        config: variant.config as Record<string, unknown>,
         created_at: now,
         updated_at: now,
         completed_at: now,
@@ -196,7 +196,7 @@ export class ContentTranscodingService {
       optimized_for_network: variant.optimizedForNetwork,
       status: 'pending',
       progress: 0,
-      config: variant.config,
+      config: variant.config as Record<string, unknown>,
       created_at: now,
       updated_at: now,
     };

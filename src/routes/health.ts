@@ -20,7 +20,7 @@ export async function healthRoutes(server: FastifyInstance): Promise<void> {
       await server.redis.ping();
       redisHealth = true;
     } catch (error) {
-      server.log.error('Redis health check failed:', error);
+      server.log.error(error, 'Redis health check failed');
     }
 
     const overall = dbHealth && redisHealth;

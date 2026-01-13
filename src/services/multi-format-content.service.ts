@@ -1198,7 +1198,7 @@ export class MultiFormatContentService {
         this.db.raw('COUNT(*) as total_items'),
         this.db.raw('AVG(quality_score) as avg_quality_score'),
         this.db.raw('COUNT(CASE WHEN accessibility_score >= 80 THEN 1 END) as with_accessibility')
-      );
+      ) as Array<{ total_items: number; avg_quality_score: number; with_accessibility: number }>;
 
     const typeStats = await query.clone()
       .select('content_type')
@@ -1211,7 +1211,7 @@ export class MultiFormatContentService {
       .groupBy('status');
 
     const [translationStats] = await this.db('content_translations')
-      .countDistinct('content_item_id as with_translations');
+      .countDistinct('content_item_id as with_translations') as Array<{ with_translations: number }>;
 
     const byType: Record<string, number> = {};
     typeStats.forEach((row: { content_type: string; count: string }) => {
