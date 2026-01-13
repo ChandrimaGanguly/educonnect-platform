@@ -4,30 +4,29 @@
  * Integration tests for the content API endpoints.
  */
 
-import { describe, it, expect, beforeEach, vi, beforeAll, afterAll } from 'vitest';
 import Fastify, { FastifyInstance } from 'fastify';
 import { contentRoutes } from '../content';
 
 // Mock services
-vi.mock('../../services/multi-format-content.service', () => ({
-  MultiFormatContentService: vi.fn().mockImplementation(() => ({
-    getContentFormats: vi.fn().mockResolvedValue([
+jest.mock('../../services/multi-format-content.service', () => ({
+  MultiFormatContentService: jest.fn().mockImplementation(() => ({
+    getContentFormats: jest.fn().mockResolvedValue([
       { id: '1', format_key: 'markdown', name: 'Markdown Text' },
       { id: '2', format_key: 'video_mp4', name: 'MP4 Video' },
     ]),
-    getContentFormatByKey: vi.fn().mockImplementation((key) => {
+    getContentFormatByKey: jest.fn().mockImplementation((key) => {
       if (key === 'markdown') {
         return Promise.resolve({ id: '1', format_key: 'markdown', name: 'Markdown Text' });
       }
       return Promise.resolve(null);
     }),
-    createContentItem: vi.fn().mockResolvedValue({
+    createContentItem: jest.fn().mockResolvedValue({
       id: 'content-123',
       title: 'Test Content',
       content_type: 'text',
       status: 'draft',
     }),
-    getContentItemById: vi.fn().mockImplementation((id) => {
+    getContentItemById: jest.fn().mockImplementation((id) => {
       if (id === 'content-123') {
         return Promise.resolve({
           id: 'content-123',
@@ -38,7 +37,7 @@ vi.mock('../../services/multi-format-content.service', () => ({
       }
       return Promise.resolve(null);
     }),
-    getContentItemWithDetails: vi.fn().mockResolvedValue({
+    getContentItemWithDetails: jest.fn().mockResolvedValue({
       id: 'content-123',
       title: 'Test Content',
       content_type: 'text',
@@ -46,21 +45,21 @@ vi.mock('../../services/multi-format-content.service', () => ({
       translations: [],
       captions: [],
     }),
-    updateContentItem: vi.fn().mockResolvedValue({
+    updateContentItem: jest.fn().mockResolvedValue({
       id: 'content-123',
       title: 'Updated Content',
       content_type: 'text',
     }),
-    publishContentItem: vi.fn().mockResolvedValue({
+    publishContentItem: jest.fn().mockResolvedValue({
       id: 'content-123',
       status: 'published',
     }),
-    archiveContentItem: vi.fn().mockResolvedValue({
+    archiveContentItem: jest.fn().mockResolvedValue({
       id: 'content-123',
       status: 'archived',
     }),
-    deleteContentItem: vi.fn().mockResolvedValue(undefined),
-    queryContentItems: vi.fn().mockResolvedValue({
+    deleteContentItem: jest.fn().mockResolvedValue(undefined),
+    queryContentItems: jest.fn().mockResolvedValue({
       items: [
         { id: '1', title: 'Item 1' },
         { id: '2', title: 'Item 2' },
@@ -70,80 +69,80 @@ vi.mock('../../services/multi-format-content.service', () => ({
       offset: 0,
       has_more: false,
     }),
-    createContentVariant: vi.fn().mockResolvedValue({
+    createContentVariant: jest.fn().mockResolvedValue({
       id: 'variant-123',
       variant_type: 'low_quality',
       status: 'pending',
     }),
-    getContentVariants: vi.fn().mockResolvedValue([
+    getContentVariants: jest.fn().mockResolvedValue([
       { id: 'v1', variant_type: 'original' },
       { id: 'v2', variant_type: 'low_quality' },
     ]),
-    createContentTranslation: vi.fn().mockResolvedValue({
+    createContentTranslation: jest.fn().mockResolvedValue({
       id: 'translation-123',
       language_code: 'es',
       title: 'Título',
     }),
-    getContentTranslations: vi.fn().mockResolvedValue([
+    getContentTranslations: jest.fn().mockResolvedValue([
       { id: 't1', language_code: 'es' },
       { id: 't2', language_code: 'fr' },
     ]),
-    getContentTranslation: vi.fn().mockImplementation((contentId, lang) => {
+    getContentTranslation: jest.fn().mockImplementation((contentId, lang) => {
       if (lang === 'es') {
         return Promise.resolve({ id: 't1', language_code: 'es', title: 'Título' });
       }
       return Promise.resolve(null);
     }),
-    createContentCaption: vi.fn().mockResolvedValue({
+    createContentCaption: jest.fn().mockResolvedValue({
       id: 'caption-123',
       language_code: 'en',
       label: 'English',
     }),
-    getContentCaptions: vi.fn().mockResolvedValue([
+    getContentCaptions: jest.fn().mockResolvedValue([
       { id: 'c1', language_code: 'en' },
     ]),
-    createCodeSandbox: vi.fn().mockResolvedValue({
+    createCodeSandbox: jest.fn().mockResolvedValue({
       id: 'sandbox-123',
       language: 'javascript',
     }),
-    getCodeSandbox: vi.fn().mockImplementation((contentId) => {
+    getCodeSandbox: jest.fn().mockImplementation((contentId) => {
       if (contentId === 'content-123') {
         return Promise.resolve({ id: 'sandbox-123', language: 'javascript' });
       }
       return Promise.resolve(null);
     }),
-    createInteractiveElement: vi.fn().mockResolvedValue({
+    createInteractiveElement: jest.fn().mockResolvedValue({
       id: 'interactive-123',
       element_type: 'quiz_widget',
     }),
-    getInteractiveElements: vi.fn().mockResolvedValue([
+    getInteractiveElements: jest.fn().mockResolvedValue([
       { id: 'i1', element_type: 'quiz_widget' },
     ]),
-    runAccessibilityCheck: vi.fn().mockResolvedValue({
+    runAccessibilityCheck: jest.fn().mockResolvedValue({
       id: 'report-123',
       overall_score: 85,
       critical_issues: 0,
     }),
-    getLatestAccessibilityReport: vi.fn().mockResolvedValue({
+    getLatestAccessibilityReport: jest.fn().mockResolvedValue({
       id: 'report-123',
       overall_score: 85,
     }),
-    getBandwidthProfile: vi.fn().mockResolvedValue({
+    getBandwidthProfile: jest.fn().mockResolvedValue({
       user_id: 'user-123',
       preferred_quality: 'auto',
       text_only_mode: false,
     }),
-    updateBandwidthProfile: vi.fn().mockResolvedValue({
+    updateBandwidthProfile: jest.fn().mockResolvedValue({
       user_id: 'user-123',
       preferred_quality: 'low',
       text_only_mode: true,
     }),
-    getContentStatistics: vi.fn().mockResolvedValue({
+    getContentStatistics: jest.fn().mockResolvedValue({
       total_items: 100,
       by_type: { text: 50, video: 30, audio: 20 },
       by_status: { published: 70, draft: 30 },
     }),
-    getContentForDelivery: vi.fn().mockResolvedValue({
+    getContentForDelivery: jest.fn().mockResolvedValue({
       content: { id: 'content-123', title: 'Test' },
       selected_variant: null,
       available_translations: [],
@@ -154,20 +153,20 @@ vi.mock('../../services/multi-format-content.service', () => ({
   })),
 }));
 
-vi.mock('../../services/content-transcoding.service', () => ({
-  ContentTranscodingService: vi.fn().mockImplementation(() => ({
-    queueTranscodingJobs: vi.fn().mockResolvedValue([
+jest.mock('../../services/content-transcoding.service', () => ({
+  ContentTranscodingService: jest.fn().mockImplementation(() => ({
+    queueTranscodingJobs: jest.fn().mockResolvedValue([
       { id: 'job-1', variant_type: 'low_quality', status: 'pending' },
       { id: 'job-2', variant_type: 'medium_quality', status: 'pending' },
     ]),
-    getTranscodingStatus: vi.fn().mockResolvedValue({
+    getTranscodingStatus: jest.fn().mockResolvedValue({
       total_variants: 3,
       ready_variants: 1,
       pending_variants: 2,
       failed_variants: 0,
       variants: [],
     }),
-    estimateBandwidthSavings: vi.fn().mockResolvedValue({
+    estimateBandwidthSavings: jest.fn().mockResolvedValue({
       original_kb: 50000,
       optimized_kb: 15000,
       savings_percent: 70,
@@ -176,21 +175,21 @@ vi.mock('../../services/content-transcoding.service', () => ({
   })),
 }));
 
-vi.mock('../../services/content-handlers/handler-factory', () => ({
-  getContentHandler: vi.fn().mockReturnValue({
-    validate: vi.fn().mockReturnValue({ valid: true, errors: [], warnings: [] }),
-    process: vi.fn().mockImplementation((content) => Promise.resolve(content)),
-    render: vi.fn().mockReturnValue({ html: '<div>Test</div>', metadata: {} }),
+jest.mock('../../services/content-handlers/handler-factory', () => ({
+  getContentHandler: jest.fn().mockReturnValue({
+    validate: jest.fn().mockReturnValue({ valid: true, errors: [], warnings: [] }),
+    process: jest.fn().mockImplementation((content) => Promise.resolve(content)),
+    render: jest.fn().mockReturnValue({ html: '<div>Test</div>', metadata: {} }),
   }),
   ContentHandlerFactory: {
-    getInstance: vi.fn().mockReturnValue({
-      getHandler: vi.fn(),
+    getInstance: jest.fn().mockReturnValue({
+      getHandler: jest.fn(),
     }),
   },
 }));
 
-vi.mock('../../database', () => ({
-  getDatabase: vi.fn(),
+jest.mock('../../database', () => ({
+  getDatabase: jest.fn(),
 }));
 
 describe('Content Routes', () => {

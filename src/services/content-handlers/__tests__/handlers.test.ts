@@ -5,7 +5,6 @@
  * validation, processing, and rendering.
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
 import { TextContentHandler } from '../text-handler';
 import { VideoContentHandler } from '../video-handler';
 import { AudioContentHandler } from '../audio-handler';

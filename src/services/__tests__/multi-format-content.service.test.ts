@@ -5,7 +5,6 @@
  * covering all CRUD operations, variants, translations, and delivery.
  */
 
-import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach, vi } from 'vitest';
 import { MultiFormatContentService } from '../multi-format-content.service';
 import { ContentTranscodingService } from '../content-transcoding.service';
 import { getDatabase, closeDatabase } from '../../database';
@@ -19,34 +18,34 @@ import {
 } from '../../types/content.types';
 
 // Mock the database
-vi.mock('../../database', () => ({
-  getDatabase: vi.fn(),
-  closeDatabase: vi.fn(),
+jest.mock('../../database', () => ({
+  getDatabase: jest.fn(),
+  closeDatabase: jest.fn(),
 }));
 
 describe('MultiFormatContentService', () => {
   let service: MultiFormatContentService;
   let mockDb: {
-    select: ReturnType<typeof vi.fn>;
-    where: ReturnType<typeof vi.fn>;
-    first: ReturnType<typeof vi.fn>;
-    insert: ReturnType<typeof vi.fn>;
-    update: ReturnType<typeof vi.fn>;
-    delete: ReturnType<typeof vi.fn>;
-    returning: ReturnType<typeof vi.fn>;
-    orderBy: ReturnType<typeof vi.fn>;
-    limit: ReturnType<typeof vi.fn>;
-    offset: ReturnType<typeof vi.fn>;
-    clone: ReturnType<typeof vi.fn>;
-    count: ReturnType<typeof vi.fn>;
-    increment: ReturnType<typeof vi.fn>;
-    whereRaw: ReturnType<typeof vi.fn>;
-    raw: ReturnType<typeof vi.fn>;
+    select: ReturnType<typeof jest.fn>;
+    where: ReturnType<typeof jest.fn>;
+    first: ReturnType<typeof jest.fn>;
+    insert: ReturnType<typeof jest.fn>;
+    update: ReturnType<typeof jest.fn>;
+    delete: ReturnType<typeof jest.fn>;
+    returning: ReturnType<typeof jest.fn>;
+    orderBy: ReturnType<typeof jest.fn>;
+    limit: ReturnType<typeof jest.fn>;
+    offset: ReturnType<typeof jest.fn>;
+    clone: ReturnType<typeof jest.fn>;
+    count: ReturnType<typeof jest.fn>;
+    increment: ReturnType<typeof jest.fn>;
+    whereRaw: ReturnType<typeof jest.fn>;
+    raw: ReturnType<typeof jest.fn>;
     fn: { now: () => string };
-    countDistinct: ReturnType<typeof vi.fn>;
-    groupBy: ReturnType<typeof vi.fn>;
-    max: ReturnType<typeof vi.fn>;
-    transaction: ReturnType<typeof vi.fn>;
+    countDistinct: ReturnType<typeof jest.fn>;
+    groupBy: ReturnType<typeof jest.fn>;
+    max: ReturnType<typeof jest.fn>;
+    transaction: ReturnType<typeof jest.fn>;
   };
 
   const mockUserId = '123e4567-e89b-12d3-a456-426614174000';
@@ -56,7 +55,7 @@ describe('MultiFormatContentService', () => {
   beforeEach(() => {
     // Create mock database with chainable methods
     const createChainableMock = () => {
-      const mock: Record<string, ReturnType<typeof vi.fn>> = {};
+      const mock: Record<string, ReturnType<typeof jest.fn>> = {};
       const chainableMethods = [
         'select', 'where', 'first', 'insert', 'update', 'delete',
         'returning', 'orderBy', 'limit', 'offset', 'clone', 'count',
@@ -65,7 +64,7 @@ describe('MultiFormatContentService', () => {
       ];
 
       chainableMethods.forEach(method => {
-        mock[method] = vi.fn().mockReturnValue(mock);
+        mock[method] = jest.fn().mockReturnValue(mock);
       });
 
       return mock;
@@ -73,10 +72,10 @@ describe('MultiFormatContentService', () => {
 
     mockDb = createChainableMock() as typeof mockDb;
     mockDb.fn = { now: () => 'NOW()' };
-    mockDb.transaction = vi.fn().mockImplementation(async (fn) => fn(mockDb));
+    mockDb.transaction = jest.fn().mockImplementation(async (fn) => fn(mockDb));
 
     // Make getDatabase return a function that returns the mock
-    (getDatabase as ReturnType<typeof vi.fn>).mockReturnValue((table: string) => {
+    (getDatabase as ReturnType<typeof jest.fn>).mockReturnValue((table: string) => {
       return mockDb;
     });
 
@@ -84,7 +83,7 @@ describe('MultiFormatContentService', () => {
   });
 
   afterEach(() => {
-    vi.clearAllMocks();
+    jest.clearAllMocks();
   });
 
   describe('Content Formats', () => {
@@ -851,11 +850,11 @@ Today we will learn about testing.`;
 
 describe('ContentTranscodingService', () => {
   let service: ContentTranscodingService;
-  let mockDb: Record<string, ReturnType<typeof vi.fn>>;
+  let mockDb: Record<string, ReturnType<typeof jest.fn>>;
 
   beforeEach(() => {
     const createChainableMock = () => {
-      const mock: Record<string, ReturnType<typeof vi.fn>> = {};
+      const mock: Record<string, ReturnType<typeof jest.fn>> = {};
       const chainableMethods = [
         'select', 'where', 'first', 'insert', 'update', 'delete',
         'returning', 'orderBy', 'limit', 'offset', 'clone', 'count',
@@ -864,7 +863,7 @@ describe('ContentTranscodingService', () => {
       ];
 
       chainableMethods.forEach(method => {
-        mock[method] = vi.fn().mockReturnValue(mock);
+        mock[method] = jest.fn().mockReturnValue(mock);
       });
 
       return mock;
@@ -873,7 +872,7 @@ describe('ContentTranscodingService', () => {
     mockDb = createChainableMock();
     mockDb.fn = { now: () => 'NOW()' };
 
-    (getDatabase as ReturnType<typeof vi.fn>).mockReturnValue((table: string) => {
+    (getDatabase as ReturnType<typeof jest.fn>).mockReturnValue((table: string) => {
       return mockDb;
     });
 
