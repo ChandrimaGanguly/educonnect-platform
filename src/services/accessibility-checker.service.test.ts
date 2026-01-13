@@ -575,14 +575,6 @@ describe('AccessibilityCheckerService', () => {
     it('should check embedded media accessibility', async () => {
       mockQueryBuilder.first.mockResolvedValue({ id: 'draft-123', title: 'Test' });
       mockQueryBuilder.orderBy.mockResolvedValue([]);
-            id: 'embed-1',
-            media_type: 'video',
-            has_captions: false,
-            transcript: null,
-            text_fallback: null,
-          },
-        ])
-        .mockResolvedValueOnce([]);
       mockQueryBuilder.returning.mockResolvedValue([{
         id: 'check-123',
         overall_score: 60,
