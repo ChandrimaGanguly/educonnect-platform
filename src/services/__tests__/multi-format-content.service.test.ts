@@ -832,7 +832,10 @@ Today we will learn about testing.`;
 
 describe('ContentTranscodingService', () => {
   let service: ContentTranscodingService;
-  let mockDb: Record<string, jest.Mock>;
+  let mockDb: Record<string, jest.Mock> & {
+    fn?: { now: () => string };
+    transaction?: jest.Mock;
+  };
 
   beforeEach(() => {
     const createChainableMock = () => {
