@@ -203,7 +203,7 @@ describe('Content Routes', () => {
     app.addHook('preHandler', async (request) => {
       // Simulate authenticated user for most tests
       if (request.headers.authorization) {
-        request.user = { id: 'user-123' };
+        request.user = { userId: 'user-123', id: 'user-123' };
       }
     });
 
