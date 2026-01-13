@@ -25,27 +25,9 @@ jest.mock('../../database', () => ({
 
 describe('MultiFormatContentService', () => {
   let service: MultiFormatContentService;
-  let mockDb: {
-    select: jest.Mock;
-    where: jest.Mock;
-    first: jest.Mock;
-    insert: jest.Mock;
-    update: jest.Mock;
-    delete: jest.Mock;
-    returning: jest.Mock;
-    orderBy: jest.Mock;
-    limit: jest.Mock;
-    offset: jest.Mock;
-    clone: jest.Mock;
-    count: jest.Mock;
-    increment: jest.Mock;
-    whereRaw: jest.Mock;
-    raw: jest.Mock;
-    fn: { now: () => string };
-    countDistinct: jest.Mock;
-    groupBy: jest.Mock;
-    max: jest.Mock;
-    transaction: jest.Mock;
+  let mockDb: Record<string, jest.Mock> & {
+    fn?: { now: () => string };
+    transaction?: jest.Mock;
   };
 
   const mockUserId = '123e4567-e89b-12d3-a456-426614174000';
@@ -70,7 +52,7 @@ describe('MultiFormatContentService', () => {
       return mock;
     };
 
-    mockDb = createChainableMock() as typeof mockDb;
+    mockDb = createChainableMock();
     mockDb.fn = { now: () => 'NOW()' };
     mockDb.transaction = jest.fn().mockImplementation(async (fn) => fn(mockDb));
 
