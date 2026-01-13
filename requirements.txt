@@ -70,8 +70,8 @@ implicit==0.7.2  # Fast implicit feedback algorithms
 # ============================================================================
 # Text Processing & Assessment Generation
 # ============================================================================
-openai==1.7.2  # OpenAI API for content generation (optional)
-anthropic==0.8.1  # Anthropic Claude API (optional)
+# openai==1.7.2  # OpenAI API for content generation (optional) - DISABLED: dependency conflicts
+# anthropic==0.8.1  # Anthropic Claude API (optional) - DISABLED: dependency conflicts
 markdown==3.5.2  # Markdown processing
 beautifulsoup4==4.12.3  # HTML/XML parsing
 bleach==6.1.0  # HTML sanitization
@@ -159,7 +159,7 @@ python-magic==0.4.27  # File type identification
 # Internationalization
 # ============================================================================
 babel==2.14.0  # Internationalization utilities
-googletrans==4.0.0rc1  # Translation API (optional, community translations)
+# googletrans==4.0.0rc1  # Translation API (optional) - DISABLED: dependency conflicts with httpx
 
 # ============================================================================
 # Document Processing (for certificate generation, content parsing)
