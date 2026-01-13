@@ -1015,7 +1015,7 @@ export class ContentReviewService {
 
     switch (decision) {
       case 'approve':
-      case 'approve_with_changes':
+      case 'approve_with_changes': {
         // Increment approval count
         const newApprovalCount = submission.current_approvals + 1;
         await this.db('content_review_submissions')
@@ -1050,6 +1050,7 @@ export class ContentReviewService {
           details: { review_id: review.id, decision },
         });
         break;
+      }
 
       case 'request_changes':
         await this.updateSubmissionStatus(
