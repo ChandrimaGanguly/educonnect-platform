@@ -58,10 +58,13 @@ describe('MultiFormatContentService', () => {
     mockDb.transaction = jest.fn().mockImplementation(async (fn) => fn(mockDb));
     mockDb.raw = jest.fn((sql) => ({ toSQL: () => ({ sql }) }));
 
-    // Make getDatabase return a function that returns the mock
-    (getDatabase as jest.Mock).mockReturnValue((table: string) => {
-      return mockDb;
-    });
+    // Make mockDb callable as a function (for table access)
+    const callableMockDb = jest.fn().mockReturnValue(mockDb);
+    Object.assign(callableMockDb, mockDb);
+    mockDb = callableMockDb as any;
+
+    // Make getDatabase return the callable mockDb
+    (getDatabase as jest.Mock).mockReturnValue(mockDb);
 
     service = new MultiFormatContentService();
   });
@@ -862,9 +865,13 @@ describe('ContentTranscodingService', () => {
     mockDb.transaction = jest.fn().mockImplementation(async (fn) => fn(mockDb));
     mockDb.raw = jest.fn((sql) => ({ toSQL: () => ({ sql }) }));
 
-    (getDatabase as jest.Mock).mockReturnValue((table: string) => {
-      return mockDb;
-    });
+    // Make mockDb callable as a function (for table access)
+    const callableMockDb = jest.fn().mockReturnValue(mockDb);
+    Object.assign(callableMockDb, mockDb);
+    mockDb = callableMockDb as any;
+
+    // Make getDatabase return the callable mockDb
+    (getDatabase as jest.Mock).mockReturnValue(mockDb);
 
     service = new ContentTranscodingService();
   });
