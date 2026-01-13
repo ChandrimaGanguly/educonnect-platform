@@ -1,9 +1,9 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { sessionService } from '../services/session.service';
 
-declare module 'fastify' {
-  interface FastifyRequest {
-    user?: {
+declare module '@fastify/jwt' {
+  interface FastifyJWT {
+    user: {
       userId: string;
       email: string;
       sessionId: string;
