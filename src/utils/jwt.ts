@@ -20,7 +20,7 @@ export function generateAccessToken(userId: string, email: string, sessionId: st
     type: 'access',
   };
 
-  return jwt.sign(payload, env.JWT_SECRET, {
+  return jwt.sign(payload, env.JWT_SECRET as string, {
     expiresIn: env.JWT_EXPIRES_IN as string,
   });
 }
@@ -36,7 +36,7 @@ export function generateRefreshToken(userId: string, email: string, sessionId: s
     type: 'refresh',
   };
 
-  return jwt.sign(payload, env.JWT_SECRET, {
+  return jwt.sign(payload, env.JWT_SECRET as string, {
     expiresIn: env.JWT_REFRESH_EXPIRES_IN as string,
   });
 }
@@ -45,7 +45,7 @@ export function generateRefreshToken(userId: string, email: string, sessionId: s
  * Verify and decode token
  */
 export function verifyToken(token: string): JwtPayload {
-  return jwt.verify(token, env.JWT_SECRET) as JwtPayload;
+  return jwt.verify(token, env.JWT_SECRET as string) as JwtPayload;
 }
 
 /**
