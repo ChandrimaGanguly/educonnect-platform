@@ -169,9 +169,10 @@ export async function contentRoutes(fastify: FastifyInstance): Promise<void> {
       if (!request.user) {
         return reply.status(401).send({ error: 'Authentication required' });
       }
+      return;
     },
     handler: async (request: FastifyRequest<{ Body: CreateContentBody }>, reply: FastifyReply) => {
-      const userId = (request.user as { id: string })?.id;
+      const userId = request.user?.userId;
 
       // Validate with handler
       const handler = getContentHandler(request.body.content_type as ContentType);
@@ -273,9 +274,10 @@ export async function contentRoutes(fastify: FastifyInstance): Promise<void> {
       if (!request.user) {
         return reply.status(401).send({ error: 'Authentication required' });
       }
+      return;
     },
     handler: async (request, reply) => {
-      const userId = (request.user as { id: string })?.id;
+      const userId = request.user?.userId;
       const { id } = request.params;
 
       const existing = await contentService.getContentItemById(id);
@@ -300,9 +302,10 @@ export async function contentRoutes(fastify: FastifyInstance): Promise<void> {
       if (!request.user) {
         return reply.status(401).send({ error: 'Authentication required' });
       }
+      return;
     },
     handler: async (request, reply) => {
-      const userId = (request.user as { id: string })?.id;
+      const userId = request.user?.userId;
       const { id } = request.params;
 
       const content = await contentService.publishContentItem(id, userId);
@@ -322,9 +325,10 @@ export async function contentRoutes(fastify: FastifyInstance): Promise<void> {
       if (!request.user) {
         return reply.status(401).send({ error: 'Authentication required' });
       }
+      return;
     },
     handler: async (request, reply) => {
-      const userId = (request.user as { id: string })?.id;
+      const userId = request.user?.userId;
       const { id } = request.params;
 
       const content = await contentService.archiveContentItem(id, userId);
@@ -344,6 +348,7 @@ export async function contentRoutes(fastify: FastifyInstance): Promise<void> {
       if (!request.user) {
         return reply.status(401).send({ error: 'Authentication required' });
       }
+      return;
     },
     handler: async (request, reply) => {
       const { id } = request.params;
@@ -410,9 +415,10 @@ export async function contentRoutes(fastify: FastifyInstance): Promise<void> {
       if (!request.user) {
         return reply.status(401).send({ error: 'Authentication required' });
       }
+      return;
     },
     handler: async (request, reply) => {
-      const userId = (request.user as { id: string })?.id;
+      const userId = request.user?.userId;
       const { id } = request.params;
       const { network, quality, language, text_only } = request.query;
 
@@ -535,6 +541,7 @@ export async function contentRoutes(fastify: FastifyInstance): Promise<void> {
       if (!request.user) {
         return reply.status(401).send({ error: 'Authentication required' });
       }
+      return;
     },
     handler: async (
       request: FastifyRequest<{
@@ -608,9 +615,10 @@ export async function contentRoutes(fastify: FastifyInstance): Promise<void> {
       if (!request.user) {
         return reply.status(401).send({ error: 'Authentication required' });
       }
+      return;
     },
     handler: async (request, reply) => {
-      const userId = (request.user as { id: string })?.id;
+      const userId = request.user?.userId;
       const { contentId } = request.params;
 
       const translation = await contentService.createContentTranslation(userId, {
@@ -685,9 +693,10 @@ export async function contentRoutes(fastify: FastifyInstance): Promise<void> {
       if (!request.user) {
         return reply.status(401).send({ error: 'Authentication required' });
       }
+      return;
     },
     handler: async (request, reply) => {
-      const userId = (request.user as { id: string })?.id;
+      const userId = request.user?.userId;
       const { contentId } = request.params;
 
       const caption = await contentService.createContentCaption(userId, {
@@ -878,9 +887,10 @@ export async function contentRoutes(fastify: FastifyInstance): Promise<void> {
       if (!request.user) {
         return reply.status(401).send({ error: 'Authentication required' });
       }
+      return;
     },
     handler: async (request, reply) => {
-      const userId = (request.user as { id: string })?.id;
+      const userId = request.user?.userId;
       const profile = await contentService.getBandwidthProfile(userId);
       return reply.send({ profile });
     },
@@ -912,9 +922,10 @@ export async function contentRoutes(fastify: FastifyInstance): Promise<void> {
       if (!request.user) {
         return reply.status(401).send({ error: 'Authentication required' });
       }
+      return;
     },
     handler: async (request, reply) => {
-      const userId = (request.user as { id: string })?.id;
+      const userId = request.user?.userId;
       const profile = await contentService.updateBandwidthProfile(userId, request.body);
       return reply.send({ profile });
     },
