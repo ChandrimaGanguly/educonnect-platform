@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import jwt, { Secret, SignOptions } from 'jsonwebtoken';
 import { env } from '../config';
 import { nanoid } from 'nanoid';
 
@@ -20,9 +20,12 @@ export function generateAccessToken(userId: string, email: string, sessionId: st
     type: 'access',
   };
 
-  return jwt.sign(payload, env.JWT_SECRET as string, {
-    expiresIn: env.JWT_EXPIRES_IN as string,
-  });
+  const secret: Secret = env.JWT_SECRET;
+  const options: SignOptions = {
+    expiresIn: env.JWT_EXPIRES_IN,
+  };
+
+  return jwt.sign(payload, secret, options);
 }
 
 /**
@@ -36,16 +39,20 @@ export function generateRefreshToken(userId: string, email: string, sessionId: s
     type: 'refresh',
   };
 
-  return jwt.sign(payload, env.JWT_SECRET as string, {
-    expiresIn: env.JWT_REFRESH_EXPIRES_IN as string,
-  });
+  const secret: Secret = env.JWT_SECRET;
+  const options: SignOptions = {
+    expiresIn: env.JWT_REFRESH_EXPIRES_IN,
+  };
+
+  return jwt.sign(payload, secret, options);
 }
 
 /**
  * Verify and decode token
  */
 export function verifyToken(token: string): JwtPayload {
-  return jwt.verify(token, env.JWT_SECRET as string) as JwtPayload;
+  const secret: Secret = env.JWT_SECRET;
+  return jwt.verify(token, secret) as JwtPayload;
 }
 
 /**
