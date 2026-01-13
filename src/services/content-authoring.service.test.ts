@@ -30,19 +30,19 @@ describe('ContentAuthoringService', () => {
       delete: jest.fn().mockReturnThis(),
       where: jest.fn().mockReturnThis(),
       whereNull: jest.fn().mockReturnThis(),
-      first: jest.fn(),
-      returning: jest.fn(),
+      first: jest.fn().mockResolvedValue(null),
+      returning: jest.fn().mockResolvedValue([]),
       orderBy: jest.fn().mockReturnThis(),
       limit: jest.fn().mockReturnThis(),
       offset: jest.fn().mockReturnThis(),
-      count: jest.fn().mockReturnThis(),
+      count: jest.fn().mockResolvedValue([{ count: 0 }]),
       clone: jest.fn().mockReturnThis(),
       raw: jest.fn(),
     };
 
     mockDb = jest.fn(() => mockQueryBuilder);
     mockDb.fn = { now: jest.fn().mockReturnValue('NOW()') };
-    mockDb.raw = jest.fn();
+    mockDb.raw = jest.fn((sql) => ({ toSQL: () => ({ sql }) }));
     mockDb.transaction = jest.fn(async (callback) => await callback(mockDb));
 
     (getDatabase as jest.Mock).mockReturnValue(mockDb);

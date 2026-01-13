@@ -30,13 +30,13 @@ describe('LearningObjectiveService', () => {
       where: jest.fn().mockReturnThis(),
       whereNull: jest.fn().mockReturnThis(),
       whereRaw: jest.fn().mockReturnThis(),
-      first: jest.fn(),
-      returning: jest.fn(),
+      first: jest.fn().mockResolvedValue(null),
+      returning: jest.fn().mockResolvedValue([]),
       orderBy: jest.fn().mockReturnThis(),
       orderByRaw: jest.fn().mockReturnThis(),
       limit: jest.fn().mockReturnThis(),
       offset: jest.fn().mockReturnThis(),
-      count: jest.fn().mockReturnThis(),
+      count: jest.fn().mockResolvedValue([{ count: 0 }]),
       clone: jest.fn().mockReturnThis(),
       select: jest.fn().mockReturnThis(),
       join: jest.fn().mockReturnThis(),
@@ -44,6 +44,7 @@ describe('LearningObjectiveService', () => {
 
     mockDb = jest.fn(() => mockQueryBuilder);
     mockDb.fn = { now: jest.fn().mockReturnValue('NOW()') };
+    mockDb.raw = jest.fn((sql) => ({ toSQL: () => ({ sql }) }));
     mockDb.transaction = jest.fn(async (callback) => await callback(mockDb));
 
     (getDatabase as jest.Mock).mockReturnValue(mockDb);

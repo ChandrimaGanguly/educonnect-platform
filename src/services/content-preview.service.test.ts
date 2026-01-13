@@ -30,18 +30,19 @@ describe('ContentPreviewService', () => {
       delete: jest.fn().mockReturnThis(),
       where: jest.fn().mockReturnThis(),
       whereIn: jest.fn().mockReturnThis(),
-      first: jest.fn(),
-      returning: jest.fn(),
+      first: jest.fn().mockResolvedValue(null),
+      returning: jest.fn().mockResolvedValue([]),
       orderBy: jest.fn().mockReturnThis(),
       limit: jest.fn().mockReturnThis(),
       offset: jest.fn().mockReturnThis(),
-      count: jest.fn().mockReturnThis(),
+      count: jest.fn().mockResolvedValue([{ count: 0 }]),
       select: jest.fn().mockReturnThis(),
     };
 
     mockDb = jest.fn(() => mockQueryBuilder);
     mockDb.fn = { now: jest.fn().mockReturnValue('NOW()') };
-    mockDb.raw = jest.fn().mockReturnValue('RAW_VALUE');
+    mockDb.raw = jest.fn((sql) => ({ toSQL: () => ({ sql }) }));
+    mockDb.transaction = jest.fn(async (callback) => await callback(mockDb));
 
     (getDatabase as jest.Mock).mockReturnValue(mockDb);
 
