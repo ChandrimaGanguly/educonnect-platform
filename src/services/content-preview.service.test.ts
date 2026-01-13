@@ -464,13 +464,14 @@ describe('ContentPreviewService', () => {
           .mockResolvedValueOnce([{ count: '5' }]) // blocks count
           .mockResolvedValueOnce([{ count: '2' }]); // objectives count
 
-        mockQueryBuilder.orderBy.mockResolvedValue([
-          { order_index: 0 },
-          { order_index: 1 },
-          { order_index: 2 },
-        ]);
-
-        mockQueryBuilder.whereIn.mockResolvedValue([]);
+        let thenCallCount = 0;
+        mockQueryBuilder.then = jest.fn((resolve) => {
+          const results = [
+            [{ order_index: 0 }, { order_index: 1 }, { order_index: 2 }], // orderBy result for order check
+            [], // whereIn result for objective check
+          ];
+          return resolve(results[thenCallCount++] || []);
+        });
 
         const result = await service.testContentStructure('draft-123');
 

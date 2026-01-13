@@ -202,9 +202,9 @@ describe('AssessmentBuilderService', () => {
           id: 'question-456',
           question_text: 'What is 2+2? (Copy)',
         }]);
-        mockQueryBuilder.orderBy.mockResolvedValue([
+        mockQueryBuilder.then = jest.fn((resolve) => resolve([
           { id: 'opt-1', option_text: 'Four', is_correct: true, display_order: 0 },
-        ]);
+        ]));
 
         const result = await service.duplicateQuestion('question-123', 'user-123');
 
@@ -264,10 +264,10 @@ describe('AssessmentBuilderService', () => {
 
     describe('getQuestionOptions', () => {
       it('should return options sorted by display_order', async () => {
-        mockQueryBuilder.orderBy.mockResolvedValue([
+        mockQueryBuilder.then = jest.fn((resolve) => resolve([
           { ...mockOptionRow, display_order: 0 },
           { ...mockOptionRow, id: 'option-456', display_order: 1 },
-        ]);
+        ]));
 
         const result = await service.getQuestionOptions('question-123');
 
@@ -309,7 +309,7 @@ describe('AssessmentBuilderService', () => {
 
     describe('replaceOptions', () => {
       it('should delete existing and create new options', async () => {
-        mockQueryBuilder.orderBy.mockResolvedValue([mockOptionRow]);
+        mockQueryBuilder.then = jest.fn((resolve) => resolve([mockOptionRow]));
 
         await service.replaceOptions('question-123', [
           { option_text: 'New A', is_correct: true, display_order: 0 },
@@ -432,7 +432,7 @@ describe('AssessmentBuilderService', () => {
           question_type: 'multiple_choice',
           points: '1.00',
         });
-        mockQueryBuilder.orderBy.mockResolvedValue([]);
+        mockQueryBuilder.then = jest.fn((resolve) => resolve([]));
         mockQueryBuilder.returning.mockResolvedValue([{}]);
 
         const result = await service.validateQuestion('question-123');
@@ -448,7 +448,7 @@ describe('AssessmentBuilderService', () => {
           question_type: 'multiple_choice',
           points: '1.00',
         });
-        mockQueryBuilder.orderBy.mockResolvedValue([]);
+        mockQueryBuilder.then = jest.fn((resolve) => resolve([]));
         mockQueryBuilder.returning.mockResolvedValue([{}]);
 
         const result = await service.validateQuestion('question-123');
@@ -464,10 +464,10 @@ describe('AssessmentBuilderService', () => {
           question_type: 'multiple_choice',
           points: '1.00',
         });
-        mockQueryBuilder.orderBy.mockResolvedValue([
+        mockQueryBuilder.then = jest.fn((resolve) => resolve([
           { is_correct: false, option_text: 'Three' },
           { is_correct: false, option_text: 'Five' },
-        ]);
+        ]));
         mockQueryBuilder.returning.mockResolvedValue([{}]);
 
         const result = await service.validateQuestion('question-123');
@@ -483,9 +483,9 @@ describe('AssessmentBuilderService', () => {
           question_type: 'true_false',
           points: '1.00',
         });
-        mockQueryBuilder.orderBy.mockResolvedValue([
+        mockQueryBuilder.then = jest.fn((resolve) => resolve([
           { is_correct: true, option_text: 'True' },
-        ]);
+        ]));
         mockQueryBuilder.returning.mockResolvedValue([{}]);
 
         const result = await service.validateQuestion('question-123');
@@ -501,10 +501,10 @@ describe('AssessmentBuilderService', () => {
           question_type: 'matching',
           points: '1.00',
         });
-        mockQueryBuilder.orderBy.mockResolvedValue([
+        mockQueryBuilder.then = jest.fn((resolve) => resolve([
           { match_key: 'match_0', is_correct: true },
           // Missing second item for pair
-        ]);
+        ]));
         mockQueryBuilder.returning.mockResolvedValue([{}]);
 
         const result = await service.validateQuestion('question-123');
@@ -520,10 +520,10 @@ describe('AssessmentBuilderService', () => {
           question_type: 'ordering',
           points: '1.00',
         });
-        mockQueryBuilder.orderBy.mockResolvedValue([
+        mockQueryBuilder.then = jest.fn((resolve) => resolve([
           { correct_position: 0 },
           { correct_position: 0 }, // Duplicate position
-        ]);
+        ]));
         mockQueryBuilder.returning.mockResolvedValue([{}]);
 
         const result = await service.validateQuestion('question-123');
@@ -542,7 +542,7 @@ describe('AssessmentBuilderService', () => {
           }),
           points: '1.00',
         });
-        mockQueryBuilder.orderBy.mockResolvedValue([]);
+        mockQueryBuilder.then = jest.fn((resolve) => resolve([]));
         mockQueryBuilder.returning.mockResolvedValue([{}]);
 
         const result = await service.validateQuestion('question-123');
@@ -558,10 +558,10 @@ describe('AssessmentBuilderService', () => {
           question_type: 'multiple_choice',
           points: '1.00',
         });
-        mockQueryBuilder.orderBy.mockResolvedValue([
+        mockQueryBuilder.then = jest.fn((resolve) => resolve([
           { is_correct: true, option_text: 'Four' },
           { is_correct: false, option_text: 'Three' },
-        ]);
+        ]));
         mockQueryBuilder.returning.mockResolvedValue([{}]);
 
         const result = await service.validateQuestion('question-123');
