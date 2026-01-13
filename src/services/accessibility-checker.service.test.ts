@@ -34,7 +34,7 @@ describe('AccessibilityCheckerService', () => {
       orderBy: jest.fn().mockReturnThis(),
       limit: jest.fn().mockReturnThis(),
       offset: jest.fn().mockReturnThis(),
-      count: jest.fn().mockResolvedValue([{ count: 0 }]),
+      count: jest.fn().mockReturnThis(),
       clone: jest.fn().mockReturnThis(),
     };
 
