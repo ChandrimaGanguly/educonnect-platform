@@ -22,7 +22,7 @@ export function generateAccessToken(userId: string, email: string, sessionId: st
 
   const secret: Secret = env.JWT_SECRET;
   const options: SignOptions = {
-    expiresIn: env.JWT_EXPIRES_IN,
+    expiresIn: env.JWT_EXPIRES_IN as SignOptions['expiresIn'],
   };
 
   return jwt.sign(payload, secret, options);
@@ -41,7 +41,7 @@ export function generateRefreshToken(userId: string, email: string, sessionId: s
 
   const secret: Secret = env.JWT_SECRET;
   const options: SignOptions = {
-    expiresIn: env.JWT_REFRESH_EXPIRES_IN,
+    expiresIn: env.JWT_REFRESH_EXPIRES_IN as SignOptions['expiresIn'],
   };
 
   return jwt.sign(payload, secret, options);
