@@ -87,7 +87,7 @@ const storageConfigSchema = z.object({
       'text/plain',
       'text/markdown'
     ]),
-  }),
+  }).optional().default({}),
 
   // Image processing settings
   imageProcessing: z.object({
@@ -100,8 +100,8 @@ const storageConfigSchema = z.object({
       low: z.number().default(50),
       medium: z.number().default(70),
       high: z.number().default(90),
-    }),
-  }),
+    }).optional().default({}),
+  }).optional().default({}),
 
   // Video processing settings
   videoProcessing: z.object({
@@ -110,7 +110,7 @@ const storageConfigSchema = z.object({
     adaptiveBitrate: z.boolean().default(true),
     qualities: z.array(z.string()).default(['360p', '480p', '720p']),
     extractAudio: z.boolean().default(true), // For audio-only mode
-  }),
+  }).optional().default({}),
 
   // Bandwidth optimization
   bandwidth: z.object({
@@ -121,25 +121,25 @@ const storageConfigSchema = z.object({
       '2g': z.object({
         maxBandwidth: z.number().default(50 * 1024), // 50KB/s
         preferredQuality: z.string().default('ultra_low'),
-      }),
+      }).optional().default({}),
       '3g': z.object({
         maxBandwidth: z.number().default(200 * 1024), // 200KB/s
         preferredQuality: z.string().default('low'),
-      }),
+      }).optional().default({}),
       '4g': z.object({
         maxBandwidth: z.number().default(2 * 1024 * 1024), // 2MB/s
         preferredQuality: z.string().default('medium'),
-      }),
+      }).optional().default({}),
       '5g': z.object({
         maxBandwidth: z.number().default(10 * 1024 * 1024), // 10MB/s
         preferredQuality: z.string().default('high'),
-      }),
+      }).optional().default({}),
       wifi: z.object({
         maxBandwidth: z.number().default(10 * 1024 * 1024), // 10MB/s
         preferredQuality: z.string().default('high'),
-      }),
-    }),
-  }),
+      }).optional().default({}),
+    }).optional().default({}),
+  }).optional().default({}),
 
   // Cache settings
   cache: z.object({
@@ -148,7 +148,7 @@ const storageConfigSchema = z.object({
     staticAssetTTL: z.number().default(31536000), // 1 year
     dynamicContentTTL: z.number().default(3600), // 1 hour
     preWarmPopularContent: z.boolean().default(true),
-  }),
+  }).optional().default({}),
 });
 
 // Parse storage configuration from environment
@@ -180,14 +180,8 @@ export const storageConfig = storageConfigSchema.parse({
     maxAudioSize: process.env.MAX_AUDIO_SIZE ? parseInt(process.env.MAX_AUDIO_SIZE) : 50 * 1024 * 1024,
     maxDocumentSize: process.env.MAX_DOCUMENT_SIZE ? parseInt(process.env.MAX_DOCUMENT_SIZE) : 10 * 1024 * 1024,
   },
-
-  allowedTypes: {},
-  imageProcessing: {},
-  videoProcessing: {},
-  bandwidth: {
-    networkPresets: {},
-  },
-  cache: {},
+  // Omit these fields to let Zod apply defaults
+  // allowedTypes, imageProcessing, videoProcessing, bandwidth, cache will use schema defaults
 });
 
 export type StorageConfig = z.infer<typeof storageConfigSchema>;

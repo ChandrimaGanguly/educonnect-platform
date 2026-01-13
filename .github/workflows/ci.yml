@@ -61,6 +61,12 @@ jobs:
       - name: Run type check
         run: npm run typecheck
 
+      - name: Run database migrations
+        env:
+          DATABASE_URL: postgresql://educonnect:test@localhost:5432/educonnect_test
+          NODE_ENV: test
+        run: npm run migrate
+
       - name: Run tests
         env:
           DATABASE_URL: postgresql://educonnect:test@localhost:5432/educonnect_test
@@ -240,4 +246,4 @@ jobs:
       - name: Audit Python dependencies
         run: |
           pip install safety
-          safety check -r requirements.txt --continue-on-error
+          safety check -r requirements.txt

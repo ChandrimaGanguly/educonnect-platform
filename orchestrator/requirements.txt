@@ -1,0 +1,131 @@
+# EduConnect Test Coverage & CI/CD Orchestrator
+# Python 3.11+ required
+# Install: pip install -r requirements.txt
+
+# =============================================================================
+# CORE ORCHESTRATION & ASYNC
+# =============================================================================
+# Task orchestration and parallel execution
+asyncio-throttle>=1.0.2        # Rate limiting for parallel tasks
+anyio>=4.2.0                   # Async compatibility layer
+aiofiles>=23.2.1               # Async file operations
+
+# =============================================================================
+# PROCESS & COMMAND EXECUTION
+# =============================================================================
+# Shell command execution and process management
+sh>=2.0.6                      # Pythonic subprocess wrapper
+psutil>=5.9.7                  # Process and system monitoring
+
+# =============================================================================
+# CLI INTERFACE & OUTPUT
+# =============================================================================
+# Beautiful CLI with progress tracking
+typer[all]>=0.9.0              # Modern CLI framework (includes click)
+rich>=13.7.0                   # Rich terminal output, tables, progress bars
+questionary>=2.0.1             # Interactive prompts
+
+# =============================================================================
+# CONFIGURATION & SERIALIZATION
+# =============================================================================
+# Config file parsing (YAML, TOML, JSON)
+pyyaml>=6.0.1                  # YAML parsing for CI configs
+toml>=0.10.2                   # TOML parsing
+python-dotenv>=1.0.0           # .env file loading
+pydantic>=2.5.3                # Configuration validation & models
+pydantic-settings>=2.1.0       # Settings management with pydantic
+
+# =============================================================================
+# GIT & GITHUB INTEGRATION
+# =============================================================================
+# Version control and GitHub API
+gitpython>=3.1.41              # Git repository operations
+pygithub>=2.1.1                # GitHub API (workflows, PRs, issues)
+
+# =============================================================================
+# HTTP & API CLIENTS
+# =============================================================================
+# For health checks, API calls, webhook triggers
+httpx>=0.26.0                  # Modern async HTTP client
+aiohttp>=3.9.1                 # Async HTTP for parallel requests
+
+# =============================================================================
+# TESTING & COVERAGE
+# =============================================================================
+# Test execution and coverage reporting
+pytest>=7.4.4                  # Test runner
+pytest-asyncio>=0.23.3         # Async test support
+pytest-cov>=4.1.0              # Coverage plugin
+coverage>=7.4.0                # Coverage measurement
+
+# =============================================================================
+# CODE GENERATION & TEMPLATES
+# =============================================================================
+# For generating test file templates
+jinja2>=3.1.2                  # Template engine for test generation
+black>=23.12.1                 # Code formatting for generated files
+isort>=5.13.2                  # Import sorting for generated files
+
+# =============================================================================
+# LOGGING & MONITORING
+# =============================================================================
+# Structured logging and observability
+structlog>=24.1.0              # Structured logging
+loguru>=0.7.2                  # Simple powerful logging
+tqdm>=4.66.1                   # Progress bars (alternative to rich)
+
+# =============================================================================
+# DATABASE & MIGRATIONS
+# =============================================================================
+# For database operations during testing
+asyncpg>=0.29.0                # Async PostgreSQL driver
+redis>=5.0.1                   # Redis client for cache operations
+alembic>=1.13.1                # Database migration management
+
+# =============================================================================
+# FILE SYSTEM & WATCHING
+# =============================================================================
+# File operations and monitoring
+watchdog>=3.0.0                # File system event monitoring
+pathspec>=0.12.1               # Git-style path matching
+
+# =============================================================================
+# DOCKER & CONTAINER MANAGEMENT
+# =============================================================================
+# Container operations for CI/CD
+docker>=7.0.0                  # Docker API client
+docker-compose>=1.29.2         # Docker Compose operations (if needed)
+
+# =============================================================================
+# KUBERNETES (Optional - for deployment phases)
+# =============================================================================
+# Uncomment if deploying to Kubernetes
+# kubernetes>=28.1.0           # Kubernetes API client
+# helm>=0.1.0                  # Helm chart operations (limited Python support)
+
+# =============================================================================
+# NOTIFICATIONS & REPORTING
+# =============================================================================
+# For sending notifications on completion/failure
+slack-sdk>=3.26.1              # Slack notifications (optional)
+sendgrid>=6.11.0               # Email notifications (optional)
+
+# =============================================================================
+# UTILITIES
+# =============================================================================
+# General utilities
+python-dateutil>=2.8.2         # Date/time utilities
+humanize>=4.9.0                # Human-readable formatting
+tenacity>=8.2.3                # Retry logic with exponential backoff
+cachetools>=5.3.2              # Caching utilities
+
+# =============================================================================
+# TYPE CHECKING & DEVELOPMENT
+# =============================================================================
+# Development dependencies (can be moved to dev-requirements.txt)
+mypy>=1.8.0                    # Static type checking
+types-pyyaml>=6.0.12.12        # Type stubs for PyYAML
+types-toml>=0.10.8.7           # Type stubs for TOML
+types-redis>=4.6.0.11          # Type stubs for Redis
+types-psutil>=5.9.5.17         # Type stubs for psutil
+ruff>=0.1.11                   # Fast Python linter
