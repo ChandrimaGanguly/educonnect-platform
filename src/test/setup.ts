@@ -13,6 +13,11 @@ process.env.SESSION_SECRET = 'test-session-secret-for-testing-only-min-32';
 // Increase timeout for integration tests
 jest.setTimeout(10000);
 
+// Mock nanoid to avoid ESM import issues
+jest.mock('nanoid', () => ({
+  nanoid: jest.fn(() => 'test-nanoid-123'),
+}));
+
 // Mock console methods to reduce noise in tests
 global.console = {
   ...console,
