@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import AsyncGenerator
 
 import pytest
+import pytest_asyncio
 from httpx import AsyncClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -50,7 +51,7 @@ async def db_session():
         Base.metadata.drop_all(bind=test_engine)
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def client(db_session) -> AsyncGenerator:
     """Create a test client for the FastAPI app"""
     # Determine which service we're testing from environment variable
