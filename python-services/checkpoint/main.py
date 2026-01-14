@@ -87,7 +87,7 @@ async def root():
     return {
         "service": "Checkpoint Service",
         "version": "0.1.0",
-        "status": "operational"
+        "status": "operational",
     }
 
 

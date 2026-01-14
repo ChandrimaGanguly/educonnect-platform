@@ -53,7 +53,7 @@ class MatchResponse(BaseModel):
 async def health():
     return {
         "status": "ok",
-        "service": settings.service_name
+        "service": settings.service_name,
     }
 
 
@@ -68,7 +68,7 @@ async def ready():
     return {
         "status": "ready",
         "database": db_ok,
-        "redis": redis_ok
+        "redis": redis_ok,
     }
 
 
@@ -78,7 +78,7 @@ async def root():
     return {
         "service": "Matching Service",
         "version": "0.1.0",
-        "status": "operational"
+        "status": "operational",
     }
 
 
@@ -108,7 +108,7 @@ async def score_match(learner_id: str, mentor_id: str):
         "mentor_id": mentor_id,
         "compatibility_score": 0.0,
         "availability_score": 0.0,
-        "overall_score": 0.0
+        "overall_score": 0.0,
     }
 
 

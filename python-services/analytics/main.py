@@ -7,7 +7,7 @@ This service handles:
 - Performance metrics
 - Predictive analytics
 """
-from fastify import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List, Optional, Dict
 from datetime import datetime
@@ -66,7 +66,7 @@ async def root():
     return {
         "service": "Analytics Service",
         "version": "0.1.0",
-        "status": "operational"
+        "status": "operational",
     }
 
 
@@ -91,7 +91,7 @@ async def get_progress(query: ProgressQuery):
         "user_id": query.user_id,
         "progress": {},
         "trends": [],
-        "recommendations": []
+        "recommendations": [],
     }
 
 
@@ -105,7 +105,7 @@ async def get_insights(user_id: str):
     return {
         "user_id": user_id,
         "insights": [],
-        "next_steps": []
+        "next_steps": [],
     }
 
 

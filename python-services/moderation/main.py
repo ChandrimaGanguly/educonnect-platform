@@ -81,7 +81,7 @@ async def root():
     return {
         "service": "Moderation Service",
         "version": "0.1.0",
-        "status": "operational"
+        "status": "operational",
     }
 
 
@@ -111,7 +111,7 @@ async def moderate_image(file: UploadFile = File(...)):
         "filename": file.filename,
         "is_safe": True,
         "category": "safe",
-        "confidence": 1.0
+        "confidence": 1.0,
     }
 
 
@@ -124,7 +124,7 @@ async def detect_spam(text: str):
     """
     return {
         "is_spam": False,
-        "confidence": 1.0
+        "confidence": 1.0,
     }
 
 
