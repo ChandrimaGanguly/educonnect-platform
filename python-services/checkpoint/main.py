@@ -68,12 +68,12 @@ class SubmissionScore(BaseModel):
 
 # Health endpoints
 @app.get("/health")
-async def health():
+async def health() -> Dict[str, str]:
     return {"status": "ok", "service": settings.service_name}
 
 
 @app.get("/ready")
-async def ready():
+async def ready() -> Dict[str, bool | str]:
     db_ok = await db_health()
     redis_ok = await redis_health_check()
 
@@ -85,7 +85,7 @@ async def ready():
 
 # API Endpoints
 @app.get("/")
-async def root():
+async def root() -> Dict[str, str]:
     return {
         "service": "Checkpoint Service",
         "version": "0.1.0",
@@ -94,7 +94,7 @@ async def root():
 
 
 @app.post("/generate", response_model=List[Question])
-async def generate_questions(request: QuestionGenerationRequest):
+async def generate_questions(request: QuestionGenerationRequest) -> List[Question]:
     """
     Generate questions using NLP/ML
 
@@ -104,7 +104,7 @@ async def generate_questions(request: QuestionGenerationRequest):
 
 
 @app.post("/score")
-async def score_submission(submission_id: str, answers: Dict):
+async def score_submission(submission_id: str, answers: Dict) -> SubmissionScore:
     """
     Score a checkpoint submission
 

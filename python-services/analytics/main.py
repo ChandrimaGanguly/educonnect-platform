@@ -47,12 +47,12 @@ class ProgressQuery(BaseModel):
 
 # Health endpoints
 @app.get("/health")
-async def health():
+async def health() -> Dict[str, str]:
     return {"status": "ok", "service": settings.service_name}
 
 
 @app.get("/ready")
-async def ready():
+async def ready() -> Dict[str, bool | str]:
     db_ok = await db_health()
     redis_ok = await redis_health_check()
 
@@ -64,7 +64,7 @@ async def ready():
 
 # API Endpoints
 @app.get("/")
-async def root():
+async def root() -> Dict[str, str]:
     return {
         "service": "Analytics Service",
         "version": "0.1.0",
@@ -73,7 +73,7 @@ async def root():
 
 
 @app.post("/events")
-async def track_event(event: Event):
+async def track_event(event: Event) -> Dict[str, str]:
     """
     Track a user event
 
@@ -83,7 +83,7 @@ async def track_event(event: Event):
 
 
 @app.post("/analytics/progress")
-async def get_progress(query: ProgressQuery):
+async def get_progress(query: ProgressQuery) -> Dict[str, str | Dict | list]:
     """
     Get learning progress analytics
 
@@ -98,7 +98,7 @@ async def get_progress(query: ProgressQuery):
 
 
 @app.get("/analytics/insights/{user_id}")
-async def get_insights(user_id: str):
+async def get_insights(user_id: str) -> Dict[str, str | list]:
     """
     Get personalized learning insights
 

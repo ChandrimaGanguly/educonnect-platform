@@ -11,7 +11,7 @@ This service handles:
 import os
 import sys
 from enum import Enum
-from typing import Optional
+from typing import Dict, Optional
 
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from pydantic import BaseModel
@@ -62,12 +62,12 @@ class ModerationResult(BaseModel):
 
 # Health endpoints
 @app.get("/health")
-async def health():
+async def health() -> Dict[str, str]:
     return {"status": "ok", "service": settings.service_name}
 
 
 @app.get("/ready")
-async def ready():
+async def ready() -> Dict[str, bool | str]:
     db_ok = await db_health()
     redis_ok = await redis_health_check()
 
@@ -79,7 +79,7 @@ async def ready():
 
 # API Endpoints
 @app.get("/")
-async def root():
+async def root() -> Dict[str, str]:
     return {
         "service": "Moderation Service",
         "version": "0.1.0",
@@ -88,7 +88,7 @@ async def root():
 
 
 @app.post("/moderate/text", response_model=ModerationResult)
-async def moderate_text(request: ModerationRequest):
+async def moderate_text(request: ModerationRequest) -> ModerationResult:
     """
     Moderate text content for toxicity, spam, etc.
 
@@ -103,7 +103,7 @@ async def moderate_text(request: ModerationRequest):
 
 
 @app.post("/moderate/image")
-async def moderate_image(file: UploadFile = File(...)):
+async def moderate_image(file: UploadFile = File(...)) -> Dict[str, str | bool | float]:
     """
     Moderate image content
 
@@ -118,7 +118,7 @@ async def moderate_image(file: UploadFile = File(...)):
 
 
 @app.post("/detect/spam")
-async def detect_spam(text: str):
+async def detect_spam(text: str) -> Dict[str, bool | float]:
     """
     Detect if content is spam
 
