@@ -10,16 +10,16 @@ This service handles:
 
 from fastapi import FastAPI, HTTPException, UploadFile, File
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import Optional
 from enum import Enum
 import sys
 import os
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
-from shared.config import settings
-from shared.database import health_check as db_health
-from shared.redis_client import redis_health_check
+from shared.config import settings  # noqa: E402
+from shared.database import health_check as db_health  # noqa: E402
+from shared.redis_client import redis_health_check  # noqa: E402
 
 app = FastAPI(
     title="EduConnect Moderation Service",

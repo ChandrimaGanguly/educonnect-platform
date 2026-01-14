@@ -7,7 +7,7 @@ This service handles:
 - Match quality optimization
 """
 
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List, Optional
 import sys
@@ -16,9 +16,9 @@ import os
 # Add parent directory to path for shared imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
-from shared.config import settings
-from shared.database import get_db, health_check as db_health
-from shared.redis_client import get_redis, redis_health_check
+from shared.config import settings  # noqa: E402
+from shared.database import health_check as db_health  # noqa: E402
+from shared.redis_client import redis_health_check  # noqa: E402
 
 # Initialize FastAPI app
 app = FastAPI(

@@ -9,7 +9,6 @@ from httpx import AsyncClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from shared.database import Base, get_db
-from shared.config import settings
 
 
 # Test database URL (use a separate test database)
