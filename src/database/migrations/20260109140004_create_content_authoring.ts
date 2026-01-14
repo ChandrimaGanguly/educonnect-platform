@@ -405,7 +405,8 @@ export async function up(knex: Knex): Promise<void> {
   });
 
   // Create accessibility_checks table
-  await knex.schema.createTable('accessibility_checks', (table) => {
+  if (!(await knex.schema.hasTable('accessibility_checks'))) {
+    await knex.schema.createTable('accessibility_checks', (table) => {
     table.uuid('id').primary().defaultTo(knex.raw('gen_random_uuid()'));
 
     // Content reference
@@ -445,6 +446,7 @@ export async function up(knex: Knex): Promise<void> {
     table.index('passed');
     table.index('checked_at');
   });
+  }
 
   // Create content_previews table for preview/testing
   await knex.schema.createTable('content_previews', (table) => {
