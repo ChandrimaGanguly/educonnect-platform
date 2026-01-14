@@ -3,6 +3,9 @@ Pytest configuration and shared fixtures
 """
 
 import asyncio
+import os
+import sys
+from pathlib import Path
 from typing import AsyncGenerator
 
 import pytest
@@ -12,8 +15,10 @@ from sqlalchemy.orm import sessionmaker
 
 from shared.database import Base, get_db
 
-# Test database URL (use a separate test database)
-TEST_DATABASE_URL = "postgresql://educonnect:test@localhost:5432/educonnect_test"
+# Test database URL (use environment variable or default to local test database)
+TEST_DATABASE_URL = os.getenv(
+    "DATABASE_URL", "postgresql://educonnect:test@localhost:5432/educonnect_test"
+)
 
 # Create test engine
 test_engine = create_engine(TEST_DATABASE_URL, echo=False)
@@ -48,6 +53,13 @@ async def db_session():
 @pytest.fixture
 async def client(db_session) -> AsyncGenerator:
     """Create a test client for the FastAPI app"""
+    # Determine which service we're testing from environment variable
+    service_name = os.getenv("SERVICE_NAME", "analytics")
+
+    # Import the service's FastAPI app dynamically
+    service_path = Path(__file__).parent / service_name
+    sys.path.insert(0, str(service_path))
+
     from main import app
 
     # Override database dependency
