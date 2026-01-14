@@ -28,32 +28,48 @@ export async function cleanupTestApp(app: FastifyInstance): Promise<void> {
 export async function cleanDatabase(): Promise<void> {
   const db = getDatabase();
 
-  // Delete from all tables in correct dependency order
-  // Note: We don't use session_replication_role = replica because it can
-  // interfere with CASCADE behavior on foreign keys
+  // Wrap in try-catch to log errors but continue cleanup
+  try {
+    // Delete from tables in correct dependency order (children before parents)
+    // Using individual deletes instead of TRUNCATE to avoid issues with parallel tests
 
-  // Delete from tables with no dependencies first (deepest children)
-  await db('trust_score_history').del();
-  await db('trust_events').del();
-  await db('user_trust_relationships').del();
-  await db('community_trust_relationships').del();
-  await db('trust_permission_rules').del();
+    // Deepest children - tables that depend on other tables
+    const childTables = [
+      'trust_score_history',
+      'trust_events',
+      'user_trust_relationships',
+      'community_trust_relationships',
+      'trust_permission_rules',
+      'community_members',
+      'community_invitations',
+      'community_join_requests',
+      'role_permissions',
+      'user_roles',
+    ];
 
-  // Delete from tables that depend on communities and users
-  await db('community_members').del();
-  await db('community_invitations').del();
-  await db('community_join_requests').del();
-  await db('role_permissions').del();
-  await db('user_roles').del();
-  await db('permissions').del();
-  await db('roles').del();
+    for (const table of childTables) {
+      try {
+        await db(table).del();
+      } catch (error) {
+        // Table might not exist in all test scenarios - continue
+        console.warn(`Warning: Could not clean table ${table}:`, error);
+      }
+    }
 
-  // Delete sessions
-  await db('sessions').del();
+    // Mid-level tables - permissions and roles (parents to role_permissions, user_roles)
+    await db('permissions').del();
+    await db('roles').del();
 
-  // Delete from parent tables last
-  await db('communities').del();
-  await db('users').del();
+    // Sessions table
+    await db('sessions').del();
+
+    // Parent tables - must be deleted last
+    await db('communities').del();
+    await db('users').del();
+  } catch (error) {
+    console.error('Error in cleanDatabase:', error);
+    throw error;
+  }
 }
 
 /**
