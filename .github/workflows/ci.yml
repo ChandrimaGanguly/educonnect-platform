@@ -61,6 +61,13 @@ jobs:
       - name: Run type check
         run: npm run typecheck
 
+      - name: Drop and recreate test database
+        env:
+          PGPASSWORD: test
+        run: |
+          psql -h localhost -U educonnect -d postgres -c "DROP DATABASE IF EXISTS educonnect_test;"
+          psql -h localhost -U educonnect -d postgres -c "CREATE DATABASE educonnect_test;"
+
       - name: Run database migrations
         env:
           DATABASE_URL: postgresql://educonnect:test@localhost:5432/educonnect_test
@@ -198,6 +205,9 @@ jobs:
   security-scan:
     name: Security Scan
     runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
 
     steps:
       - name: Checkout code
@@ -212,7 +222,7 @@ jobs:
           output: 'trivy-results.sarif'
 
       - name: Upload Trivy results to GitHub Security
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: 'trivy-results.sarif'
 
