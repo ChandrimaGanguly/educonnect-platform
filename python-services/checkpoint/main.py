@@ -6,6 +6,7 @@ This service handles:
 - Automated scoring of assessments
 - Difficulty calibration
 """
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List, Optional, Dict
@@ -108,14 +109,10 @@ async def score_submission(submission_id: str, answers: Dict):
 
     TODO: Implement automated scoring
     """
-    return SubmissionScore(
-        submission_id=submission_id,
-        score=0.0,
-        max_score=100.0,
-        feedback=None
-    )
+    return SubmissionScore(submission_id=submission_id, score=0.0, max_score=100.0, feedback=None)
 
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host=settings.host, port=settings.port)

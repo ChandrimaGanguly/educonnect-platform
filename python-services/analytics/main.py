@@ -7,6 +7,7 @@ This service handles:
 - Performance metrics
 - Predictive analytics
 """
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List, Optional, Dict
@@ -111,4 +112,5 @@ async def get_insights(user_id: str):
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host=settings.host, port=settings.port)

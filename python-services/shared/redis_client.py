@@ -1,4 +1,5 @@
 """Redis client for Python microservices"""
+
 import redis.asyncio as aioredis
 from typing import Optional
 from .config import settings

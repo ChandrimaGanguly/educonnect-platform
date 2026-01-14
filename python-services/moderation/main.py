@@ -7,6 +7,7 @@ This service handles:
 - Spam filtering
 - Content flagging
 """
+
 from fastapi import FastAPI, HTTPException, UploadFile, File
 from pydantic import BaseModel
 from typing import List, Optional
@@ -96,7 +97,7 @@ async def moderate_text(request: ModerationRequest):
         content_id=request.content_id,
         is_safe=True,
         category=ModerationCategory.SAFE,
-        confidence=1.0
+        confidence=1.0,
     )
 
 
@@ -130,4 +131,5 @@ async def detect_spam(text: str):
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host=settings.host, port=settings.port)

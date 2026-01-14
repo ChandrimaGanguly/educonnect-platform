@@ -6,6 +6,7 @@ This service handles:
 - Availability matching
 - Match quality optimization
 """
+
 from fastapi import FastAPI, HTTPException, Depends
 from pydantic import BaseModel
 from typing import List, Optional
@@ -90,10 +91,7 @@ async def find_matches(request: MatchRequest):
     TODO: Implement ML-based matching algorithm
     """
     # Placeholder implementation
-    return MatchResponse(
-        learner_id=request.learner_id,
-        matches=[]
-    )
+    return MatchResponse(learner_id=request.learner_id, matches=[])
 
 
 @app.post("/match/score")
@@ -114,4 +112,5 @@ async def score_match(learner_id: str, mentor_id: str):
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host=settings.host, port=settings.port)
