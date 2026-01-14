@@ -7,12 +7,13 @@ This service handles:
 - Difficulty calibration
 """
 
+import os
+import sys
+from enum import Enum
+from typing import Dict, List, Optional
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from typing import List, Optional, Dict
-from enum import Enum
-import sys
-import os
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 

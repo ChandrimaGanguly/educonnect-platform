@@ -8,12 +8,13 @@ This service handles:
 - Content flagging
 """
 
-from fastapi import FastAPI, HTTPException, UploadFile, File
-from pydantic import BaseModel
-from typing import Optional
-from enum import Enum
-import sys
 import os
+import sys
+from enum import Enum
+from typing import Optional
+
+from fastapi import FastAPI, File, HTTPException, UploadFile
+from pydantic import BaseModel
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 

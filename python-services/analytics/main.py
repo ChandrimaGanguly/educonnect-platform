@@ -8,12 +8,13 @@ This service handles:
 - Predictive analytics
 """
 
+import os
+import sys
+from datetime import datetime
+from typing import Dict, Optional
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from typing import Optional, Dict
-from datetime import datetime
-import sys
-import os
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 

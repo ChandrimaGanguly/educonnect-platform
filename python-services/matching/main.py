@@ -7,11 +7,12 @@ This service handles:
 - Match quality optimization
 """
 
+import os
+import sys
+from typing import List, Optional
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from typing import List, Optional
-import sys
-import os
 
 # Add parent directory to path for shared imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))

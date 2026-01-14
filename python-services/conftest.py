@@ -2,14 +2,15 @@
 Pytest configuration and shared fixtures
 """
 
-import pytest
 import asyncio
 from typing import AsyncGenerator
+
+import pytest
 from httpx import AsyncClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from shared.database import Base, get_db
 
+from shared.database import Base, get_db
 
 # Test database URL (use a separate test database)
 TEST_DATABASE_URL = "postgresql://educonnect:test@localhost:5432/educonnect_test"
