@@ -2,323 +2,384 @@
 
 ## Overview
 
-This roadmap organizes features into parallel groups based on dependencies and implementation complexity. Features within the same group can be built concurrently by separate agents.
+This roadmap is organized by **MVP priority** - Phase 1 delivers a working demo, subsequent phases add features incrementally.
 
 **Legend:**
-- **Group A, B, C...** = Features that can be implemented in parallel
-- **Phase 1, 2, 3, 4** = Sequential phases (Phase 2 requires Phase 1 complete)
+- ✅ Complete - Feature fully implemented
+- 🔶 Partial - Schema/service exists, needs API routes or completion
+- ❌ Not Started - Needs implementation
 - **Complexity**: Low / Medium / High
-- **Spec Reference**: Link to specification file
 
 ---
 
-## Phase 1: Foundation Layer
+## Phase 1: Demo-Ready MVP
 
-*Everything else depends on these. Must be completed first.*
+*Everything needed for a working demo: Register → Join Community → Browse Content → Take Checkpoint → Get Matched with Mentor*
 
-### Group A (Parallel)
+### Group A: Infrastructure & Authentication
 
-| Feature | Complexity | Spec | Description |
-|---------|------------|------|-------------|
-| **A1: Database Schema & Infrastructure** | Low | core | PostgreSQL setup, base tables (users, communities), Redis config |
-| **A2: Project Scaffolding** | Low | - | Node.js/Fastify setup, Python service stubs, Docker configs |
-| **A3: Development Tooling** | Low | - | Linting, testing frameworks, CI/CD pipeline setup |
+| Feature | Status | Complexity | Description |
+|---------|--------|------------|-------------|
+| **A1: Database Schema** | ✅ Done | Low | PostgreSQL setup, base tables, Redis config |
+| **A2: Project Scaffolding** | ✅ Done | Low | Node.js/Fastify, Python service stubs, Docker |
+| **A3: Development Tooling** | ✅ Done | Low | Linting, Jest testing, CI/CD pipeline |
+| **A4: User Authentication** | ✅ Done | Medium | Registration, login, JWT tokens, sessions |
+| **A5: MFA Support** | ✅ Done | Medium | TOTP authenticator, backup codes |
+| **A6: Session Management** | ✅ Done | Low | Active sessions, logout, session revocation |
 
-### Group B (Parallel, after A)
+### Group B: User & Community Management
 
-| Feature | Complexity | Spec | Description |
-|---------|------------|------|-------------|
-| **B1: User Account Management** | Medium | core | Registration, login, password recovery, session management |
-| **B2: Authentication System** | Medium | security | JWT tokens, MFA support, session security |
-| **B3: Basic API Gateway** | Low | - | GraphQL setup, REST endpoints, rate limiting |
+| Feature | Status | Complexity | Description |
+|---------|--------|------------|-------------|
+| **B1: User Profile System** | 🔶 Partial | Medium | Profile CRUD, privacy settings, avatar |
+| **B2: Profile Setup Wizard** | ❌ Needed | Medium | Guided setup, learning interests, goals |
+| **B3: Skill Self-Assessment** | ❌ Needed | Medium | Skill questionnaire, baseline levels |
+| **B4: Community CRUD** | ❌ Needed | Medium | Create, read, update, delete communities |
+| **B5: Community Membership** | ❌ Needed | Medium | Join, leave, invite, member listing |
+| **B6: Community Discovery** | ❌ Needed | Low | Browse, search, filter communities |
 
-### Group C (Parallel, after B)
+### Group C: Role-Based Access Control
 
-| Feature | Complexity | Spec | Description |
-|---------|------------|------|-------------|
-| **C1: User Profile System** | Medium | core | Profile creation, privacy controls, skill self-assessment |
-| **C2: Community Management** | Medium | core | Community CRUD, configuration, membership |
-| **C3: Role-Based Access Control** | Medium | core | Default roles, permissions, role assignment |
-| **C4: Trust Score Foundation** | Medium | security | Basic trust calculation, trust-based permissions |
+| Feature | Status | Complexity | Description |
+|---------|--------|------------|-------------|
+| **C1: RBAC Schema** | ✅ Done | Medium | Roles, permissions, user_community_roles tables |
+| **C2: Default Roles Seed** | ✅ Done | Low | Learner, mentor, admin role definitions |
+| **C3: Permission Middleware** | ❌ Needed | Medium | Route-level permission enforcement |
+| **C4: Role Assignment API** | ❌ Needed | Low | Assign/revoke roles in communities |
+| **C5: Trust Score Foundation** | ✅ Done | Medium | Trust calculation, trust-based permissions |
 
-### Group D (Parallel, after C)
+### Group D: Curriculum & Content Delivery
 
-| Feature | Complexity | Spec | Description |
-|---------|------------|------|-------------|
-| **D1: Inter-Community Trust Networks** | Medium | security | Community-to-community trust relationships |
-| **D2: Audit Logging System** | Low | core | Immutable audit logs for all actions |
-| **D3: Basic Notification Infrastructure** | Medium | notifications | In-app notifications, notification preferences |
+| Feature | Status | Complexity | Description |
+|---------|--------|------------|-------------|
+| **D1: Curriculum Schema** | ✅ Done | Medium | Domains, subjects, courses, modules, lessons |
+| **D2: Domain API** | ❌ Needed | Low | List and filter domains |
+| **D3: Subject API** | ❌ Needed | Low | List subjects by domain |
+| **D4: Course API** | ❌ Needed | Medium | Course CRUD, course details |
+| **D5: Module API** | ❌ Needed | Low | List modules in course |
+| **D6: Lesson API** | ❌ Needed | Medium | Lesson content delivery, mark complete |
+| **D7: Content Handlers** | ✅ Done | High | Text, video, audio, image, code handlers |
 
-**Phase 1 Deliverables:**
-- ✅ Users can register, login, manage profiles
-- ✅ Communities can be created and configured
-- ✅ Role-based permissions enforced
-- ✅ Trust-based access control working
-- ✅ Basic notifications functional
+### Group E: Checkpoint Execution
+
+| Feature | Status | Complexity | Description |
+|---------|--------|------------|-------------|
+| **E1: Checkpoint Schema** | ✅ Done | Medium | Templates, question banks, sessions |
+| **E2: Checkpoint Types Service** | 🔶 Partial | Medium | MCQ, true/false, short answer support |
+| **E3: Session Management** | ❌ Needed | High | Start session, timer, integrity checks |
+| **E4: Question Delivery** | ❌ Needed | Medium | Paginated questions, answer tracking |
+| **E5: Response Submission** | ❌ Needed | Medium | Submit answers, validate completeness |
+| **E6: Automated Scoring** | 🔶 Partial | Medium | Score calculation, partial credit |
+| **E7: Results Display** | ❌ Needed | Low | Score, feedback, recommendations |
+
+### Group F: Basic Mentor Matching
+
+| Feature | Status | Complexity | Description |
+|---------|--------|------------|-------------|
+| **F1: Mentor Profile Schema** | ❌ Needed | Medium | Skills, availability, capacity, subjects |
+| **F2: Mentor Profile API** | ❌ Needed | Medium | Create/update mentor profiles |
+| **F3: Match Request API** | ❌ Needed | Medium | Learner submits match request |
+| **F4: Matching Algorithm** | ❌ Needed | High | Subject + availability scoring |
+| **F5: Recommendation API** | ❌ Needed | Medium | Return ranked mentor matches |
+| **F6: Request Response API** | ❌ Needed | Medium | Mentor accept/decline workflow |
+| **F7: Relationship Creation** | ❌ Needed | Low | Establish confirmed relationship |
+
+### Group G: Progress & Notifications
+
+| Feature | Status | Complexity | Description |
+|---------|--------|------------|-------------|
+| **G1: Learning Progress Tracking** | ❌ Needed | Medium | Course/module completion tracking |
+| **G2: Progress Dashboard API** | ❌ Needed | Medium | User's overall learning progress |
+| **G3: Notification Schema** | ✅ Done | Low | Notifications table structure |
+| **G4: In-App Notifications** | 🔶 Partial | Medium | List, mark read, notification count |
+| **G5: Audit Logging** | ✅ Done | Low | Immutable action audit trail |
+
+### Group H: MVP Seed Data
+
+| Feature | Status | Complexity | Description |
+|---------|--------|------------|-------------|
+| **H1: Sample Communities** | ❌ Needed | Low | 3-5 demo communities |
+| **H2: Sample Curriculum** | ❌ Needed | Medium | 2-3 domains, courses, 10+ lessons |
+| **H3: Sample Checkpoints** | ❌ Needed | Medium | 5+ checkpoints with questions |
+| **H4: Sample Users** | ❌ Needed | Low | Learners, mentors, admin accounts |
+| **H5: Sample Relationships** | ❌ Needed | Low | Pre-existing mentor-learner pairs |
+
+**Phase 1 MVP Deliverables:**
+- ✅ Users can register, login, manage sessions
+- ⬜ Users can complete profile setup with skills/interests
+- ⬜ Users can browse and join communities
+- ⬜ Users can navigate curriculum and view lessons
+- ⬜ Users can take checkpoints and see scores
+- ⬜ Learners can request and receive mentor recommendations
+- ⬜ Mentors can accept/decline requests
+- ⬜ Relationships are established and visible
 
 ---
 
-## Phase 2: Content & Learning Infrastructure
+## Phase 2: Enhanced Learning Experience
 
-*Build the educational content foundation.*
+*Improve UX with offline support, advanced content, and learning paths*
 
-### Group E (Parallel)
+### Group I: Offline & Low-Bandwidth
 
-| Feature | Complexity | Spec | Description |
-|---------|------------|------|-------------|
-| **E1: Curriculum Structure** | Medium | curriculum | Domains, subjects, courses, modules, lessons hierarchy |
-| **E2: Content Storage & CDN** | Medium | mobile | File storage, CDN setup, progressive loading |
-| **E3: Low-Bandwidth Core** | High | mobile | Offline-first architecture, sync engine, conflict resolution |
+| Feature | Status | Complexity | Description |
+|---------|--------|------------|-------------|
+| **I1: Sync Engine** | 🔶 Partial | High | Offline queue, conflict resolution |
+| **I2: Content Pre-Download** | ❌ Needed | Medium | Intelligent content caching |
+| **I3: Offline Checkpoints** | ❌ Needed | High | Take assessments offline |
+| **I4: PWA Implementation** | ❌ Needed | Medium | Service workers, app shell |
+| **I5: Text-First Mode** | ✅ Done | Low | Bandwidth-saving content mode |
 
-### Group F (Parallel, after E)
+### Group J: Content Authoring & Review
 
-| Feature | Complexity | Spec | Description |
-|---------|------------|------|-------------|
-| **F1: Content Authoring Tools** | High | curriculum | WYSIWYG editor, media upload, assessment builder |
-| **F2: Content Review Workflow** | Medium | curriculum | Peer review, approval pipeline, plagiarism detection |
-| **F3: Multi-Format Support** | Medium | curriculum | Text, video, audio, interactive content handling |
-| **F4: Accessibility Compliance** | Medium | curriculum | Alt text, captions, screen reader support |
+| Feature | Status | Complexity | Description |
+|---------|--------|------------|-------------|
+| **J1: Content Authoring Service** | 🔶 Partial | High | WYSIWYG editor, media upload |
+| **J2: Assessment Builder** | 🔶 Partial | Medium | Question creation tools |
+| **J3: Content Review Workflow** | 🔶 Partial | Medium | Peer review, approval pipeline |
+| **J4: Plagiarism Detection** | ❌ Needed | Medium | Content originality checking |
+| **J5: Accessibility Compliance** | ✅ Done | Medium | WCAG 2.1 AA checker |
 
-### Group G (Parallel, after F)
+### Group K: Advanced Checkpoints
 
-| Feature | Complexity | Spec | Description |
-|---------|------------|------|-------------|
-| **G1: Checkpoint Types** | Medium | checkpoints | MCQ, short answer, practical, oral assessment formats |
-| **G2: Checkpoint Execution Engine** | High | checkpoints | Session management, offline support, integrity checks |
-| **G3: Automated Scoring** | Medium | checkpoints | Objective scoring, partial credit, immediate feedback |
-| **G4: Text-First Content Mode** | Low | mobile | Text alternatives, bandwidth-saving mode |
+| Feature | Status | Complexity | Description |
+|---------|--------|------------|-------------|
+| **K1: Practical Assessments** | ❌ Needed | High | Project submissions, rubrics |
+| **K2: Code Execution** | ❌ Needed | High | Sandboxed code running |
+| **K3: Oral Assessments** | ❌ Needed | Medium | Voice recording, transcription |
+| **K4: Adaptive Difficulty** | ❌ Needed | High | IRT-based calibration |
 
-### Group H (Parallel, after G)
+### Group L: Learning Paths
 
-| Feature | Complexity | Spec | Description |
-|---------|------------|------|-------------|
-| **H1: Learning Path Engine** | Medium | curriculum | Prerequisites, progress tracking, adaptive sequencing |
-| **H2: Checkpoint Scheduling** | Medium | checkpoints | Progress triggers, spaced repetition, deadlines |
-| **H3: Progression Logic** | Medium | checkpoints | Pass/fail, retry policy, content unlocking |
-| **H4: PWA Implementation** | Medium | mobile | Service workers, offline caching, push notifications |
+| Feature | Status | Complexity | Description |
+|---------|--------|------------|-------------|
+| **L1: Prerequisite System** | ❌ Needed | Medium | Content dependency definitions |
+| **L2: Prerequisite Checking** | ❌ Needed | Medium | Block/unlock content logic |
+| **L3: Path Recommendations** | ❌ Needed | Medium | Suggested next content |
+| **L4: Spaced Repetition** | ❌ Needed | Medium | Review scheduling |
+| **L5: Learner Pacing** | ❌ Needed | Low | Self-paced vs cohort modes |
+
+### Group M: Notification Delivery
+
+| Feature | Status | Complexity | Description |
+|---------|--------|------------|-------------|
+| **M1: Push Notifications** | ❌ Needed | Medium | FCM/APNs integration |
+| **M2: Email Notifications** | ❌ Needed | Medium | Transactional emails |
+| **M3: SMS Notifications** | ❌ Needed | Medium | SMS gateway integration |
+| **M4: Notification Batching** | ❌ Needed | Low | Digest mode, low-bandwidth batch |
 
 **Phase 2 Deliverables:**
-- ✅ Content can be created, reviewed, published
-- ✅ Learners can consume content offline
-- ✅ Checkpoints can be taken and auto-scored
-- ✅ Learning paths guide progression
-- ✅ Works on 3G connections
+- ⬜ Content works offline with sync
+- ⬜ Content creators can author and publish
+- ⬜ Advanced checkpoint types available
+- ⬜ Learning paths guide progression
+- ⬜ Multi-channel notifications working
 
 ---
 
 ## Phase 3: Intelligence & Engagement
 
-*Add ML/AI features and engagement mechanics.*
+*Add ML/AI features and gamification mechanics*
 
-### Group I (Parallel)
+### Group N: Analytics Pipeline
 
-| Feature | Complexity | Spec | Description |
-|---------|------------|------|-------------|
-| **I1: Analytics Data Collection** | Medium | analytics | Event tracking, consent management, data pipeline |
-| **I2: Points System Core** | Medium | incentives | Learning/Mentor/Community points, earning rules |
-| **I3: Basic Matching Algorithm** | High | matching | Compatibility scoring, availability matching |
+| Feature | Status | Complexity | Description |
+|---------|--------|------------|-------------|
+| **N1: Event Tracking** | ❌ Needed | Medium | User action logging |
+| **N2: Consent Management** | ❌ Needed | Medium | Analytics opt-in/out |
+| **N3: Data Pipeline** | ❌ Needed | High | ETL processing |
+| **N4: Learner Analytics** | ❌ Needed | Medium | Personal progress insights |
+| **N5: Community Analytics** | ❌ Needed | Medium | Admin health dashboards |
 
-### Group J (Parallel, after I)
+### Group O: Points & Achievements
 
-| Feature | Complexity | Spec | Description |
-|---------|------------|------|-------------|
-| **J1: Achievement & Badge System** | Medium | incentives | Categories, tiers, unlock conditions, display |
-| **J2: Learner Dashboard Analytics** | Medium | analytics | Personal progress, trends, recommendations |
-| **J3: Mentor Matching Flow** | Medium | matching | Request workflow, response handling, match confirmation |
-| **J4: Push Notifications** | Medium | notifications | FCM/APNs integration, rich notifications |
+| Feature | Status | Complexity | Description |
+|---------|--------|------------|-------------|
+| **O1: Points System Core** | ❌ Needed | Medium | Learning/mentor/community points |
+| **O2: Point Earning Rules** | ❌ Needed | Medium | Activity-based point awards |
+| **O3: Achievement Categories** | ❌ Needed | Medium | Learning, mentoring, community |
+| **O4: Badge Tiers** | ❌ Needed | Low | Bronze, silver, gold, platinum |
+| **O5: Leaderboards** | ❌ Needed | Medium | Opt-in competitive rankings |
 
-### Group K (Parallel, after J)
+### Group P: Engagement Mechanics
 
-| Feature | Complexity | Spec | Description |
-|---------|------------|------|-------------|
-| **K1: Peer Mentor Development** | High | matching | Eligibility assessment, training pathway, supervision |
-| **K2: Relationship Management** | Medium | matching | Session scheduling, progress check-ins, conclusion |
-| **K3: Engagement Mechanics** | Medium | incentives | Daily challenges, streaks, goal setting |
-| **K4: Email/SMS Notifications** | Medium | notifications | Multi-channel delivery, digest mode, low-bandwidth batching |
+| Feature | Status | Complexity | Description |
+|---------|--------|------------|-------------|
+| **P1: Daily Challenges** | ❌ Needed | Medium | Daily learning goals |
+| **P2: Learning Streaks** | ❌ Needed | Low | Consecutive day tracking |
+| **P3: Goal Setting** | ❌ Needed | Medium | User-defined goals |
+| **P4: Streak Shields** | ❌ Needed | Low | Streak protection mechanics |
 
-### Group L (Parallel, after K)
+### Group Q: ML-Enhanced Features
 
-| Feature | Complexity | Spec | Description |
-|---------|------------|------|-------------|
-| **L1: Auto Question Generation** | High | checkpoints | NLP-based generation, difficulty calibration |
-| **L2: Match Quality ML** | High | matching | Feedback analysis, algorithm optimization, bias detection |
-| **L3: Personalization Engine** | High | analytics | Learning path recommendations, pace optimization |
-| **L4: Rewards & Redemption** | Medium | incentives | Digital rewards, certificates, partner integration |
+| Feature | Status | Complexity | Description |
+|---------|--------|------------|-------------|
+| **Q1: Match Quality ML** | ❌ Needed | High | Feedback-trained matching |
+| **Q2: Auto Question Generation** | ❌ Needed | High | NLP-based checkpoint creation |
+| **Q3: Personalization Engine** | ❌ Needed | High | Adaptive learning paths |
+| **Q4: Predictive Analytics** | ❌ Needed | High | Dropout/success prediction |
 
-### Group M (Parallel, after L)
+### Group R: Advanced Mentoring
 
-| Feature | Complexity | Spec | Description |
-|---------|------------|------|-------------|
-| **M1: Checkpoint Evolution** | High | analytics | Performance analysis, question retirement, format innovation |
-| **M2: Predictive Analytics** | High | analytics | Dropout prediction, success prediction, demand forecasting |
-| **M3: Group Mentoring** | Medium | matching | Study groups, cohorts, group session management |
-| **M4: Leaderboards & Social** | Medium | incentives | Opt-in leaderboards, kudos, spotlights |
+| Feature | Status | Complexity | Description |
+|---------|--------|------------|-------------|
+| **R1: Peer Mentor Development** | ❌ Needed | High | Training pathway, certification |
+| **R2: Supervised Mentoring** | ❌ Needed | Medium | New mentor oversight |
+| **R3: Group Mentoring** | ❌ Needed | Medium | Study groups, cohorts |
+| **R4: Session Scheduling** | ❌ Needed | Medium | Calendar integration |
+| **R5: Relationship Check-Ins** | ❌ Needed | Low | Progress reviews, feedback |
 
 **Phase 3 Deliverables:**
-- ✅ Learners matched with appropriate mentors
-- ✅ Points, badges, and achievements motivate engagement
-- ✅ Analytics drive personalized learning paths
-- ✅ Checkpoints evolve based on performance data
-- ✅ Multi-channel notifications keep users engaged
+- ⬜ Analytics dashboard for learners
+- ⬜ Full points and achievement system
+- ⬜ ML-optimized mentor matching
+- ⬜ Auto-generated checkpoint questions
+- ⬜ Engagement mechanics drive retention
+- ⬜ Peer mentor development pathway
 
 ---
 
-## Phase 4: Governance & Quality
+## Phase 4: Governance & Compliance
 
-*Add moderation, oversight, and compliance features.*
+*Enterprise-ready moderation, oversight, and regulatory compliance*
 
-### Group N (Parallel)
+### Group S: Content Moderation
 
-| Feature | Complexity | Spec | Description |
-|---------|------------|------|-------------|
-| **N1: Automated Content Screening** | High | content | Toxicity detection, image moderation, spam filtering |
-| **N2: Community Reporting** | Medium | content | Report submission, categorization, triage |
-| **N3: Committee Structure** | Medium | oversight | Committee types, membership, charter management |
+| Feature | Status | Complexity | Description |
+|---------|--------|------------|-------------|
+| **S1: Automated Screening** | ❌ Needed | High | Toxicity, spam, bias detection |
+| **S2: Community Reporting** | ❌ Needed | Medium | User report submission |
+| **S3: Human Review Queue** | ❌ Needed | Medium | Moderator review workflow |
+| **S4: Moderation Actions** | ❌ Needed | Medium | Warnings, removal, appeals |
+| **S5: Transparency Reports** | ❌ Needed | Low | Public moderation statistics |
 
-### Group O (Parallel, after N)
+### Group T: Oversight Committees
 
-| Feature | Complexity | Spec | Description |
-|---------|------------|------|-------------|
-| **O1: Human Review Workflow** | Medium | content | Review queue, decision making, appeals |
-| **O2: Oversight Review Workflows** | Medium | oversight | Content review, accuracy verification, bias review |
-| **O3: Moderation Actions** | Medium | content | Content removal, user warnings, progressive discipline |
+| Feature | Status | Complexity | Description |
+|---------|--------|------------|-------------|
+| **T1: Committee Structure** | ❌ Needed | Medium | Types, membership, charters |
+| **T2: Oversight Workflows** | ❌ Needed | Medium | Content review, bias review |
+| **T3: Quality Assurance** | ❌ Needed | Medium | Periodic re-reviews |
+| **T4: Volunteer Management** | ❌ Needed | Medium | Workload, recognition |
 
-### Group P (Parallel, after O)
+### Group U: Algorithmic Oversight
 
-| Feature | Complexity | Spec | Description |
-|---------|------------|------|-------------|
-| **P1: Algorithmic Oversight** | High | oversight | Algorithm transparency, review process, monitoring |
-| **P2: Transparency Reports** | Medium | content | Public statistics, decision documentation |
-| **P3: Quality Assurance** | Medium | oversight | Periodic re-review, educational accuracy, bias audits |
-| **P4: Volunteer Management** | Medium | oversight | Workload management, recognition, wellness support |
+| Feature | Status | Complexity | Description |
+|---------|--------|------------|-------------|
+| **U1: Algorithm Transparency** | ❌ Needed | High | Explainable recommendations |
+| **U2: Bias Detection** | ❌ Needed | High | Demographic fairness analysis |
+| **U3: Bias Remediation** | ❌ Needed | High | Correction mechanisms |
+| **U4: Algorithm Audits** | ❌ Needed | Medium | Periodic fairness reviews |
 
-### Group Q (Parallel, after P)
+### Group V: Compliance & Administration
 
-| Feature | Complexity | Spec | Description |
-|---------|------------|------|-------------|
-| **Q1: Bias Detection System** | High | analytics | Demographic analysis, DIF detection, remediation |
-| **Q2: Community Admin Dashboard** | Medium | analytics | Health metrics, growth analytics, resource utilization |
-| **Q3: Platform Admin Tools** | Medium | analytics | Cross-community views, algorithm effectiveness |
-| **Q4: Compliance & Audit** | Medium | security | GDPR/FERPA compliance, data export, audit reports |
+| Feature | Status | Complexity | Description |
+|---------|--------|------------|-------------|
+| **V1: GDPR Compliance** | ❌ Needed | Medium | Data export, deletion rights |
+| **V2: FERPA Compliance** | ❌ Needed | Medium | Educational records protection |
+| **V3: Platform Admin Tools** | ❌ Needed | Medium | Cross-community management |
+| **V4: Community Admin Dashboard** | ❌ Needed | Medium | Health metrics, analytics |
+| **V5: Audit Reports** | ❌ Needed | Low | Compliance documentation |
 
 **Phase 4 Deliverables:**
-- ✅ Content automatically screened for safety
-- ✅ Human oversight committees review quality
-- ✅ Algorithmic decisions are transparent and fair
-- ✅ Platform complies with privacy regulations
-- ✅ Bias detection prevents discrimination
+- ⬜ Automated content screening
+- ⬜ Human oversight committees functional
+- ⬜ Algorithmic decisions are fair and transparent
+- ⬜ Platform complies with GDPR/FERPA
+- ⬜ Admin dashboards for platform management
 
 ---
 
-## Implementation Summary
+## MVP Critical Path
 
 ```
-Phase 1: Foundation          Phase 2: Content           Phase 3: Intelligence      Phase 4: Governance
-═══════════════════          ═════════════════          ════════════════════       ═══════════════════
-
-   ┌─────┐                      ┌─────┐                    ┌─────┐                    ┌─────┐
-   │  A  │ Infrastructure       │  E  │ Structure          │  I  │ Analytics          │  N  │ Screening
-   └──┬──┘                      └──┬──┘                    └──┬──┘                    └──┬──┘
-      │                            │                          │                          │
-   ┌──▼──┐                      ┌──▼──┐                    ┌──▼──┐                    ┌──▼──┐
-   │  B  │ Auth                 │  F  │ Authoring          │  J  │ Badges/Match       │  O  │ Review
-   └──┬──┘                      └──┬──┘                    └──┬──┘                    └──┬──┘
-      │                            │                          │                          │
-   ┌──▼──┐                      ┌──▼──┐                    ┌──▼──┐                    ┌──▼──┐
-   │  C  │ Profiles/Roles       │  G  │ Checkpoints        │  K  │ Peer Mentoring     │  P  │ Oversight
-   └──┬──┘                      └──┬──┘                    └──┬──┘                    └──┬──┘
-      │                            │                          │                          │
-   ┌──▼──┐                      ┌──▼──┐                    ┌──▼──┐                    ┌──▼──┐
-   │  D  │ Trust/Audit          │  H  │ Paths/PWA          │  L  │ ML Generation      │  Q  │ Compliance
-   └─────┘                      └─────┘                    └──┬──┘                    └─────┘
-                                                              │
-                                                           ┌──▼──┐
-                                                           │  M  │ Predictive
-                                                           └─────┘
+A1-A6 → B1-B6 → C1-C5 → D1-D7 → E1-E7 → F1-F7 → G1-G5 → H1-H5
+(Auth)   (Profile)  (RBAC)  (Content)  (Checkpoint) (Matching) (Progress) (Seed)
+  ✅        🔶         🔶        🔶          🔶          ❌          ❌        ❌
 ```
 
----
-
-## Quick Reference: Parallel Groups
-
-| Group | Features | Phase | Can Start After |
-|-------|----------|-------|-----------------|
-| **A** | DB, Scaffolding, Tooling | 1 | Immediately |
-| **B** | User Auth, JWT, API Gateway | 1 | A complete |
-| **C** | Profiles, Communities, RBAC | 1 | B complete |
-| **D** | Trust Networks, Audit, Basic Notifications | 1 | C complete |
-| **E** | Curriculum Structure, CDN, Offline Core | 2 | Phase 1 complete |
-| **F** | Authoring, Review, Multi-format, A11y | 2 | E complete |
-| **G** | Checkpoint Types, Execution, Scoring, Text Mode | 2 | F complete |
-| **H** | Learning Paths, Scheduling, Progression, PWA | 2 | G complete |
-| **I** | Analytics Pipeline, Points Core, Basic Matching | 3 | Phase 2 complete |
-| **J** | Badges, Learner Analytics, Match Flow, Push | 3 | I complete |
-| **K** | Peer Mentors, Relationships, Streaks, Email/SMS | 3 | J complete |
-| **L** | Auto-Gen Questions, Match ML, Personalization, Rewards | 3 | K complete |
-| **M** | Checkpoint Evolution, Predictive, Groups, Social | 3 | L complete |
-| **N** | Auto Screening, Reporting, Committee Setup | 4 | Phase 3 complete |
-| **O** | Human Review, Oversight Review, Actions | 4 | N complete |
-| **P** | Algorithm Oversight, Transparency, QA, Volunteers | 4 | O complete |
-| **Q** | Bias Detection, Admin Dashboards, Compliance | 4 | P complete |
+**MVP Demo Flow:**
+1. Register/Login (✅ Complete)
+2. Complete profile setup (🔶 Needs wizard)
+3. Browse and join community (❌ Needs API)
+4. Navigate curriculum (❌ Needs API)
+5. View lesson content (❌ Needs API)
+6. Take checkpoint (❌ Needs session mgmt)
+7. See score and feedback (❌ Needs results API)
+8. Request mentor match (❌ Needs matching)
+9. Receive recommendations (❌ Needs algorithm)
+10. Mentor accepts request (❌ Needs workflow)
 
 ---
 
-## Agent Assignment Recommendations
+## Implementation Priority Order
 
-For optimal parallel execution:
+### MVP Sprint 1: Community & Profiles
+- B4: Community CRUD
+- B5: Community Membership
+- B6: Community Discovery
+- B2: Profile Setup Wizard
+- B3: Skill Self-Assessment
+- C3: Permission Middleware
 
-### Phase 1 (4 parallel agents max)
-- Agent 1: Database & Infrastructure (A1, A2, A3)
-- Agent 2: Authentication (B1, B2, B3)
-- Agent 3: User Management (C1, C2, C3)
-- Agent 4: Trust & Notifications (C4, D1, D2, D3)
+### MVP Sprint 2: Content Delivery
+- D2-D6: Curriculum APIs
+- G1: Learning Progress Tracking
+- G4: In-App Notifications (complete)
 
-### Phase 2 (4 parallel agents max)
-- Agent 1: Curriculum Backend (E1, F1, F2)
-- Agent 2: Mobile/Offline (E2, E3, G4, H4)
-- Agent 3: Checkpoints (G1, G2, G3, H2, H3)
-- Agent 4: Content Formats (F3, F4, H1)
+### MVP Sprint 3: Checkpoints
+- E3: Session Management
+- E4: Question Delivery
+- E5: Response Submission
+- E6: Automated Scoring (complete)
+- E7: Results Display
 
-### Phase 3 (5 parallel agents max)
-- Agent 1: Analytics Pipeline (I1, J2, L3, M2)
-- Agent 2: Incentives System (I2, J1, K3, L4, M4)
-- Agent 3: Matching Algorithm (I3, J3, L2, M3)
-- Agent 4: Peer Mentoring (K1, K2)
-- Agent 5: Notifications & AI Gen (J4, K4, L1, M1)
+### MVP Sprint 4: Mentor Matching
+- F1: Mentor Profile Schema
+- F2: Mentor Profile API
+- F3: Match Request API
+- F4: Matching Algorithm
+- F5: Recommendation API
+- F6: Request Response API
+- F7: Relationship Creation
 
-### Phase 4 (4 parallel agents max)
-- Agent 1: Content Moderation (N1, N2, O1, O3)
-- Agent 2: Oversight Committees (N3, O2, P3, P4)
-- Agent 3: Algorithm Governance (P1, P2, Q1)
-- Agent 4: Admin & Compliance (Q2, Q3, Q4)
-
----
-
-## Critical Path
-
-The fastest path to MVP:
-
-```
-A1 → B1 → C1 → E1 → F1 → G1 → H1 → I1 → J3 → K2
-       ↓
-     (Core user flow: Register → Learn → Checkpoint → Match with Mentor)
-```
-
-**MVP Features** (minimum for usable product):
-1. User registration and profiles (A-C)
-2. Basic content delivery (E-F)
-3. Simple checkpoints (G)
-4. Basic mentor matching (I3, J3)
-5. Offline support (E3)
+### MVP Sprint 5: Polish & Seed Data
+- H1-H5: All seed data
+- G2: Progress Dashboard
+- Bug fixes and testing
 
 ---
 
-## Risk Mitigation
+## Success Criteria
 
-**High-Risk Features** (may need iteration):
-- L1: Auto Question Generation (ML quality varies)
-- L2: Match Quality ML (needs data to train)
-- E3: Offline Sync (complex conflict resolution)
-- N1: Automated Screening (false positive/negative tuning)
+### Phase 1 Complete When:
+- [ ] New user can register and complete profile setup
+- [ ] User can browse and join communities
+- [ ] User can navigate curriculum (domain → lesson)
+- [ ] User can view lesson content
+- [ ] User can complete checkpoint with scoring
+- [ ] User can request mentor matching
+- [ ] System returns mentor recommendations
+- [ ] Mentor can accept/decline requests
+- [ ] Relationship established and visible
+- [ ] Seed data exists for demonstration
+- [ ] Demo flow completes in <15 minutes
 
-**Recommendation**: Build simple rule-based versions first, then enhance with ML.
+### Phase 2 Complete When:
+- [ ] Content works offline with reliable sync
+- [ ] Contributors can author and publish content
+- [ ] Advanced checkpoint types functional
+- [ ] Learning paths enforce prerequisites
+- [ ] Notifications delivered via push/email
+
+### Phase 3 Complete When:
+- [ ] Analytics dashboard available
+- [ ] Full gamification system working
+- [ ] ML-enhanced matching operational
+- [ ] Engagement metrics improving retention
+
+### Phase 4 Complete When:
+- [ ] Automated moderation screening active
+- [ ] Human oversight committees operational
+- [ ] Bias detection and remediation working
+- [ ] GDPR/FERPA compliance verified

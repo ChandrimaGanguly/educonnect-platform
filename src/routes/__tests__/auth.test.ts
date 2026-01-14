@@ -29,11 +29,11 @@ describe('auth routes', () => {
     await cleanupTestApp(app);
   });
 
-  describe('POST /api/auth/register', () => {
+  describe('POST /api/v1/auth/register', () => {
     it('should register a new user', async () => {
       const response = await app.inject({
         method: 'POST',
-        url: '/api/auth/register',
+        url: '/api/v1/auth/register',
         payload: {
           email: 'newuser@example.com',
           username: 'newuser',
@@ -57,13 +57,13 @@ describe('auth routes', () => {
     });
   });
 
-  describe('POST /api/auth/login', () => {
+  describe('POST /api/v1/auth/login', () => {
     it('should login with valid credentials', async () => {
       const user = await createTestUser();
 
       const response = await app.inject({
         method: 'POST',
-        url: '/api/auth/login',
+        url: '/api/v1/auth/login',
         payload: {
           email: user.email,
           password: 'TestPassword123!',
@@ -85,14 +85,14 @@ describe('auth routes', () => {
     });
   });
 
-  describe('POST /api/auth/logout', () => {
+  describe('POST /api/v1/auth/logout', () => {
     it('should logout authenticated user', async () => {
       const user = await createTestUser();
       const token = generateTestToken(app, { userId: user.id });
 
       const response = await app.inject({
         method: 'POST',
-        url: '/api/auth/logout',
+        url: '/api/v1/auth/logout',
         headers: {
           authorization: `Bearer ${token}`,
         },
@@ -102,7 +102,7 @@ describe('auth routes', () => {
     });
   });
 
-  describe('POST /api/auth/refresh', () => {
+  describe('POST /api/v1/auth/refresh', () => {
     it('should refresh valid token', async () => {
       // TODO: Test token refresh
       expect(true).toBe(true);
@@ -114,28 +114,28 @@ describe('auth routes', () => {
     });
   });
 
-  describe('POST /api/auth/forgot-password', () => {
+  describe('POST /api/v1/auth/forgot-password', () => {
     it('should initiate password reset', async () => {
       // TODO: Test password reset flow
       expect(true).toBe(true);
     });
   });
 
-  describe('POST /api/auth/reset-password', () => {
+  describe('POST /api/v1/auth/reset-password', () => {
     it('should reset password with valid token', async () => {
       // TODO: Test password reset completion
       expect(true).toBe(true);
     });
   });
 
-  describe('POST /api/auth/mfa/enable', () => {
+  describe('POST /api/v1/auth/mfa/enable', () => {
     it('should enable MFA for user', async () => {
       // TODO: Test MFA enablement
       expect(true).toBe(true);
     });
   });
 
-  describe('POST /api/auth/mfa/verify', () => {
+  describe('POST /api/v1/auth/mfa/verify', () => {
     it('should verify MFA code', async () => {
       // TODO: Test MFA verification
       expect(true).toBe(true);

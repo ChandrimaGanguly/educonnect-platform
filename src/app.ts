@@ -126,6 +126,10 @@ export async function buildApp() {
   const { authRoutes } = await import('./routes/auth');
   await app.register(authRoutes, { prefix: '/api/v1/auth' });
 
+  // Register content routes
+  const { contentRoutes } = await import('./routes/content');
+  await app.register(contentRoutes, { prefix: '/api/v1/content' });
+
   // Register GraphQL server
   const { registerGraphQL } = await import('./graphql');
   await registerGraphQL(app);
