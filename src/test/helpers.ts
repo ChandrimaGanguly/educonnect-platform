@@ -43,6 +43,7 @@ export async function cleanDatabase(): Promise<void> {
       'community_members',
       'community_invitations',
       'community_join_requests',
+      'community_user_roles',
       'role_permissions',
       'user_roles',
     ];
@@ -57,15 +58,35 @@ export async function cleanDatabase(): Promise<void> {
     }
 
     // Mid-level tables - permissions and roles (parents to role_permissions, user_roles)
-    await db('permissions').del();
-    await db('roles').del();
+    try {
+      await db('permissions').del();
+    } catch (error) {
+      console.warn('Warning: Could not clean table permissions:', error);
+    }
+    try {
+      await db('roles').del();
+    } catch (error) {
+      console.warn('Warning: Could not clean table roles:', error);
+    }
 
     // Sessions table
-    await db('sessions').del();
+    try {
+      await db('sessions').del();
+    } catch (error) {
+      console.warn('Warning: Could not clean table sessions:', error);
+    }
 
     // Parent tables - must be deleted last
-    await db('communities').del();
-    await db('users').del();
+    try {
+      await db('communities').del();
+    } catch (error) {
+      console.warn('Warning: Could not clean table communities:', error);
+    }
+    try {
+      await db('users').del();
+    } catch (error) {
+      console.warn('Warning: Could not clean table users:', error);
+    }
   } catch (error) {
     console.error('Error in cleanDatabase:', error);
     throw error;
