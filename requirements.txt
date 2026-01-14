@@ -1,5 +1,8 @@
-# EduConnect Platform - Python Services Requirements
+# EduConnect Platform - Python Services Requirements (Production)
 # For ML/AI microservices, analytics, and content processing
+#
+# NOTE: For CI/CD testing, use requirements-test.txt instead (lightweight, ~500MB)
+# This file contains ALL dependencies including heavy ML packages (~4GB+)
 
 # ============================================================================
 # Core Web Framework (for Python-based microservices)

@@ -1,0 +1,140 @@
+# EduConnect Platform - Test Requirements
+# Minimal dependencies for CI/CD testing (lightweight, ~500MB vs 4GB+)
+# For production deployment, use requirements.txt
+
+# ============================================================================
+# Core Web Framework
+# ============================================================================
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+pydantic==2.5.3
+python-multipart==0.0.6
+
+# ============================================================================
+# Database & Caching
+# ============================================================================
+psycopg2-binary==2.9.9  # PostgreSQL adapter
+redis==5.0.1  # Redis client (includes async support)
+SQLAlchemy==2.0.25  # ORM for database operations
+alembic==1.13.1  # Database migrations
+
+# ============================================================================
+# Essential Data Libraries (lightweight)
+# ============================================================================
+numpy==1.26.3  # Numerical computing (required by many packages)
+pandas==2.1.4  # Data manipulation (used in tests)
+
+# ============================================================================
+# Text Processing (lightweight)
+# ============================================================================
+markdown==3.5.2  # Markdown processing
+beautifulsoup4==4.12.3  # HTML/XML parsing
+bleach==6.1.0  # HTML sanitization
+
+# ============================================================================
+# Security & Cryptography
+# ============================================================================
+cryptography==44.0.1  # Cryptographic recipes and primitives
+PyJWT==2.8.0  # JSON Web Token implementation
+passlib[bcrypt]==1.7.4  # Password hashing
+python-jose[cryptography]==3.3.0  # JOSE implementation
+
+# ============================================================================
+# Async & Background Tasks
+# ============================================================================
+celery==5.3.6  # Distributed task queue
+asyncpg==0.29.0  # Async PostgreSQL client
+
+# ============================================================================
+# HTTP & API Clients
+# ============================================================================
+httpx==0.26.0  # Async HTTP client
+requests==2.31.0  # HTTP library
+aiohttp==3.11.11  # Async HTTP client/server
+
+# ============================================================================
+# Data Validation & Serialization
+# ============================================================================
+marshmallow==3.20.2  # Object serialization
+jsonschema==4.20.0  # JSON Schema validation
+
+# ============================================================================
+# Monitoring & Logging
+# ============================================================================
+prometheus-client==0.19.0  # Prometheus metrics
+sentry-sdk==1.39.2  # Error tracking
+python-json-logger==2.0.7  # JSON logging
+structlog==24.1.0  # Structured logging
+
+# ============================================================================
+# Testing
+# ============================================================================
+pytest==7.4.4  # Testing framework
+pytest-asyncio==0.23.3  # Async test support
+pytest-cov==4.1.0  # Coverage plugin
+pytest-mock==3.12.0  # Mocking plugin
+faker==22.0.0  # Fake data generation for testing
+hypothesis==6.98.3  # Property-based testing
+
+# ============================================================================
+# Code Quality & Linting
+# ============================================================================
+black==24.1.1  # Code formatter
+flake8==7.0.0  # Linting
+mypy==1.8.0  # Static type checking
+isort==5.13.2  # Import sorting
+
+# ============================================================================
+# Utilities
+# ============================================================================
+python-dotenv==1.0.0  # Environment variable management
+pyyaml==6.0.1  # YAML parser
+python-dateutil==2.8.2  # Date/time utilities
+pytz==2024.1  # Timezone definitions
+click==8.1.7  # CLI creation
+
+# ============================================================================
+# Rate Limiting
+# ============================================================================
+slowapi==0.1.9  # Rate limiting for FastAPI
+limits==3.8.0  # Rate limiting utilities
+
+# ============================================================================
+# Email (lightweight)
+# ============================================================================
+jinja2==3.1.5  # Template engine for emails
+
+# ============================================================================
+# EXCLUDED FROM TEST REQUIREMENTS (use requirements.txt for production):
+# ============================================================================
+# Heavy ML/AI packages (~3-4 GB):
+# - transformers, sentence-transformers (pulls torch ~900MB + CUDA packages)
+# - spacy, nltk (NLP with large models)
+# - detoxify (toxicity detection, pulls torch)
+# - scikit-learn, scipy (ML algorithms)
+# - fairlearn, aif360 (bias detection)
+# - surprise, implicit (recommendation systems)
+# - opencv-python-headless (computer vision)
+# - matplotlib, seaborn, statsmodels (data viz/stats)
+#
+# Document/Media processing:
+# - Pillow, imageio, ffmpeg-python (image/video)
+# - reportlab, PyPDF2, python-docx, openpyxl (document generation)
+#
+# External services:
+# - google-cloud-dlp (PII detection)
+# - elasticsearch (search indexing)
+# - sendgrid (email service)
+# - UnleashClient, splitio-client (feature flags)
+# - geoip2, geopy (geolocation)
+# - svix (webhooks)
+# - networkx, python-igraph (graph processing)
+# - xlsxwriter, tabulate (reporting)
+# - langdetect, lingua-language-detector (language detection)
+# - brotli, python-magic (file processing)
+# - whoosh (search)
+# - flower, pylint (monitoring/analysis)
+#
+# NOTE: Mock these dependencies in unit tests. For integration tests that
+# require ML functionality, use the full requirements.txt or test with
+# Docker images that have all dependencies pre-installed.
