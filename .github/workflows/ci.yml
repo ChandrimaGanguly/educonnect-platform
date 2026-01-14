@@ -75,7 +75,6 @@ jobs:
           psql -h localhost -U educonnect -d postgres -c "CREATE DATABASE educonnect_test;"
 
       - name: Run database migrations
-        continue-on-error: true  # Temporary: investigating "relation already exists" errors
         env:
           DATABASE_URL: postgresql://educonnect:test@localhost:5432/educonnect_test
           NODE_ENV: test
