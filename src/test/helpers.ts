@@ -28,16 +28,16 @@ export async function cleanupTestApp(app: FastifyInstance): Promise<void> {
 export async function cleanDatabase(): Promise<void> {
   const db = getDatabase();
 
-  // Disable foreign key checks temporarily
+  // Disable triggers while preserving CASCADE behavior
   await db.raw('SET session_replication_role = replica');
 
-  // Truncate tables
-  const tables = ['sessions', 'communities', 'users'];
-  for (const table of tables) {
-    await db(table).truncate();
-  }
+  // Delete from parent tables - CASCADE handles dependent tables automatically
+  // This avoids foreign key constraint errors that TRUNCATE would cause
+  await db('communities').del();
+  await db('users').del();
+  await db('sessions').del();
 
-  // Re-enable foreign key checks
+  // Re-enable triggers
   await db.raw('SET session_replication_role = DEFAULT');
 }
 
