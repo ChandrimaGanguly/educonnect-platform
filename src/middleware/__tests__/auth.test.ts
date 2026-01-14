@@ -25,7 +25,7 @@ describe('auth middleware', () => {
   describe('Token Validation', () => {
     it('should allow requests with valid token', async () => {
       const user = await createTestUser();
-      const token = generateTestToken(user.id);
+      const token = generateTestToken(app, { userId: user.id });
 
       // TODO: Make authenticated request and verify success
       expect(token).toBeDefined();

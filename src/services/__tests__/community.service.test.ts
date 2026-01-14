@@ -62,7 +62,7 @@ describe('community.service', () => {
   describe('Integration', () => {
     it('should integrate with user and RBAC services', async () => {
       const user = await createTestUser();
-      const community = await createTestCommunity();
+      const community = await createTestCommunity(user.id);
       expect(user).toBeDefined();
       expect(community).toBeDefined();
     });

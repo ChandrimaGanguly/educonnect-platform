@@ -88,7 +88,7 @@ describe('auth routes', () => {
   describe('POST /api/auth/logout', () => {
     it('should logout authenticated user', async () => {
       const user = await createTestUser();
-      const token = generateTestToken(user.id);
+      const token = generateTestToken(app, { userId: user.id });
 
       const response = await app.inject({
         method: 'POST',
