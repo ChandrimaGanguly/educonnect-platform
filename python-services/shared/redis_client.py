@@ -24,7 +24,7 @@ async def get_redis() -> aioredis.Redis:
     return _redis_client
 
 
-async def close_redis():
+async def close_redis() -> None:
     """Close Redis connection"""
     global _redis_client
 

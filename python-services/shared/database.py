@@ -1,8 +1,10 @@
 """Database connection for Python microservices"""
 
-from sqlalchemy import create_engine
+from typing import Generator
+
+from sqlalchemy import create_engine, text
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import Session, sessionmaker
 
 from .config import settings
 
@@ -18,7 +20,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 
-def get_db():
+def get_db() -> Generator[Session, None, None]:
     """Dependency for FastAPI to get database session"""
     db = SessionLocal()
     try:
@@ -31,7 +33,7 @@ async def health_check() -> bool:
     """Check if database is accessible"""
     try:
         with engine.connect() as connection:
-            connection.execute("SELECT 1")
+            connection.execute(text("SELECT 1"))
         return True
     except Exception as e:
         print(f"Database health check failed: {e}")

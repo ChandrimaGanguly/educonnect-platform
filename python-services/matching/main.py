@@ -9,7 +9,7 @@ This service handles:
 
 import os
 import sys
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
@@ -52,7 +52,7 @@ class MatchResponse(BaseModel):
 
 # Health endpoints
 @app.get("/health")
-async def health():
+async def health() -> Dict[str, str]:
     return {
         "status": "ok",
         "service": settings.service_name,
@@ -60,7 +60,7 @@ async def health():
 
 
 @app.get("/ready")
-async def ready():
+async def ready() -> Dict[str, bool | str]:
     db_ok = await db_health()
     redis_ok = await redis_health_check()
 
@@ -76,7 +76,7 @@ async def ready():
 
 # API Endpoints
 @app.get("/")
-async def root():
+async def root() -> Dict[str, str]:
     return {
         "service": "Matching Service",
         "version": "0.1.0",
@@ -85,7 +85,7 @@ async def root():
 
 
 @app.post("/match", response_model=MatchResponse)
-async def find_matches(request: MatchRequest):
+async def find_matches(request: MatchRequest) -> MatchResponse:
     """
     Find compatible mentors for a learner
 
@@ -96,7 +96,7 @@ async def find_matches(request: MatchRequest):
 
 
 @app.post("/match/score")
-async def score_match(learner_id: str, mentor_id: str):
+async def score_match(learner_id: str, mentor_id: str) -> Dict[str, str | float]:
     """
     Calculate compatibility score between a learner and mentor
 
