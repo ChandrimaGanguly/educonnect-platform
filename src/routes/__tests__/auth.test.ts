@@ -38,7 +38,7 @@ describe('auth routes', () => {
           email: 'newuser@example.com',
           username: 'newuser',
           password: 'SecurePassword123!',
-          full_name: 'New User',
+          fullName: 'New User',
         },
       });
 
@@ -65,7 +65,7 @@ describe('auth routes', () => {
         method: 'POST',
         url: '/api/v1/auth/login',
         payload: {
-          email: user.email,
+          emailOrUsername: user.email,
           password: 'TestPassword123!',
         },
       });
