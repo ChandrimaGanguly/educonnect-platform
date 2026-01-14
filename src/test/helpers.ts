@@ -28,17 +28,32 @@ export async function cleanupTestApp(app: FastifyInstance): Promise<void> {
 export async function cleanDatabase(): Promise<void> {
   const db = getDatabase();
 
-  // Disable triggers while preserving CASCADE behavior
-  await db.raw('SET session_replication_role = replica');
+  // Delete from all tables in correct dependency order
+  // Note: We don't use session_replication_role = replica because it can
+  // interfere with CASCADE behavior on foreign keys
 
-  // Delete from parent tables - CASCADE handles dependent tables automatically
-  // This avoids foreign key constraint errors that TRUNCATE would cause
-  await db('communities').del();
-  await db('users').del();
+  // Delete from tables with no dependencies first (deepest children)
+  await db('trust_score_history').del();
+  await db('trust_events').del();
+  await db('user_trust_relationships').del();
+  await db('community_trust_relationships').del();
+  await db('trust_permission_rules').del();
+
+  // Delete from tables that depend on communities and users
+  await db('community_members').del();
+  await db('community_invitations').del();
+  await db('community_join_requests').del();
+  await db('role_permissions').del();
+  await db('user_roles').del();
+  await db('permissions').del();
+  await db('roles').del();
+
+  // Delete sessions
   await db('sessions').del();
 
-  // Re-enable triggers
-  await db.raw('SET session_replication_role = DEFAULT');
+  // Delete from parent tables last
+  await db('communities').del();
+  await db('users').del();
 }
 
 /**
