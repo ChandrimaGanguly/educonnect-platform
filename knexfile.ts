@@ -31,7 +31,7 @@ const config: { [key: string]: Knex.Config } = {
 
   test: {
     client: 'postgresql',
-    connection: process.env.TEST_DATABASE_URL || {
+    connection: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL || {
       host: 'localhost',
       port: 5432,
       user: 'educonnect',
