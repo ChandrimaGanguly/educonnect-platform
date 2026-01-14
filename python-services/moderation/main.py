@@ -110,7 +110,7 @@ async def moderate_image(file: UploadFile = File(...)) -> Dict[str, str | bool |
     TODO: Implement image moderation using CV models
     """
     return {
-        "filename": file.filename,
+        "filename": file.filename or "unknown",
         "is_safe": True,
         "category": "safe",
         "confidence": 1.0,
