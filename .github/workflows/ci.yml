@@ -260,4 +260,4 @@ jobs:
       - name: Audit Python dependencies
         run: |
           pip install safety
-          safety check -r requirements-test.txt
+          safety scan --file requirements-test.txt
