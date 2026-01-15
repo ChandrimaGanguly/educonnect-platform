@@ -69,7 +69,8 @@ jobs:
         with:
           context: .
           file: ./Dockerfile.python
-          build-args: SERVICE_NAME=${{ matrix.service }}
+          build-args: |
+            SERVICE_NAME=${{ matrix.service }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

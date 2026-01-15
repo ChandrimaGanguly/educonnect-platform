@@ -4,6 +4,16 @@ import { resolve } from 'path';
 
 dotenv.config();
 
+// Determine if we're running in production/staging (compiled) or development (TypeScript)
+const isProd = process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging';
+const migrationsDir = isProd
+  ? resolve(__dirname, 'src/database/migrations')
+  : resolve(__dirname, 'src/database/migrations');
+const migrationsExt = isProd ? 'js' : 'ts';
+const seedsDir = isProd
+  ? resolve(__dirname, 'src/database/seeds')
+  : resolve(__dirname, 'src/database/seeds');
+
 const config: { [key: string]: Knex.Config } = {
   development: {
     client: 'postgresql',
@@ -20,12 +30,12 @@ const config: { [key: string]: Knex.Config } = {
     },
     migrations: {
       tableName: 'knex_migrations',
-      directory: resolve(__dirname, 'src/database/migrations'),
-      extension: 'ts',
+      directory: migrationsDir,
+      extension: migrationsExt,
     },
     seeds: {
-      directory: resolve(__dirname, 'src/database/seeds'),
-      extension: 'ts',
+      directory: seedsDir,
+      extension: migrationsExt,
     },
   },
 
@@ -48,12 +58,12 @@ const config: { [key: string]: Knex.Config } = {
     acquireConnectionTimeout: 30000,
     migrations: {
       tableName: 'knex_migrations',
-      directory: resolve(__dirname, 'src/database/migrations'),
-      extension: 'ts',
+      directory: migrationsDir,
+      extension: migrationsExt,
     },
     seeds: {
-      directory: resolve(__dirname, 'src/database/seeds'),
-      extension: 'ts',
+      directory: seedsDir,
+      extension: migrationsExt,
     },
   },
 
@@ -66,8 +76,8 @@ const config: { [key: string]: Knex.Config } = {
     },
     migrations: {
       tableName: 'knex_migrations',
-      directory: resolve(__dirname, 'dist/database/migrations'),
-      extension: 'js',
+      directory: migrationsDir,
+      extension: migrationsExt,
     },
   },
 
@@ -80,8 +90,8 @@ const config: { [key: string]: Knex.Config } = {
     },
     migrations: {
       tableName: 'knex_migrations',
-      directory: resolve(__dirname, 'dist/database/migrations'),
-      extension: 'js',
+      directory: migrationsDir,
+      extension: migrationsExt,
     },
     acquireConnectionTimeout: 10000,
   },
