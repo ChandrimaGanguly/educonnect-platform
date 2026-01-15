@@ -95,6 +95,28 @@ export class TrustService {
     this.db = getDatabase();
   }
 
+  // ========== Helper Methods ==========
+
+  /**
+   * Normalize a trust event from database (convert decimal strings to numbers)
+   */
+  private normalizeTrustEvent(event: any): TrustEvent {
+    return {
+      ...event,
+      trust_impact: typeof event.trust_impact === 'string' ? parseFloat(event.trust_impact) : event.trust_impact,
+    };
+  }
+
+  /**
+   * Normalize a user trust relationship from database
+   */
+  private normalizeUserTrustRelationship(relationship: any): UserTrustRelationship {
+    return {
+      ...relationship,
+      trust_level: typeof relationship.trust_level === 'string' ? parseFloat(relationship.trust_level) : relationship.trust_level,
+    };
+  }
+
   // ========== Trust Events ==========
 
   /**
@@ -119,7 +141,7 @@ export class TrustService {
     // Update user's trust score
     await this.updateUserTrustScore(userId);
 
-    return event;
+    return this.normalizeTrustEvent(event);
   }
 
   /**
@@ -144,7 +166,7 @@ export class TrustService {
     // Update community's trust score
     await this.updateCommunityTrustScore(communityId);
 
-    return event;
+    return this.normalizeTrustEvent(event);
   }
 
   /**
@@ -162,7 +184,7 @@ export class TrustService {
       .limit(limit)
       .offset(offset);
 
-    return events;
+    return events.map(event => this.normalizeTrustEvent(event));
   }
 
   /**
@@ -180,7 +202,7 @@ export class TrustService {
       .limit(limit)
       .offset(offset);
 
-    return events;
+    return events.map(event => this.normalizeTrustEvent(event));
   }
 
   // ========== Trust Score Calculation ==========
@@ -310,7 +332,7 @@ export class TrustService {
         })
         .returning('*');
 
-      return relationship;
+      return this.normalizeUserTrustRelationship(relationship);
     } else {
       const [relationship] = await this.db('user_trust_relationships')
         .insert({
@@ -324,7 +346,7 @@ export class TrustService {
         })
         .returning('*');
 
-      return relationship;
+      return this.normalizeUserTrustRelationship(relationship);
     }
   }
 
@@ -336,7 +358,7 @@ export class TrustService {
       .where({ trustor_id: userId, is_active: true })
       .orderBy('trust_level', 'desc');
 
-    return relationships;
+    return relationships.map(rel => this.normalizeUserTrustRelationship(rel));
   }
 
   /**
@@ -347,7 +369,7 @@ export class TrustService {
       .where({ trustee_id: userId, is_active: true })
       .orderBy('trust_level', 'desc');
 
-    return relationships;
+    return relationships.map(rel => this.normalizeUserTrustRelationship(rel));
   }
 
   /**

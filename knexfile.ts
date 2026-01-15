@@ -39,9 +39,13 @@ const config: { [key: string]: Knex.Config } = {
       database: 'educonnect_test',
     },
     pool: {
-      min: 1,
-      max: 5,
+      min: 2,
+      max: 20,
+      acquireTimeoutMillis: 30000,
+      idleTimeoutMillis: 1000,
+      reapIntervalMillis: 100,
     },
+    acquireConnectionTimeout: 30000,
     migrations: {
       tableName: 'knex_migrations',
       directory: resolve(__dirname, 'src/database/migrations'),

@@ -44,7 +44,7 @@ describe('trust.service', () => {
         expect(event).toBeDefined();
         expect(event.user_id).toBe(testUser.id);
         expect(event.event_type).toBe('contribution');
-        expect(parseFloat(event.trust_impact)).toBe(5);
+        expect(event.trust_impact).toBe(5);
       });
 
       it('should update user trust score when recording event', async () => {
@@ -87,7 +87,7 @@ describe('trust.service', () => {
 
         const event = await trustService.recordUserTrustEvent(testUser.id, eventData);
 
-        expect(parseFloat(event.trust_impact)).toBe(-10);
+        expect(event.trust_impact).toBe(-10);
       });
     });
 
@@ -105,7 +105,7 @@ describe('trust.service', () => {
         expect(event).toBeDefined();
         expect(event.community_id).toBe(testCommunity.id);
         expect(event.event_type).toBe('community_growth');
-        expect(parseFloat(event.trust_impact)).toBe(20);
+        expect(event.trust_impact).toBe(20);
       });
 
       it('should store related entity information', async () => {
@@ -237,7 +237,7 @@ describe('trust.service', () => {
       expect(relationship).toBeDefined();
       expect(relationship.trustor_id).toBe(testUser.id);
       expect(relationship.trustee_id).toBe(testUser2.id);
-      expect(parseFloat(relationship.trust_level)).toBe(80);
+      expect(relationship.trust_level).toBe(80);
       expect(relationship.trust_type).toBe('endorsement');
       expect(relationship.is_active).toBe(true);
     });
@@ -259,7 +259,7 @@ describe('trust.service', () => {
         'collaboration'
       );
 
-      expect(parseFloat(updated.trust_level)).toBe(85);
+      expect(updated.trust_level).toBe(85);
     });
 
     it('should get user trust relationships', async () => {
@@ -403,7 +403,7 @@ describe('trust.service', () => {
         trust_impact: 0,
       });
 
-      expect(parseFloat(event.trust_impact)).toBe(0);
+      expect(event.trust_impact).toBe(0);
     });
 
     it('should handle missing optional fields', async () => {
@@ -415,8 +415,8 @@ describe('trust.service', () => {
       });
 
       expect(event).toBeDefined();
-      expect(event.description).toBeUndefined();
-      expect(event.metadata).toBeUndefined();
+      expect(event.description).toBeNull();
+      expect(event.metadata).toBeNull();
     });
 
     it('should return empty array for user with no trust events', async () => {

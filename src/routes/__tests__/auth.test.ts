@@ -16,17 +16,29 @@ import {
   generateTestToken,
 } from '../../test/helpers';
 import type { FastifyInstance } from 'fastify';
+import { getRedisClient } from '../../config/redis';
 
 describe('auth routes', () => {
   let app: FastifyInstance;
 
   beforeEach(async () => {
-    app = await createTestApp();
+    // Clean database first (before creating app)
     await cleanDatabase();
+
+    // Clear Redis rate limit keys
+    const redis = getRedisClient();
+    if (redis) {
+      await redis.flushdb();
+    }
+
+    // Create app last
+    app = await createTestApp();
   });
 
   afterEach(async () => {
-    await cleanupTestApp(app);
+    if (app) {
+      await cleanupTestApp(app);
+    }
   });
 
   describe('POST /api/v1/auth/register', () => {
@@ -59,7 +71,7 @@ describe('auth routes', () => {
 
   describe('POST /api/v1/auth/login', () => {
     it('should login with valid credentials', async () => {
-      const user = await createTestUser();
+      const user = await createTestUser({ password: 'TestPassword123!' });
 
       const response = await app.inject({
         method: 'POST',
@@ -69,6 +81,11 @@ describe('auth routes', () => {
           password: 'TestPassword123!',
         },
       });
+
+      if (response.statusCode !== 200) {
+        console.error('Login failed with status:', response.statusCode);
+        console.error('Response body:', response.body);
+      }
 
       expect(response.statusCode).toBe(200);
       // TODO: Validate JWT token in response
@@ -87,14 +104,25 @@ describe('auth routes', () => {
 
   describe('POST /api/v1/auth/logout', () => {
     it('should logout authenticated user', async () => {
-      const user = await createTestUser();
-      const token = generateTestToken(app, { userId: user.id });
+      const user = await createTestUser({ password: 'TestPassword123!' });
+
+      // Login to get a real session
+      const loginResponse = await app.inject({
+        method: 'POST',
+        url: '/api/v1/auth/login',
+        payload: {
+          emailOrUsername: user.email,
+          password: 'TestPassword123!',
+        },
+      });
+
+      const { accessToken } = JSON.parse(loginResponse.body);
 
       const response = await app.inject({
         method: 'POST',
         url: '/api/v1/auth/logout',
         headers: {
-          authorization: `Bearer ${token}`,
+          authorization: `Bearer ${accessToken}`,
         },
       });
 

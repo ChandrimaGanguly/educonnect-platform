@@ -421,16 +421,19 @@ export class RbacService {
     }
 
     const allRoles = [...platformRoles, ...communityRoles];
-    const roleIds = allRoles.map(r => r.id);
+    const roleIds = allRoles.map(r => r.id).filter(Boolean); // Filter out any undefined/null values
 
     if (roleIds.length === 0) {
       return [];
     }
 
+    // Use a CTE/subquery approach to avoid JSON comparison issues in DISTINCT
     const permissions = await this.db('permissions')
-      .join('role_permissions', 'permissions.id', 'role_permissions.permission_id')
-      .whereIn('role_permissions.role_id', roleIds)
-      .distinct('permissions.*');
+      .whereIn('permissions.id',
+        this.db('role_permissions')
+          .select('permission_id')
+          .whereIn('role_id', roleIds)
+      );
 
     return permissions;
   }

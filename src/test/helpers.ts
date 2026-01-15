@@ -5,6 +5,7 @@ import { FastifyInstance } from 'fastify';
 import { buildApp } from '../app';
 import { getDatabase, closeDatabase } from '../database';
 import { closeRedis } from '../config/redis';
+import { hashPassword } from '../utils/password';
 
 /**
  * Create a test Fastify instance
@@ -15,11 +16,15 @@ export async function createTestApp(): Promise<FastifyInstance> {
 
 /**
  * Clean up test resources
+ * Note: We don't close the database connection here to avoid pool exhaustion
+ * The database connection will be reused across tests and closed in the global teardown
  */
 export async function cleanupTestApp(app: FastifyInstance): Promise<void> {
   await app.close();
-  await closeDatabase();
-  await closeRedis();
+  // Don't close database - reuse the connection
+  // await closeDatabase();
+  // Don't close Redis - reuse the connection
+  // await closeRedis();
 }
 
 /**
@@ -95,14 +100,30 @@ export async function cleanDatabase(): Promise<void> {
 
 /**
  * Create a test user
+ * @param overrides - Optional overrides for user properties
+ *                    Use `password` to set a plain password (will be hashed automatically)
+ *                    Use `password_hash` to set a pre-hashed password
  */
-export async function createTestUser(overrides = {}) {
+export async function createTestUser(overrides: any = {}) {
   const db = getDatabase();
 
+  // Generate unique email and username to avoid conflicts
+  const uniqueSuffix = Math.random().toString(36).substring(2, 15);
+
+  // If a plain password is provided, hash it
+  let passwordHash = '$2b$12$test.hash.value'; // Default test hash
+  if (overrides.password) {
+    passwordHash = await hashPassword(overrides.password);
+    delete overrides.password; // Remove plain password from overrides
+  } else if (overrides.password_hash) {
+    passwordHash = overrides.password_hash;
+    delete overrides.password_hash; // Remove from overrides to avoid duplication
+  }
+
   const defaultUser = {
-    email: 'test@example.com',
-    username: 'testuser',
-    password_hash: '$2b$12$test.hash.value',
+    email: `test-${uniqueSuffix}@example.com`,
+    username: `testuser-${uniqueSuffix}`,
+    password_hash: passwordHash,
     full_name: 'Test User',
     status: 'active',
     ...overrides,
@@ -118,9 +139,12 @@ export async function createTestUser(overrides = {}) {
 export async function createTestCommunity(createdBy: string, overrides = {}) {
   const db = getDatabase();
 
+  // Generate unique slug to avoid conflicts
+  const uniqueSuffix = Math.random().toString(36).substring(2, 15);
+
   const defaultCommunity = {
     name: 'Test Community',
-    slug: 'test-community',
+    slug: `test-community-${uniqueSuffix}`,
     description: 'A test community',
     type: 'public',
     status: 'active',
