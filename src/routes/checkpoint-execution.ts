@@ -82,14 +82,47 @@ const recordEventSchema = z.object({
   client_timestamp: z.number().optional(),
 });
 
-// ========== Service Instances ==========
+// ========== Helper Functions ==========
 
-const sessionService = new CheckpointSessionService();
-const executionService = new CheckpointExecutionService();
+/**
+ * Verify that the authenticated user owns the specified session
+ * SECURITY: Prevents IDOR attacks by checking session ownership
+ * @returns session object if authorized, null if not found or unauthorized
+ */
+async function verifySessionOwnership(
+  sessionService: CheckpointSessionService,
+  sessionId: string,
+  userId: string,
+  reply: FastifyReply
+): Promise<any | null> {
+  const session = await sessionService.getSession(sessionId);
+
+  if (!session) {
+    reply.status(404).send({
+      error: 'Not Found',
+      message: 'Session not found',
+    });
+    return null;
+  }
+
+  if (session.user_id !== userId) {
+    reply.status(403).send({
+      error: 'Forbidden',
+      message: 'You do not have access to this session',
+    });
+    return null;
+  }
+
+  return session;
+}
 
 // ========== Routes ==========
 
 export async function checkpointExecutionRoutes(server: FastifyInstance): Promise<void> {
+  // Create service instances per route registration to avoid stale database connections
+  // Services are lightweight and stateless, so this is safe and prevents connection issues
+  const getSessionService = () => new CheckpointSessionService();
+  const getExecutionService = () => new CheckpointExecutionService();
   // ========== Session Management ==========
 
   /**
@@ -104,7 +137,7 @@ export async function checkpointExecutionRoutes(server: FastifyInstance): Promis
   }>, reply: FastifyReply) => {
     try {
       const data = createSessionSchema.parse(request.body);
-      const session = await sessionService.createSession(
+      const session = await getSessionService().createSession(
         request.user!.userId,
         request.params.checkpointId,
         {
@@ -145,6 +178,7 @@ export async function checkpointExecutionRoutes(server: FastifyInstance): Promis
   /**
    * POST /api/v1/checkpoint-sessions/:sessionId/start
    * Start a checkpoint session
+   * SECURITY: Verifies session ownership before allowing start
    */
   server.post('/checkpoint-sessions/:sessionId/start', {
     preHandler: [authenticate],
@@ -152,6 +186,17 @@ export async function checkpointExecutionRoutes(server: FastifyInstance): Promis
     Params: { sessionId: string };
   }>, reply: FastifyReply) => {
     try {
+      const sessionService = getSessionService();
+
+      // SECURITY: Verify session ownership before allowing state change
+      const verifiedSession = await verifySessionOwnership(
+        sessionService,
+        request.params.sessionId,
+        request.user!.userId,
+        reply
+      );
+      if (!verifiedSession) return;
+
       const session = await sessionService.startSession(request.params.sessionId);
       return { session };
     } catch (error: any) {
@@ -180,7 +225,7 @@ export async function checkpointExecutionRoutes(server: FastifyInstance): Promis
   }, async (request: FastifyRequest<{
     Params: { sessionId: string };
   }>, reply: FastifyReply) => {
-    const session = await sessionService.getSession(request.params.sessionId);
+    const session = await getSessionService().getSession(request.params.sessionId);
 
     if (!session) {
       return reply.status(404).send({
@@ -203,6 +248,7 @@ export async function checkpointExecutionRoutes(server: FastifyInstance): Promis
   /**
    * POST /api/v1/checkpoint-sessions/:sessionId/pause
    * Pause an active session
+   * SECURITY: Verifies session ownership before allowing pause
    */
   server.post('/checkpoint-sessions/:sessionId/pause', {
     preHandler: [authenticate],
@@ -210,6 +256,17 @@ export async function checkpointExecutionRoutes(server: FastifyInstance): Promis
     Params: { sessionId: string };
   }>, reply: FastifyReply) => {
     try {
+      const sessionService = getSessionService();
+
+      // SECURITY: Verify session ownership
+      const verifiedSession = await verifySessionOwnership(
+        sessionService,
+        request.params.sessionId,
+        request.user!.userId,
+        reply
+      );
+      if (!verifiedSession) return;
+
       const session = await sessionService.pauseSession(request.params.sessionId);
       return { session };
     } catch (error: any) {
@@ -226,6 +283,7 @@ export async function checkpointExecutionRoutes(server: FastifyInstance): Promis
   /**
    * POST /api/v1/checkpoint-sessions/:sessionId/resume
    * Resume a paused session
+   * SECURITY: Verifies session ownership before allowing resume
    */
   server.post('/checkpoint-sessions/:sessionId/resume', {
     preHandler: [authenticate],
@@ -233,6 +291,17 @@ export async function checkpointExecutionRoutes(server: FastifyInstance): Promis
     Params: { sessionId: string };
   }>, reply: FastifyReply) => {
     try {
+      const sessionService = getSessionService();
+
+      // SECURITY: Verify session ownership
+      const verifiedSession = await verifySessionOwnership(
+        sessionService,
+        request.params.sessionId,
+        request.user!.userId,
+        reply
+      );
+      if (!verifiedSession) return;
+
       const session = await sessionService.resumeSession(request.params.sessionId);
       return { session };
     } catch (error: any) {
@@ -249,6 +318,7 @@ export async function checkpointExecutionRoutes(server: FastifyInstance): Promis
   /**
    * POST /api/v1/checkpoint-sessions/:sessionId/break
    * Start a break
+   * SECURITY: Verifies session ownership before allowing break
    */
   server.post('/checkpoint-sessions/:sessionId/break', {
     preHandler: [authenticate],
@@ -256,6 +326,17 @@ export async function checkpointExecutionRoutes(server: FastifyInstance): Promis
     Params: { sessionId: string };
   }>, reply: FastifyReply) => {
     try {
+      const sessionService = getSessionService();
+
+      // SECURITY: Verify session ownership
+      const verifiedSession = await verifySessionOwnership(
+        sessionService,
+        request.params.sessionId,
+        request.user!.userId,
+        reply
+      );
+      if (!verifiedSession) return;
+
       const session = await sessionService.startBreak(request.params.sessionId);
       return { session };
     } catch (error: any) {
@@ -272,6 +353,7 @@ export async function checkpointExecutionRoutes(server: FastifyInstance): Promis
   /**
    * POST /api/v1/checkpoint-sessions/:sessionId/end-break
    * End a break
+   * SECURITY: Verifies session ownership before allowing end-break
    */
   server.post('/checkpoint-sessions/:sessionId/end-break', {
     preHandler: [authenticate],
@@ -279,6 +361,17 @@ export async function checkpointExecutionRoutes(server: FastifyInstance): Promis
     Params: { sessionId: string };
   }>, reply: FastifyReply) => {
     try {
+      const sessionService = getSessionService();
+
+      // SECURITY: Verify session ownership
+      const verifiedSession = await verifySessionOwnership(
+        sessionService,
+        request.params.sessionId,
+        request.user!.userId,
+        reply
+      );
+      if (!verifiedSession) return;
+
       const session = await sessionService.endBreak(request.params.sessionId);
       return { session };
     } catch (error: any) {
@@ -302,7 +395,7 @@ export async function checkpointExecutionRoutes(server: FastifyInstance): Promis
     Params: { sessionId: string };
   }>, reply: FastifyReply) => {
     try {
-      const session = await sessionService.submitSession(
+      const session = await getSessionService().submitSession(
         request.params.sessionId,
         request.user!.userId
       );
@@ -324,6 +417,7 @@ export async function checkpointExecutionRoutes(server: FastifyInstance): Promis
   /**
    * POST /api/v1/checkpoint-sessions/:sessionId/abandon
    * Abandon a session
+   * SECURITY: Verifies session ownership before allowing abandon
    */
   server.post('/checkpoint-sessions/:sessionId/abandon', {
     preHandler: [authenticate],
@@ -331,6 +425,17 @@ export async function checkpointExecutionRoutes(server: FastifyInstance): Promis
     Params: { sessionId: string };
   }>, reply: FastifyReply) => {
     try {
+      const sessionService = getSessionService();
+
+      // SECURITY: Verify session ownership
+      const verifiedSession = await verifySessionOwnership(
+        sessionService,
+        request.params.sessionId,
+        request.user!.userId,
+        reply
+      );
+      if (!verifiedSession) return;
+
       const session = await sessionService.abandonSession(
         request.params.sessionId,
         'user'
@@ -354,7 +459,7 @@ export async function checkpointExecutionRoutes(server: FastifyInstance): Promis
     Params: { sessionId: string };
   }>, reply: FastifyReply) => {
     try {
-      const progress = await sessionService.getSessionProgress(request.params.sessionId);
+      const progress = await getSessionService().getSessionProgress(request.params.sessionId);
       return { progress };
     } catch (error: any) {
       if (error.message.includes('not found')) {
@@ -378,7 +483,7 @@ export async function checkpointExecutionRoutes(server: FastifyInstance): Promis
   }>, reply: FastifyReply) => {
     try {
       const data = verifyIdentitySchema.parse(request.body);
-      const session = await sessionService.verifyIdentity(
+      const session = await getSessionService().verifyIdentity(
         {
           session_id: request.params.sessionId,
           method: data.method,
@@ -417,7 +522,7 @@ export async function checkpointExecutionRoutes(server: FastifyInstance): Promis
     Params: { sessionId: string };
   }>, reply: FastifyReply) => {
     try {
-      const questions = await executionService.getSessionQuestions(
+      const questions = await getExecutionService().getSessionQuestions(
         request.params.sessionId,
         request.user!.userId
       );
@@ -443,7 +548,7 @@ export async function checkpointExecutionRoutes(server: FastifyInstance): Promis
     Params: { sessionId: string; questionId: string };
   }>, reply: FastifyReply) => {
     try {
-      const question = await executionService.getQuestion(
+      const question = await getExecutionService().getQuestion(
         request.params.sessionId,
         request.params.questionId,
         request.user!.userId
@@ -475,7 +580,7 @@ export async function checkpointExecutionRoutes(server: FastifyInstance): Promis
     Params: { sessionId: string; questionId: string };
   }>, reply: FastifyReply) => {
     try {
-      await executionService.markQuestionViewed(
+      await getExecutionService().markQuestionViewed(
         request.params.sessionId,
         request.params.questionId,
         request.user!.userId
@@ -503,7 +608,7 @@ export async function checkpointExecutionRoutes(server: FastifyInstance): Promis
   }>, reply: FastifyReply) => {
     try {
       const data = submitResponseSchema.parse(request.body);
-      const response = await executionService.submitResponse(
+      const response = await getExecutionService().submitResponse(
         {
           session_id: request.params.sessionId,
           ...data,
@@ -542,7 +647,7 @@ export async function checkpointExecutionRoutes(server: FastifyInstance): Promis
     Params: { sessionId: string; questionId: string };
   }>, reply: FastifyReply) => {
     try {
-      const response = await executionService.flagQuestion(
+      const response = await getExecutionService().flagQuestion(
         request.params.sessionId,
         request.params.questionId,
         request.user!.userId
@@ -569,7 +674,7 @@ export async function checkpointExecutionRoutes(server: FastifyInstance): Promis
     Params: { sessionId: string; questionId: string };
   }>, reply: FastifyReply) => {
     try {
-      const response = await executionService.unflagQuestion(
+      const response = await getExecutionService().unflagQuestion(
         request.params.sessionId,
         request.params.questionId,
         request.user!.userId
@@ -596,7 +701,7 @@ export async function checkpointExecutionRoutes(server: FastifyInstance): Promis
     Params: { sessionId: string; questionId: string };
   }>, reply: FastifyReply) => {
     try {
-      const response = await executionService.skipQuestion(
+      const response = await getExecutionService().skipQuestion(
         request.params.sessionId,
         request.params.questionId,
         request.user!.userId
@@ -626,7 +731,7 @@ export async function checkpointExecutionRoutes(server: FastifyInstance): Promis
     Params: { sessionId: string };
   }>, reply: FastifyReply) => {
     try {
-      const completeness = await executionService.checkCompleteness(
+      const completeness = await getExecutionService().checkCompleteness(
         request.params.sessionId
       );
       return { completeness };
@@ -652,7 +757,7 @@ export async function checkpointExecutionRoutes(server: FastifyInstance): Promis
   }>, reply: FastifyReply) => {
     try {
       const data = recordEventSchema.parse(request.body);
-      const event = await sessionService.recordEvent({
+      const event = await getSessionService().recordEvent({
         session_id: request.params.sessionId,
         event_type: data.event_type as SessionEventType,
         event_data: data.event_data,
@@ -690,7 +795,7 @@ export async function checkpointExecutionRoutes(server: FastifyInstance): Promis
   }>, reply: FastifyReply) => {
     const { checkpoint_id, status, limit, offset } = request.query;
 
-    const result = await sessionService.getUserSessions(
+    const result = await getSessionService().getUserSessions(
       request.user!.userId,
       checkpoint_id,
       {
