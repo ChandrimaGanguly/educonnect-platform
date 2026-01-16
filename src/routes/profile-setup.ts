@@ -16,10 +16,10 @@ const profileService = new UserProfileService();
 export async function profileSetupRoutes(server: FastifyInstance): Promise<void> {
 
   /**
-   * GET /profile-setup/status
+   * GET /status
    * Check profile setup completion status
    */
-  server.get('/profile-setup/status', {
+  server.get('/status', {
     preHandler: [authenticate],
   }, async (request: FastifyRequest, reply: FastifyReply) => {
     const { userId } = request.user!;
@@ -61,10 +61,10 @@ export async function profileSetupRoutes(server: FastifyInstance): Promise<void>
   });
 
   /**
-   * POST /profile-setup/basic
+   * POST /basic
    * Step 1: Complete basic profile information
    */
-  server.post('/profile-setup/basic', {
+  server.post('/basic', {
     preHandler: [authenticate],
   }, async (request: FastifyRequest, reply: FastifyReply) => {
     try {
@@ -96,10 +96,10 @@ export async function profileSetupRoutes(server: FastifyInstance): Promise<void>
   });
 
   /**
-   * POST /profile-setup/skills
+   * POST /skills
    * Step 2: Add skills with self-assessment
    */
-  server.post('/profile-setup/skills', {
+  server.post('/skills', {
     preHandler: [authenticate],
   }, async (request: FastifyRequest, reply: FastifyReply) => {
     try {
@@ -135,10 +135,10 @@ export async function profileSetupRoutes(server: FastifyInstance): Promise<void>
   });
 
   /**
-   * POST /profile-setup/interests
+   * POST /interests
    * Step 3: Add learning interests
    */
-  server.post('/profile-setup/interests', {
+  server.post('/interests', {
     preHandler: [authenticate],
   }, async (request: FastifyRequest, reply: FastifyReply) => {
     try {
@@ -174,10 +174,10 @@ export async function profileSetupRoutes(server: FastifyInstance): Promise<void>
   });
 
   /**
-   * POST /profile-setup/availability
+   * POST /availability
    * Step 4: Add availability schedule
    */
-  server.post('/profile-setup/availability', {
+  server.post('/availability', {
     preHandler: [authenticate],
   }, async (request: FastifyRequest, reply: FastifyReply) => {
     try {
@@ -212,10 +212,10 @@ export async function profileSetupRoutes(server: FastifyInstance): Promise<void>
   });
 
   /**
-   * POST /profile-setup/complete
+   * POST /complete
    * Mark profile setup as completed
    */
-  server.post('/profile-setup/complete', {
+  server.post('/complete', {
     preHandler: [authenticate],
   }, async (request: FastifyRequest, reply: FastifyReply) => {
     const { userId } = request.user!;

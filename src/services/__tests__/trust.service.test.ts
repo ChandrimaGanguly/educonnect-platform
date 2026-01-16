@@ -20,9 +20,11 @@ describe('trust.service', () => {
   beforeEach(async () => {
     await cleanDatabase();
     trustService = new TrustService();
-    testUser = await createTestUser({ email: 'trust-user1@example.com', username: 'trust-user1' });
-    testUser2 = await createTestUser({ email: 'trust-user2@example.com', username: 'trust-user2' });
-    testCommunity = await createTestCommunity(testUser.id, { name: 'Trust Test Community', slug: 'trust-test-community' });
+    // Use unique identifiers to avoid conflicts
+    const uniqueSuffix = Math.random().toString(36).substring(2, 15);
+    testUser = await createTestUser({ email: `trust-user1-${uniqueSuffix}@example.com`, username: `trust-user1-${uniqueSuffix}` });
+    testUser2 = await createTestUser({ email: `trust-user2-${uniqueSuffix}@example.com`, username: `trust-user2-${uniqueSuffix}` });
+    testCommunity = await createTestCommunity(testUser.id, { name: `Trust Test Community ${uniqueSuffix}`, slug: `trust-test-community-${uniqueSuffix}` });
   });
 
   afterEach(() => {

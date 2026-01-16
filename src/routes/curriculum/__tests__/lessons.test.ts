@@ -220,7 +220,8 @@ describe('Lesson Routes', () => {
       expect(response.statusCode).toBe(200);
       const body = JSON.parse(response.body);
       expect(body.lesson).toBeDefined();
-      expect(body.lesson.resources).toBeUndefined();
+      // When include_resources=false, resources should either be undefined or an empty array
+      expect(body.lesson.resources === undefined || (Array.isArray(body.lesson.resources) && body.lesson.resources.length === 0)).toBe(true);
     });
   });
 

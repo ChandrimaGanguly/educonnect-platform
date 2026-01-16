@@ -8,6 +8,59 @@ import { env } from '../../config';
 const mentorProfileService = new MentorProfileService();
 const userProfileService = new UserProfileService();
 
+/**
+ * Validate matching service URL to prevent SSRF attacks
+ * SECURITY: Only allow connections to whitelisted hosts and ports
+ */
+function validateMatchingServiceUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+
+    // Whitelist allowed hosts (adjust based on deployment)
+    const allowedHosts = [
+      'matching-service',
+      'localhost',
+      '127.0.0.1',
+      'matching', // Docker service name
+    ];
+
+    // Whitelist allowed ports
+    const allowedPorts = ['8001', '80', '443'];
+
+    // Only allow HTTP/HTTPS protocols
+    if (!['http:', 'https:'].includes(parsed.protocol)) {
+      return false;
+    }
+
+    // Check hostname whitelist
+    if (!allowedHosts.includes(parsed.hostname)) {
+      return false;
+    }
+
+    // Check port whitelist (if port is specified)
+    if (parsed.port && !allowedPorts.includes(parsed.port)) {
+      return false;
+    }
+
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Validate matching service response structure
+ */
+function isValidScoreResponse(data: any): boolean {
+  return (
+    typeof data === 'object' &&
+    typeof data.overall_score === 'number' &&
+    typeof data.subject_overlap_score === 'number' &&
+    typeof data.availability_overlap_score === 'number' &&
+    Array.isArray(data.match_reasons)
+  );
+}
+
 export async function matchingRoutes(server: FastifyInstance): Promise<void> {
 
   /**
@@ -66,42 +119,80 @@ export async function matchingRoutes(server: FastifyInstance): Promise<void> {
             })),
           };
 
-          // Call Python matching service
+          // Call Python matching service with security controls
           const matchingServiceUrl = env.MATCHING_SERVICE_URL;
-          const response = await fetch(`${matchingServiceUrl}/match/score`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              learner_profile: learnerProfile,
-              mentor_profile: mentorProfile,
-            }),
-          });
 
-          if (response.ok) {
-            const scoreData = await response.json() as {
-              overall_score: number;
-              subject_overlap_score: number;
-              availability_overlap_score: number;
-              match_reasons: string[];
-            };
+          // SECURITY: Validate service URL to prevent SSRF
+          if (!validateMatchingServiceUrl(matchingServiceUrl)) {
+            server.log.error('Invalid matching service URL configuration');
+            continue; // Skip this mentor and continue with others
+          }
 
-            matchedMentors.push({
-              mentor_id: mentor.user_id,
-              mentor_profile: mentor,
-              compatibility_score: scoreData.overall_score,
-              subject_overlap_score: scoreData.subject_overlap_score,
-              availability_overlap_score: scoreData.availability_overlap_score,
-              match_reasons: scoreData.match_reasons || [],
+          // Create abort controller for timeout
+          const controller = new AbortController();
+          const timeout = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+
+          try {
+            const response = await fetch(`${matchingServiceUrl}/match/score`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                learner_profile: learnerProfile,
+                mentor_profile: mentorProfile,
+              }),
+              signal: controller.signal,
             });
-          } else {
-            // If matching service fails, skip this mentor
-            server.log.warn(
-              `Matching service failed for mentor ${mentor.user_id}: ${response.statusText}`
-            );
+
+            clearTimeout(timeout);
+
+            if (response.ok) {
+              const scoreData = await response.json();
+
+              // SECURITY: Validate response structure
+              if (!isValidScoreResponse(scoreData)) {
+                server.log.warn('Invalid response structure from matching service');
+                continue;
+              }
+
+              matchedMentors.push({
+                mentor_id: mentor.user_id,
+                mentor_profile: mentor,
+                compatibility_score: scoreData.overall_score,
+                subject_overlap_score: scoreData.subject_overlap_score,
+                availability_overlap_score: scoreData.availability_overlap_score,
+                match_reasons: scoreData.match_reasons || [],
+              });
+            } else {
+              // If matching service fails, skip this mentor
+              server.log.warn({
+                event: 'matching_service_error',
+                mentor_id: mentor.user_id.substring(0, 8) + '...', // Redact full ID
+                status: response.status,
+              }, 'Matching service request failed');
+            }
+          } catch (fetchError: any) {
+            clearTimeout(timeout);
+
+            if (fetchError.name === 'AbortError') {
+              server.log.warn({
+                event: 'matching_service_timeout',
+                mentor_id: mentor.user_id.substring(0, 8) + '...',
+              }, 'Matching service request timed out');
+            } else {
+              server.log.error({
+                event: 'matching_service_error',
+                mentor_id: mentor.user_id.substring(0, 8) + '...',
+                error_type: fetchError.name,
+              }, 'Error calling matching service');
+            }
+            // Continue with other mentors
           }
         } catch (error: any) {
           // Log error but continue with other mentors
-          server.log.error(`Error scoring mentor ${mentor.user_id}: ${error.message}`);
+          server.log.error({
+            event: 'mentor_scoring_error',
+            mentor_id: mentor.user_id.substring(0, 8) + '...',
+          }, 'Error in mentor scoring loop');
         }
       }
 

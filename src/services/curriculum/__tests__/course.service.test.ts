@@ -170,6 +170,7 @@ describe('CourseService', () => {
           domain_id: curriculum.domain.id,
           name: 'Empty Subject',
           slug: 'empty-subject-' + Math.random().toString(36).substring(2, 15),
+          description: 'An empty subject for testing',
           status: 'published',
           created_by: testUser.id,
         })

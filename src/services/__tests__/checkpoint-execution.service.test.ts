@@ -62,7 +62,6 @@ describe('CheckpointExecutionService', () => {
       category_id: category.id,
       passing_score: 70,
       allow_pause: true,
-      status: 'draft',
     });
 
     const published = await typesService.publishCheckpoint(checkpoint.id, userId);

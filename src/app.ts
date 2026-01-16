@@ -146,6 +146,30 @@ export async function buildApp() {
   const { contentRoutes } = await import('./routes/content');
   await app.register(contentRoutes, { prefix: '/api/v1/content' });
 
+  // Register curriculum routes (Phase 1 Group D)
+  const { domainRoutes } = await import('./routes/curriculum/domains');
+  await app.register(domainRoutes, { prefix: '/api/v1/curriculum' });
+
+  const { subjectRoutes } = await import('./routes/curriculum/subjects');
+  await app.register(subjectRoutes, { prefix: '/api/v1/curriculum' });
+
+  const { courseRoutes } = await import('./routes/curriculum/courses');
+  await app.register(courseRoutes, { prefix: '/api/v1/curriculum' });
+
+  const { moduleRoutes } = await import('./routes/curriculum/modules');
+  await app.register(moduleRoutes, { prefix: '/api/v1/curriculum' });
+
+  const { lessonRoutes } = await import('./routes/curriculum/lessons');
+  await app.register(lessonRoutes, { prefix: '/api/v1/curriculum' });
+
+  // Register progress routes (Phase 1 Group G)
+  const { progressRoutes } = await import('./routes/progress');
+  await app.register(progressRoutes, { prefix: '/api/v1' });
+
+  // Register notifications routes (Phase 1 Group G)
+  const { notificationRoutes } = await import('./routes/notifications');
+  await app.register(notificationRoutes, { prefix: '/api/v1' });
+
   // Register GraphQL server
   const { registerGraphQL } = await import('./graphql');
   await registerGraphQL(app);

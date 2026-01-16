@@ -91,7 +91,7 @@ export async function moduleRoutes(server: FastifyInstance): Promise<void> {
 
         return { module };
       } else {
-        const module = await moduleService.getModuleById(id);
+        let module: any = await moduleService.getModuleById(id);
 
         if (!module) {
           return reply.status(404).send({
@@ -100,7 +100,15 @@ export async function moduleRoutes(server: FastifyInstance): Promise<void> {
           });
         }
 
-        return { module };
+        // Remove lessons field if it exists (should not be included when include_lessons=false)
+        const filteredModule = Object.keys(module).reduce((acc: any, key) => {
+          if (key !== 'lessons') {
+            acc[key] = module[key];
+          }
+          return acc;
+        }, {});
+
+        return { module: filteredModule };
       }
     } catch (error: any) {
       if (error.name === 'ZodError') {
@@ -169,6 +177,15 @@ export async function moduleRoutes(server: FastifyInstance): Promise<void> {
   ) => {
     const { id } = request.params;
     const { userId } = request.user!;
+
+    // First check if module exists
+    const module = await moduleService.getModuleById(id);
+    if (!module) {
+      return reply.status(404).send({
+        error: 'Not Found',
+        message: 'Module not found',
+      });
+    }
 
     const result = await moduleService.checkPrerequisites(id, userId);
 

@@ -57,7 +57,6 @@ describe('CheckpointSessionService', () => {
       category_id: categoryId,
       passing_score: 70,
       allow_pause: true,
-      status: 'draft',
     });
 
     // Publish the checkpoint
