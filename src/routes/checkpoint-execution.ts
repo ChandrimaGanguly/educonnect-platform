@@ -195,7 +195,7 @@ export async function checkpointExecutionRoutes(server: FastifyInstance): Promis
         request.user!.userId,
         reply
       );
-      if (!verifiedSession) return;
+      if (!verifiedSession) return undefined;
 
       const session = await sessionService.startSession(request.params.sessionId);
       return { session };
@@ -265,7 +265,7 @@ export async function checkpointExecutionRoutes(server: FastifyInstance): Promis
         request.user!.userId,
         reply
       );
-      if (!verifiedSession) return;
+      if (!verifiedSession) return undefined;
 
       const session = await sessionService.pauseSession(request.params.sessionId);
       return { session };
@@ -300,7 +300,7 @@ export async function checkpointExecutionRoutes(server: FastifyInstance): Promis
         request.user!.userId,
         reply
       );
-      if (!verifiedSession) return;
+      if (!verifiedSession) return undefined;
 
       const session = await sessionService.resumeSession(request.params.sessionId);
       return { session };
@@ -335,7 +335,7 @@ export async function checkpointExecutionRoutes(server: FastifyInstance): Promis
         request.user!.userId,
         reply
       );
-      if (!verifiedSession) return;
+      if (!verifiedSession) return undefined;
 
       const session = await sessionService.startBreak(request.params.sessionId);
       return { session };
@@ -370,7 +370,7 @@ export async function checkpointExecutionRoutes(server: FastifyInstance): Promis
         request.user!.userId,
         reply
       );
-      if (!verifiedSession) return;
+      if (!verifiedSession) return undefined;
 
       const session = await sessionService.endBreak(request.params.sessionId);
       return { session };
@@ -434,7 +434,7 @@ export async function checkpointExecutionRoutes(server: FastifyInstance): Promis
         request.user!.userId,
         reply
       );
-      if (!verifiedSession) return;
+      if (!verifiedSession) return undefined;
 
       const session = await sessionService.abandonSession(
         request.params.sessionId,
