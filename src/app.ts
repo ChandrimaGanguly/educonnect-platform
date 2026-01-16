@@ -126,6 +126,10 @@ export async function buildApp() {
   const { authRoutes } = await import('./routes/auth');
   await app.register(authRoutes, { prefix: '/api/v1/auth' });
 
+  // Register role and permission routes
+  const { roleRoutes } = await import('./routes/roles');
+  await app.register(roleRoutes, { prefix: '/api/v1' });
+
   // Register content routes
   const { contentRoutes } = await import('./routes/content');
   await app.register(contentRoutes, { prefix: '/api/v1/content' });
