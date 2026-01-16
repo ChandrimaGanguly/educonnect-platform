@@ -194,3 +194,193 @@ export async function generateTestToken(app: FastifyInstance, payload: { userId:
     sessionId: session.id,
   });
 }
+
+/**
+ * Create a test domain
+ */
+export async function createTestDomain(createdBy: string, overrides = {}) {
+  const db = getDatabase();
+
+  const uniqueSuffix = Math.random().toString(36).substring(2, 15);
+
+  const defaultDomain = {
+    name: 'Test Domain',
+    slug: `test-domain-${uniqueSuffix}`,
+    description: 'A test domain',
+    status: 'published',
+    display_order: 0,
+    color: '#3B82F6',
+    created_by: createdBy,
+    ...overrides,
+  };
+
+  const [domain] = await db('curriculum_domains').insert(defaultDomain).returning('*');
+  return domain;
+}
+
+/**
+ * Create a test subject
+ */
+export async function createTestSubject(domainId: string, createdBy: string, overrides = {}) {
+  const db = getDatabase();
+
+  const uniqueSuffix = Math.random().toString(36).substring(2, 15);
+
+  const defaultSubject = {
+    domain_id: domainId,
+    name: 'Test Subject',
+    slug: `test-subject-${uniqueSuffix}`,
+    description: 'A test subject',
+    status: 'published',
+    display_order: 0,
+    created_by: createdBy,
+    ...overrides,
+  };
+
+  const [subject] = await db('curriculum_subjects').insert(defaultSubject).returning('*');
+  return subject;
+}
+
+/**
+ * Create a test course
+ */
+export async function createTestCourse(subjectId: string, createdBy: string, overrides = {}) {
+  const db = getDatabase();
+
+  const uniqueSuffix = Math.random().toString(36).substring(2, 15);
+
+  const defaultCourse = {
+    subject_id: subjectId,
+    name: 'Test Course',
+    slug: `test-course-${uniqueSuffix}`,
+    description: 'A test course',
+    status: 'published',
+    difficulty_level: 'beginner',
+    track_type: 'practical',
+    is_certification_eligible: false,
+    requires_approval: false,
+    enrollment_count: 0,
+    is_enrollable: true,
+    display_order: 0,
+    version: 1,
+    board_approved: false,
+    created_by: createdBy,
+    ...overrides,
+  };
+
+  const [course] = await db('curriculum_courses').insert(defaultCourse).returning('*');
+  return course;
+}
+
+/**
+ * Create a test module
+ */
+export async function createTestModule(courseId: string, createdBy: string, overrides = {}) {
+  const db = getDatabase();
+
+  const uniqueSuffix = Math.random().toString(36).substring(2, 15);
+
+  const defaultModule = {
+    course_id: courseId,
+    name: 'Test Module',
+    slug: `test-module-${uniqueSuffix}`,
+    description: 'A test module',
+    status: 'published',
+    display_order: 0,
+    unlock_type: 'always',
+    has_prerequisites: false,
+    created_by: createdBy,
+    ...overrides,
+  };
+
+  const [module] = await db('curriculum_modules').insert(defaultModule).returning('*');
+  return module;
+}
+
+/**
+ * Create a test lesson
+ */
+export async function createTestLesson(moduleId: string, createdBy: string, overrides = {}) {
+  const db = getDatabase();
+
+  const uniqueSuffix = Math.random().toString(36).substring(2, 15);
+
+  const defaultLesson = {
+    module_id: moduleId,
+    name: 'Test Lesson',
+    slug: `test-lesson-${uniqueSuffix}`,
+    description: 'A test lesson',
+    content: 'Test lesson content',
+    lesson_type: 'text',
+    content_format: 'markdown',
+    status: 'published',
+    display_order: 0,
+    has_video: false,
+    has_audio: false,
+    has_interactive: false,
+    has_prerequisites: false,
+    has_transcript: false,
+    has_captions: false,
+    has_alt_text: false,
+    text_only_available: true,
+    created_by: createdBy,
+    ...overrides,
+  };
+
+  const [lesson] = await db('curriculum_lessons').insert(defaultLesson).returning('*');
+  return lesson;
+}
+
+/**
+ * Create a complete curriculum hierarchy for testing
+ * Returns all created entities
+ */
+export async function createTestCurriculum(createdBy: string) {
+  const domain = await createTestDomain(createdBy);
+  const subject = await createTestSubject(domain.id, createdBy);
+  const course = await createTestCourse(subject.id, createdBy);
+  const module = await createTestModule(course.id, createdBy);
+  const lesson = await createTestLesson(module.id, createdBy);
+
+  return {
+    domain,
+    subject,
+    course,
+    module,
+    lesson,
+  };
+}
+
+/**
+ * Clean curriculum tables
+ */
+export async function cleanCurriculumDatabase(): Promise<void> {
+  const db = getDatabase();
+
+  try {
+    // Delete curriculum tables in dependency order
+    const curriculumTables = [
+      'lesson_completions',
+      'curriculum_resources',
+      'curriculum_lessons',
+      'curriculum_modules',
+      'curriculum_learning_paths',
+      'curriculum_content_standards',
+      'curriculum_standards',
+      'curriculum_courses',
+      'curriculum_subjects',
+      'curriculum_domains',
+    ];
+
+    for (const table of curriculumTables) {
+      try {
+        await db(table).del();
+      } catch (error) {
+        console.warn(`Warning: Could not clean table ${table}:`, error);
+      }
+    }
+  } catch (error) {
+    console.error('Error in cleanCurriculumDatabase:', error);
+    throw error;
+  }
+}

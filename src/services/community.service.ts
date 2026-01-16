@@ -450,15 +450,13 @@ export class CommunityService {
 
       // If user is an owner, check if they're the last owner
       if (member.membership_type === 'owner') {
-        const ownerCount = await trx('community_members')
+        // Select and lock all active owner rows (can't use count() with forUpdate)
+        const owners = await trx('community_members')
+          .select('id')
           .where({ community_id: communityId, membership_type: 'owner', status: 'active' })
-          .forUpdate()  // Lock all owner rows
-          .count('* as count')
-          .first();
+          .forUpdate();  // Lock all owner rows
 
-        const count = parseInt(ownerCount?.count as string || '0', 10);
-
-        if (count === 1) {
+        if (owners.length === 1) {
           return {
             success: false,
             error: 'You cannot leave the community as the only owner. Transfer ownership first.',

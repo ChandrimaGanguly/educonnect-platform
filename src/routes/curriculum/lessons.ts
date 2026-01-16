@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { z } from 'zod';
 import { LessonService } from '../../services/curriculum/lesson.service';
+import { ModuleService } from '../../services/curriculum/module.service';
 import { authenticate } from '../../middleware/auth';
 
 // Validation schemas
@@ -25,8 +26,9 @@ const lessonCompleteSchema = z.object({
   metadata: z.record(z.unknown()).optional(),
 });
 
-// Singleton service
+// Singleton services
 const lessonService = new LessonService();
+const moduleService = new ModuleService();
 
 export async function lessonRoutes(server: FastifyInstance): Promise<void> {
   /**
@@ -168,6 +170,8 @@ export async function lessonRoutes(server: FastifyInstance): Promise<void> {
    * POST /lessons/:id/complete
    * Mark lesson as complete for authenticated user
    * Idempotent: returns existing completion if already completed
+   *
+   * Authorization: Checks that lesson is published and module prerequisites are met
    */
   server.post('/lessons/:id/complete', {
     preHandler: [authenticate],
@@ -180,12 +184,49 @@ export async function lessonRoutes(server: FastifyInstance): Promise<void> {
       const { userId } = request.user!;
       const data = lessonCompleteSchema.parse(request.body);
 
-      // Verify lesson exists
+      // Verify lesson exists and is published
       const lesson = await lessonService.getLessonById(id);
       if (!lesson) {
         return reply.status(404).send({
           error: 'Not Found',
           message: 'Lesson not found',
+        });
+      }
+
+      if (lesson.status !== 'published') {
+        return reply.status(403).send({
+          error: 'Forbidden',
+          message: 'This lesson is not available',
+        });
+      }
+
+      // Check module prerequisites
+      const module = await moduleService.getModuleById(lesson.module_id);
+      if (!module) {
+        return reply.status(500).send({
+          error: 'Internal Server Error',
+          message: 'Module not found for lesson',
+        });
+      }
+
+      if (module.status !== 'published') {
+        return reply.status(403).send({
+          error: 'Forbidden',
+          message: 'This module is not available',
+        });
+      }
+
+      // Check if module is unlocked for user
+      const isUnlocked = await moduleService.isModuleUnlocked(lesson.module_id, userId);
+      if (!isUnlocked) {
+        const prerequisiteCheck = await moduleService.checkPrerequisites(lesson.module_id, userId);
+        return reply.status(403).send({
+          error: 'Forbidden',
+          message: 'Prerequisites not met for this lesson',
+          details: {
+            missing_prerequisites: prerequisiteCheck.missing_prerequisites,
+            reason: prerequisiteCheck.reason,
+          },
         });
       }
 
