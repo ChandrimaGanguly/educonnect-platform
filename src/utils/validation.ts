@@ -261,3 +261,127 @@ export const listMembersSchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).optional().default(20),
   offset: z.coerce.number().int().min(0).optional().default(0),
 });
+
+// ========== Mentorship System Schemas ==========
+
+/**
+ * Create mentor profile validation schema
+ */
+export const createMentorProfileSchema = z.object({
+  max_mentees: z.number().int().min(1).max(10).optional().default(3),
+  subjects: z.array(z.string().uuid('Invalid subject ID')).optional(),
+  bio: z.string().max(1000, 'Bio must be at most 1000 characters').optional(),
+  preferred_session_duration: z.number().int().min(15).max(240).optional(),
+  response_time_hours: z.number().int().min(1).max(168).optional().default(48),
+  community_id: z.string().uuid('Invalid community ID').optional(),
+  metadata: z.record(z.any()).optional(),
+});
+
+/**
+ * Update mentor profile validation schema (all fields optional)
+ */
+export const updateMentorProfileSchema = createMentorProfileSchema.partial();
+
+/**
+ * Update mentor status validation schema
+ */
+export const updateMentorStatusSchema = z.object({
+  mentor_status: z.enum(['available', 'busy', 'inactive', 'on_break'], {
+    errorMap: () => ({ message: 'Status must be available, busy, inactive, or on_break' }),
+  }),
+});
+
+/**
+ * Create mentorship request validation schema
+ */
+export const createMentorshipRequestSchema = z.object({
+  mentor_id: z.string().uuid('Invalid mentor ID'),
+  subject_id: z.string().uuid('Invalid subject ID').optional(),
+  message: z.string().max(500, 'Message must be at most 500 characters').optional(),
+  urgency: z.enum(['low', 'normal', 'high', 'urgent']).optional().default('normal'),
+  community_id: z.string().uuid('Invalid community ID').optional(),
+});
+
+/**
+ * Respond to mentorship request validation schema
+ */
+export const respondToRequestSchema = z.object({
+  status: z.enum(['accepted', 'declined'], {
+    errorMap: () => ({ message: 'Status must be accepted or declined' }),
+  }),
+  response_message: z.string().max(500, 'Response message must be at most 500 characters').optional(),
+});
+
+/**
+ * Update mentorship relationship validation schema
+ */
+export const updateRelationshipSchema = z.object({
+  goals: z.string().max(1000, 'Goals must be at most 1000 characters').optional(),
+  next_session_at: z.coerce.date().optional(),
+});
+
+/**
+ * Terminate relationship validation schema
+ */
+export const terminateRelationshipSchema = z.object({
+  reason: z.string().min(1, 'Reason is required').max(500, 'Reason must be at most 500 characters'),
+});
+
+/**
+ * Submit mentorship feedback validation schema
+ */
+export const submitFeedbackSchema = z.object({
+  overall_rating: z.number().min(1.0).max(5.0),
+  communication_rating: z.number().min(1.0).max(5.0).optional(),
+  expertise_rating: z.number().min(1.0).max(5.0).optional(),
+  availability_rating: z.number().min(1.0).max(5.0).optional(),
+  feedback_text: z.string().max(1000, 'Feedback text must be at most 1000 characters').optional(),
+  would_recommend: z.boolean().optional(),
+});
+
+/**
+ * Record session validation schema
+ */
+export const recordSessionSchema = z.object({
+  scheduled: z.boolean().optional().default(false),
+  session_date: z.coerce.date().optional(),
+});
+
+/**
+ * Mentor search query validation schema
+ */
+export const mentorSearchSchema = z.object({
+  subject_id: z.string().uuid('Invalid subject ID').optional(),
+  mentor_status: z.enum(['available', 'busy', 'inactive', 'on_break']).optional().default('available'),
+  community_id: z.string().uuid('Invalid community ID').optional(),
+  limit: z.coerce.number().int().min(1).max(100).optional().default(20),
+  offset: z.coerce.number().int().min(0).optional().default(0),
+});
+
+/**
+ * Mentorship request query validation schema
+ */
+export const requestQuerySchema = z.object({
+  status: z.enum(['pending', 'accepted', 'declined', 'expired', 'cancelled', 'withdrawn']).optional(),
+  limit: z.coerce.number().int().min(1).max(100).optional().default(20),
+  offset: z.coerce.number().int().min(0).optional().default(0),
+});
+
+/**
+ * Mentorship relationship query validation schema
+ */
+export const relationshipQuerySchema = z.object({
+  status: z.enum(['active', 'paused', 'completed', 'terminated']).optional(),
+  as_role: z.enum(['learner', 'mentor']).optional(),
+  limit: z.coerce.number().int().min(1).max(100).optional().default(20),
+  offset: z.coerce.number().int().min(0).optional().default(0),
+});
+
+/**
+ * Match request validation schema
+ */
+export const matchRequestSchema = z.object({
+  subject_id: z.string().uuid('Invalid subject ID').optional(),
+  community_id: z.string().uuid('Invalid community ID').optional(),
+  limit: z.coerce.number().int().min(1).max(50).optional().default(10),
+});

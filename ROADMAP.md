@@ -76,13 +76,13 @@ This roadmap is organized by **MVP priority** - Phase 1 delivers a working demo,
 
 | Feature | Status | Complexity | Description |
 |---------|--------|------------|-------------|
-| **F1: Mentor Profile Schema** | ❌ Needed | Medium | Skills, availability, capacity, subjects |
-| **F2: Mentor Profile API** | ❌ Needed | Medium | Create/update mentor profiles |
-| **F3: Match Request API** | ❌ Needed | Medium | Learner submits match request |
-| **F4: Matching Algorithm** | ❌ Needed | High | Subject + availability scoring |
-| **F5: Recommendation API** | ❌ Needed | Medium | Return ranked mentor matches |
-| **F6: Request Response API** | ❌ Needed | Medium | Mentor accept/decline workflow |
-| **F7: Relationship Creation** | ❌ Needed | Low | Establish confirmed relationship |
+| **F1: Mentor Profile Schema** | ✅ Done | Medium | 4 tables: mentor_profiles, mentorship_requests, mentorship_relationships, mentorship_feedback |
+| **F2: Mentor Profile API** | ✅ Done | Medium | 7 endpoints: create/update profile, status, search, capacity check |
+| **F3: Match Request API** | ✅ Done | Medium | 6 endpoints: create, list outgoing/incoming, respond, cancel, count |
+| **F4: Matching Algorithm** | ✅ Done | High | 2-factor scoring: subject overlap (60%) + availability overlap (40%) with Jaccard similarity |
+| **F5: Recommendation API** | ✅ Done | Medium | POST /match endpoint with Python service integration + fallback |
+| **F6: Request Response API** | ✅ Done | Medium | Accept/decline workflow with automatic relationship creation |
+| **F7: Relationship Creation** | ✅ Done | Low | 7 endpoints: list, get, update, terminate, sessions, feedback |
 
 ### Group G: Progress & Notifications
 
@@ -109,10 +109,10 @@ This roadmap is organized by **MVP priority** - Phase 1 delivers a working demo,
 - ✅ Users can complete profile setup with skills/interests
 - ✅ Users can browse and join communities
 - ✅ Users can navigate curriculum and view lessons
-- ⬜ Users can take checkpoints and see scores
-- ⬜ Learners can request and receive mentor recommendations
-- ⬜ Mentors can accept/decline requests
-- ⬜ Relationships are established and visible
+- ✅ Users can take checkpoints and see scores
+- ✅ Learners can request and receive mentor recommendations
+- ✅ Mentors can accept/decline requests
+- ✅ Relationships are established and visible
 
 ---
 
