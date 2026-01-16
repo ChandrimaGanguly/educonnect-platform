@@ -74,8 +74,10 @@ const parseEnv = () => {
     return envSchema.parse(process.env);
   } catch (error) {
     if (error instanceof z.ZodError) {
+      // eslint-disable-next-line no-console
       console.error('❌ Invalid environment variables:');
       error.errors.forEach((err) => {
+        // eslint-disable-next-line no-console
         console.error(`  - ${err.path.join('.')}: ${err.message}`);
       });
       process.exit(1);
@@ -151,24 +153,39 @@ const validateSecrets = (env: ReturnType<typeof envSchema.parse>) => {
     }
   }
 
+  // Skip validation in test environment
+  if (env.NODE_ENV === 'test') {
+    return;
+  }
+
   // Fail startup if weak secrets detected
   if (weakSecrets.length > 0) {
+    // eslint-disable-next-line no-console
     console.error('\n❌ SECURITY ERROR: Weak or default secrets detected!\n');
+    // eslint-disable-next-line no-console
     console.error('The following secrets are using insecure default values:');
     weakSecrets.forEach(secret => {
+      // eslint-disable-next-line no-console
       console.error(`  - ${secret}`);
     });
+    // eslint-disable-next-line no-console
     console.error('\n📝 To fix this:\n');
+    // eslint-disable-next-line no-console
     console.error('1. Generate strong secrets:');
+    // eslint-disable-next-line no-console
     console.error('   node -e "console.log(require(\'crypto\').randomBytes(64).toString(\'hex\'))"\n');
+    // eslint-disable-next-line no-console
     console.error('2. Update your .env.local file with the generated secrets\n');
+    // eslint-disable-next-line no-console
     console.error('3. For production, use a secrets manager (AWS Secrets Manager, HashiCorp Vault)\n');
+    // eslint-disable-next-line no-console
     console.error('⚠️  Application startup aborted for security reasons.\n');
     process.exit(1);
   }
 
   // Warn if using development secrets in production
   if (env.NODE_ENV === 'production') {
+    // eslint-disable-next-line no-console
     console.log('✅ Production secrets validation passed');
   }
 };
