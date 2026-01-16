@@ -1,8 +1,17 @@
 import type { Knex } from 'knex';
 import * as dotenv from 'dotenv';
 import { resolve } from 'path';
+import { existsSync } from 'fs';
 
-dotenv.config();
+// Load environment variables from .env.local (preferred) or .env
+const envLocalPath = resolve(process.cwd(), '.env.local');
+const envPath = resolve(process.cwd(), '.env');
+
+if (existsSync(envLocalPath)) {
+  dotenv.config({ path: envLocalPath });
+} else {
+  dotenv.config({ path: envPath });
+}
 
 // Determine if we're running in production/staging (compiled) or development (TypeScript)
 const isProd = process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging';

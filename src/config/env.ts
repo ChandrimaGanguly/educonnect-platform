@@ -1,8 +1,17 @@
 import * as dotenv from 'dotenv';
 import { z } from 'zod';
+import { existsSync } from 'fs';
+import { resolve } from 'path';
 
-// Load environment variables
-dotenv.config();
+// Load environment variables from .env.local (preferred) or .env
+const envLocalPath = resolve(process.cwd(), '.env.local');
+const envPath = resolve(process.cwd(), '.env');
+
+if (existsSync(envLocalPath)) {
+  dotenv.config({ path: envLocalPath });
+} else {
+  dotenv.config({ path: envPath });
+}
 
 // Define environment schema
 const envSchema = z.object({
@@ -75,7 +84,99 @@ const parseEnv = () => {
   }
 };
 
+/**
+ * Validate secrets are not using weak/default values
+ * This prevents accidental deployment with insecure defaults
+ */
+const validateSecrets = (env: ReturnType<typeof envSchema.parse>) => {
+  // List of weak/default secret patterns that should never be used
+  const WEAK_SECRET_PATTERNS = [
+    'INSECURE_DEFAULT',
+    'CHANGE_ME',
+    'CHANGE_THIS',
+    'your-super-secret',
+    'your-session-secret',
+    'changeme',
+    'password',
+    'secret',
+    'default',
+    'example',
+    'test123',
+    '12345',
+  ];
+
+  const WEAK_DATABASE_PASSWORDS = [
+    'changeme',
+    'password',
+    'postgres',
+    'admin',
+    '12345',
+  ];
+
+  // Extract secrets to validate
+  const secrets = {
+    JWT_SECRET: env.JWT_SECRET,
+    SESSION_SECRET: env.SESSION_SECRET,
+  };
+
+  // Check each secret for weak patterns
+  const weakSecrets: string[] = [];
+
+  Object.entries(secrets).forEach(([key, value]) => {
+    const lowerValue = value.toLowerCase();
+
+    // Check if secret is too short (less than 32 chars is already caught by Zod)
+    // But we can check for minimum entropy
+
+    // Check for weak patterns
+    const hasWeakPattern = WEAK_SECRET_PATTERNS.some(pattern =>
+      lowerValue.includes(pattern.toLowerCase())
+    );
+
+    if (hasWeakPattern) {
+      weakSecrets.push(key);
+    }
+  });
+
+  // Check database password
+  const dbUrlMatch = env.DATABASE_URL.match(/:\/\/[^:]+:([^@]+)@/);
+  if (dbUrlMatch) {
+    const dbPassword = dbUrlMatch[1];
+    const hasWeakDbPassword = WEAK_DATABASE_PASSWORDS.some(weak =>
+      dbPassword.toLowerCase() === weak.toLowerCase()
+    );
+
+    if (hasWeakDbPassword) {
+      weakSecrets.push('DATABASE_URL password');
+    }
+  }
+
+  // Fail startup if weak secrets detected
+  if (weakSecrets.length > 0) {
+    console.error('\n❌ SECURITY ERROR: Weak or default secrets detected!\n');
+    console.error('The following secrets are using insecure default values:');
+    weakSecrets.forEach(secret => {
+      console.error(`  - ${secret}`);
+    });
+    console.error('\n📝 To fix this:\n');
+    console.error('1. Generate strong secrets:');
+    console.error('   node -e "console.log(require(\'crypto\').randomBytes(64).toString(\'hex\'))"\n');
+    console.error('2. Update your .env.local file with the generated secrets\n');
+    console.error('3. For production, use a secrets manager (AWS Secrets Manager, HashiCorp Vault)\n');
+    console.error('⚠️  Application startup aborted for security reasons.\n');
+    process.exit(1);
+  }
+
+  // Warn if using development secrets in production
+  if (env.NODE_ENV === 'production') {
+    console.log('✅ Production secrets validation passed');
+  }
+};
+
 export const env = parseEnv();
+
+// Validate secrets before exporting
+validateSecrets(env);
 
 export const isDevelopment = env.NODE_ENV === 'development';
 export const isProduction = env.NODE_ENV === 'production';
