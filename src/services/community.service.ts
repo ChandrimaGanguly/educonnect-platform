@@ -426,6 +426,58 @@ export class CommunityService {
       });
   }
 
+  /**
+   * Remove member from community with atomic last-owner check
+   * SECURITY: Prevents race condition where user could leave as last owner
+   * Uses pessimistic locking to ensure atomicity
+   *
+   * @returns Object with success status and optional error message
+   */
+  async removeMemberIfNotLastOwner(
+    communityId: string,
+    userId: string
+  ): Promise<{ success: boolean; error?: string }> {
+    return await this.db.transaction(async (trx) => {
+      // Lock the relevant rows to prevent concurrent modifications
+      const member = await trx('community_members')
+        .where({ community_id: communityId, user_id: userId, status: 'active' })
+        .forUpdate()
+        .first();
+
+      if (!member) {
+        return { success: false, error: 'You are not a member of this community' };
+      }
+
+      // If user is an owner, check if they're the last owner
+      if (member.membership_type === 'owner') {
+        const ownerCount = await trx('community_members')
+          .where({ community_id: communityId, membership_type: 'owner', status: 'active' })
+          .forUpdate()  // Lock all owner rows
+          .count('* as count')
+          .first();
+
+        const count = parseInt(ownerCount?.count as string || '0', 10);
+
+        if (count === 1) {
+          return {
+            success: false,
+            error: 'You cannot leave the community as the only owner. Transfer ownership first.',
+          };
+        }
+      }
+
+      // Safe to remove - either not owner, or there are other owners
+      await trx('community_members')
+        .where({ community_id: communityId, user_id: userId })
+        .update({
+          status: 'inactive',
+          left_at: trx.fn.now(),
+        });
+
+      return { success: true };
+    });
+  }
+
   // ========== Invitations ==========
 
   /**

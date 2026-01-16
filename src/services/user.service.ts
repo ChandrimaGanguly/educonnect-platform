@@ -55,6 +55,7 @@ export interface UpdateUserData {
   phone_number?: string;
   privacy_settings?: Partial<PrivacySettings>;
   notification_preferences?: Partial<NotificationPreferences>;
+  metadata?: Partial<UserMetadata>;
 }
 
 export class UserService {

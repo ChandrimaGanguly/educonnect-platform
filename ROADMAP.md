@@ -53,11 +53,11 @@ This roadmap is organized by **MVP priority** - Phase 1 delivers a working demo,
 | Feature | Status | Complexity | Description |
 |---------|--------|------------|-------------|
 | **D1: Curriculum Schema** | ✅ Done | Medium | Domains, subjects, courses, modules, lessons |
-| **D2: Domain API** | ❌ Needed | Low | List and filter domains |
-| **D3: Subject API** | ❌ Needed | Low | List subjects by domain |
-| **D4: Course API** | ❌ Needed | Medium | Course CRUD, course details |
-| **D5: Module API** | ❌ Needed | Low | List modules in course |
-| **D6: Lesson API** | ❌ Needed | Medium | Lesson content delivery, mark complete |
+| **D2: Domain API** | ✅ Done | Low | List and filter domains |
+| **D3: Subject API** | ✅ Done | Low | List subjects by domain |
+| **D4: Course API** | ✅ Done | Medium | Course CRUD, course details |
+| **D5: Module API** | ✅ Done | Low | List modules in course |
+| **D6: Lesson API** | ✅ Done | Medium | Lesson content delivery, mark complete |
 | **D7: Content Handlers** | ✅ Done | High | Text, video, audio, image, code handlers |
 
 ### Group E: Checkpoint Execution
@@ -295,15 +295,15 @@ This roadmap is organized by **MVP priority** - Phase 1 delivers a working demo,
 ```
 A1-A6 → B1-B6 → C1-C5 → D1-D7 → E1-E7 → F1-F7 → G1-G5 → H1-H5
 (Auth)   (Profile)  (RBAC)  (Content)  (Checkpoint) (Matching) (Progress) (Seed)
-  ✅        🔶         🔶        🔶          🔶          ❌          ❌        ❌
+  ✅        🔶         🔶        ✅          🔶          ❌          ❌        ❌
 ```
 
 **MVP Demo Flow:**
 1. Register/Login (✅ Complete)
 2. Complete profile setup (🔶 Needs wizard)
-3. Browse and join community (❌ Needs API)
-4. Navigate curriculum (❌ Needs API)
-5. View lesson content (❌ Needs API)
+3. Browse and join community (🔶 Partial - APIs exist)
+4. Navigate curriculum (✅ Complete - D2-D6 APIs)
+5. View lesson content (✅ Complete - Lesson API with resources)
 6. Take checkpoint (❌ Needs session mgmt)
 7. See score and feedback (❌ Needs results API)
 8. Request mentor match (❌ Needs matching)

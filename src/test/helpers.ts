@@ -153,12 +153,44 @@ export async function createTestCommunity(createdBy: string, overrides = {}) {
   };
 
   const [community] = await db('communities').insert(defaultCommunity).returning('*');
+
+  // Add creator as owner member
+  await db('community_members').insert({
+    community_id: community.id,
+    user_id: createdBy,
+    membership_type: 'owner',
+    status: 'active',
+    approved: true,
+  });
+
   return community;
 }
 
 /**
- * Generate a test JWT token
+ * Generate a test JWT token with a valid session
  */
-export function generateTestToken(app: FastifyInstance, payload: any): string {
-  return app.jwt.sign(payload);
+export async function generateTestToken(app: FastifyInstance, payload: { userId: string; email: string }): Promise<string> {
+  const db = getDatabase();
+
+  // Generate unique session token
+  const sessionToken = `test_session_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+
+  // Create a test session
+  const [session] = await db('sessions')
+    .insert({
+      user_id: payload.userId,
+      session_token: sessionToken,
+      refresh_token: `test_refresh_${Date.now()}`,
+      ip_address: '127.0.0.1',
+      user_agent: 'Test Agent',
+      expires_at: new Date(Date.now() + 86400000), // 24 hours from now
+    })
+    .returning('*');
+
+  // Include sessionId in the JWT payload
+  return app.jwt.sign({
+    userId: payload.userId,
+    email: payload.email,
+    sessionId: session.id,
+  });
 }

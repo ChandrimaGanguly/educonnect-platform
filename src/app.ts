@@ -130,6 +130,18 @@ export async function buildApp() {
   const { roleRoutes } = await import('./routes/roles');
   await app.register(roleRoutes, { prefix: '/api/v1' });
 
+  // Register user profile routes (Phase 1 Group B)
+  const { profileRoutes } = await import('./routes/profile');
+  await app.register(profileRoutes, { prefix: '/api/v1' });
+
+  // Register profile setup wizard routes (Phase 1 Group B)
+  const { profileSetupRoutes } = await import('./routes/profile-setup');
+  await app.register(profileSetupRoutes, { prefix: '/api/v1/profile-setup' });
+
+  // Register community routes (Phase 1 Group B)
+  const { communityRoutes } = await import('./routes/community');
+  await app.register(communityRoutes, { prefix: '/api/v1' });
+
   // Register content routes
   const { contentRoutes } = await import('./routes/content');
   await app.register(contentRoutes, { prefix: '/api/v1/content' });

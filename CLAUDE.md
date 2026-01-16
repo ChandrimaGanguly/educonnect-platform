@@ -466,3 +466,54 @@ const matchScore = await response.json();
 - `DEPENDENCIES.md`: Dependency documentation and rationale
 - `openspec/project.md`: OpenSpec conventions
 - `openspec/specs/`: Feature specifications
+
+<!-- OPENSPEC:START -->
+# OpenSpec Instructions
+
+These instructions are for AI assistants working in this project.
+
+Always open `@/openspec/AGENTS.md` when the request:
+- Mentions planning or proposals (words like proposal, spec, change, plan)
+- Introduces new capabilities, breaking changes, architecture shifts, or big performance/security work
+- Sounds ambiguous and you need the authoritative spec before coding
+
+Use `@/openspec/AGENTS.md` to learn:
+- How to create and apply change proposals
+- Spec format and conventions
+- Project structure and guidelines
+
+Keep this managed block so 'openspec update' can refresh the instructions.
+
+<!-- OPENSPEC:END -->
+
+<!--AGENTS:START-->
+
+## Security Auditor
+When the request involves security scanning, vulnerability assessment, or code auditing:
+- Load `@/openspec/agents/security-auditor.md`
+- Follow the security audit workflow defined there
+
+→ Load `@/openspec/agents/security-auditor.md` and follow its workflow
+
+## Code Reviewer
+When the request involves code review and code quality tasks:
+- Load `@/openspec/agents/code-reviewer.md`
+- Follow the code review workflow defined there
+
+→ Load `@/openspec/agents/code-reviewer.md` and follow its workflow
+
+## Solution Architecture
+When the request involves:
+- System design or architecture decisions
+- Technology selection or comparison
+- Scalability, performance, or reliability planning
+- Migration strategies
+- Architecture reviews or ADRs
+
+→ Load `@/openspec/agents/solution-architect.md` and follow its workflow.
+
+## General Development
+For standard development tasks, proceed normally using project conventions.
+
+
+<!--AGENTS:END-->

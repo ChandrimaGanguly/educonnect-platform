@@ -135,15 +135,27 @@ export class UserProfileService {
   }
 
   /**
-   * Update a skill
+   * Get skill by ID if owned by user (atomic ownership check)
+   * SECURITY: Prevents IDOR vulnerabilities
    */
-  async updateSkill(skillId: string, data: Partial<CreateSkillData>): Promise<UserSkill> {
+  async getSkillIfOwned(userId: string, skillId: string): Promise<UserSkill | null> {
+    const skill = await this.db('user_skills')
+      .where({ id: skillId, user_id: userId })
+      .first();
+    return skill || null;
+  }
+
+  /**
+   * Update a skill (with atomic ownership verification)
+   * SECURITY: Combined ownership check and update in single query
+   */
+  async updateSkill(skillId: string, userId: string, data: Partial<CreateSkillData>): Promise<UserSkill | null> {
     const [skill] = await this.db('user_skills')
-      .where({ id: skillId })
+      .where({ id: skillId, user_id: userId })
       .update(data)
       .returning('*');
 
-    return skill;
+    return skill || null;
   }
 
   /**
@@ -175,10 +187,14 @@ export class UserProfileService {
   }
 
   /**
-   * Delete a skill
+   * Delete a skill (with atomic ownership verification)
+   * SECURITY: Only delete if owned by user
    */
-  async deleteSkill(skillId: string): Promise<void> {
-    await this.db('user_skills').where({ id: skillId }).delete();
+  async deleteSkill(skillId: string, userId: string): Promise<boolean> {
+    const deleted = await this.db('user_skills')
+      .where({ id: skillId, user_id: userId })
+      .delete();
+    return deleted > 0;
   }
 
   // ========== Interests Management ==========
@@ -226,22 +242,38 @@ export class UserProfileService {
   }
 
   /**
-   * Update an interest
+   * Get interest by ID if owned by user (atomic ownership check)
+   * SECURITY: Prevents IDOR vulnerabilities
    */
-  async updateInterest(interestId: string, data: Partial<CreateInterestData>): Promise<UserInterest> {
-    const [interest] = await this.db('user_interests')
-      .where({ id: interestId })
-      .update(data)
-      .returning('*');
-
-    return interest;
+  async getInterestIfOwned(userId: string, interestId: string): Promise<UserInterest | null> {
+    const interest = await this.db('user_interests')
+      .where({ id: interestId, user_id: userId })
+      .first();
+    return interest || null;
   }
 
   /**
-   * Delete an interest
+   * Update an interest (with atomic ownership verification)
+   * SECURITY: Combined ownership check and update in single query
    */
-  async deleteInterest(interestId: string): Promise<void> {
-    await this.db('user_interests').where({ id: interestId }).delete();
+  async updateInterest(interestId: string, userId: string, data: Partial<CreateInterestData>): Promise<UserInterest | null> {
+    const [interest] = await this.db('user_interests')
+      .where({ id: interestId, user_id: userId })
+      .update(data)
+      .returning('*');
+
+    return interest || null;
+  }
+
+  /**
+   * Delete an interest (with atomic ownership verification)
+   * SECURITY: Only delete if owned by user
+   */
+  async deleteInterest(interestId: string, userId: string): Promise<boolean> {
+    const deleted = await this.db('user_interests')
+      .where({ id: interestId, user_id: userId })
+      .delete();
+    return deleted > 0;
   }
 
   // ========== Education Management ==========
@@ -273,22 +305,38 @@ export class UserProfileService {
   }
 
   /**
-   * Update education
+   * Get education by ID if owned by user (atomic ownership check)
+   * SECURITY: Prevents IDOR vulnerabilities
    */
-  async updateEducation(educationId: string, data: Partial<CreateEducationData>): Promise<UserEducation> {
-    const [education] = await this.db('user_education')
-      .where({ id: educationId })
-      .update(data)
-      .returning('*');
-
-    return education;
+  async getEducationIfOwned(userId: string, educationId: string): Promise<UserEducation | null> {
+    const education = await this.db('user_education')
+      .where({ id: educationId, user_id: userId })
+      .first();
+    return education || null;
   }
 
   /**
-   * Delete education
+   * Update education (with atomic ownership verification)
+   * SECURITY: Combined ownership check and update in single query
    */
-  async deleteEducation(educationId: string): Promise<void> {
-    await this.db('user_education').where({ id: educationId }).delete();
+  async updateEducation(educationId: string, userId: string, data: Partial<CreateEducationData>): Promise<UserEducation | null> {
+    const [education] = await this.db('user_education')
+      .where({ id: educationId, user_id: userId })
+      .update(data)
+      .returning('*');
+
+    return education || null;
+  }
+
+  /**
+   * Delete education (with atomic ownership verification)
+   * SECURITY: Only delete if owned by user
+   */
+  async deleteEducation(educationId: string, userId: string): Promise<boolean> {
+    const deleted = await this.db('user_education')
+      .where({ id: educationId, user_id: userId })
+      .delete();
+    return deleted > 0;
   }
 
   // ========== Availability Management ==========
@@ -342,24 +390,38 @@ export class UserProfileService {
   }
 
   /**
-   * Update availability
+   * Get availability by ID if owned by user (atomic ownership check)
+   * SECURITY: Prevents IDOR vulnerabilities
    */
-  async updateAvailability(availabilityId: string, data: Partial<CreateAvailabilityData>): Promise<UserAvailability> {
-    const [availability] = await this.db('user_availability')
-      .where({ id: availabilityId })
-      .update(data)
-      .returning('*');
-
-    return availability;
+  async getAvailabilityIfOwned(userId: string, availabilityId: string): Promise<UserAvailability | null> {
+    const availability = await this.db('user_availability')
+      .where({ id: availabilityId, user_id: userId })
+      .first();
+    return availability || null;
   }
 
   /**
-   * Delete availability (soft delete by setting is_active to false)
+   * Update availability (with atomic ownership verification)
+   * SECURITY: Combined ownership check and update in single query
    */
-  async deleteAvailability(availabilityId: string): Promise<void> {
-    await this.db('user_availability')
-      .where({ id: availabilityId })
+  async updateAvailability(availabilityId: string, userId: string, data: Partial<CreateAvailabilityData>): Promise<UserAvailability | null> {
+    const [availability] = await this.db('user_availability')
+      .where({ id: availabilityId, user_id: userId })
+      .update(data)
+      .returning('*');
+
+    return availability || null;
+  }
+
+  /**
+   * Delete availability (soft delete with atomic ownership verification)
+   * SECURITY: Only delete if owned by user
+   */
+  async deleteAvailability(availabilityId: string, userId: string): Promise<boolean> {
+    const deleted = await this.db('user_availability')
+      .where({ id: availabilityId, user_id: userId })
       .update({ is_active: false });
+    return deleted > 0;
   }
 
   /**
