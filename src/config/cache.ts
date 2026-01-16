@@ -1,4 +1,5 @@
 import { getRedisClient } from './redis';
+import { logger } from './logger';
 
 export interface CacheOptions {
   ttl?: number; // Time to live in seconds
@@ -35,7 +36,7 @@ export class CacheService {
     try {
       return JSON.parse(value) as T;
     } catch (error) {
-      console.error('Error parsing cached value:', error);
+      logger.warn({ error, key }, 'Failed to parse cached value');
       return null;
     }
   }

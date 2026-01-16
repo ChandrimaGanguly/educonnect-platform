@@ -1,4 +1,5 @@
 import Redis, { RedisOptions } from 'ioredis';
+import { logger } from './logger';
 
 export interface RedisConfig extends RedisOptions {
   url?: string;
@@ -40,11 +41,11 @@ export function getRedisClient(): Redis {
     redisClient = new Redis(redisConfig);
 
     redisClient.on('error', (err) => {
-      console.error('Redis Client Error:', err);
+      logger.error({ err }, 'Redis client error');
     });
 
     redisClient.on('connect', () => {
-      console.log('Redis Client connected');
+      logger.info('Redis client connected');
     });
   }
 
@@ -59,11 +60,11 @@ export function getRedisSubscriber(): Redis {
     redisSubscriber = new Redis(redisConfig);
 
     redisSubscriber.on('error', (err) => {
-      console.error('Redis Subscriber Error:', err);
+      logger.error({ err }, 'Redis subscriber error');
     });
 
     redisSubscriber.on('connect', () => {
-      console.log('Redis Subscriber connected');
+      logger.info('Redis subscriber connected');
     });
   }
 
@@ -78,11 +79,11 @@ export function getRedisPublisher(): Redis {
     redisPublisher = new Redis(redisConfig);
 
     redisPublisher.on('error', (err) => {
-      console.error('Redis Publisher Error:', err);
+      logger.error({ err }, 'Redis publisher error');
     });
 
     redisPublisher.on('connect', () => {
-      console.log('Redis Publisher connected');
+      logger.info('Redis publisher connected');
     });
   }
 
@@ -119,7 +120,7 @@ export async function redisHealthCheck(): Promise<boolean> {
     await client.ping();
     return true;
   } catch (error) {
-    console.error('Redis health check failed:', error);
+    logger.error({ error }, 'Redis health check failed');
     return false;
   }
 }

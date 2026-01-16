@@ -85,6 +85,10 @@ export async function authRoutes(server: FastifyInstance): Promise<void> {
   /**
    * POST /login
    * Authenticate user and create session
+   *
+   * SECURITY: Implements constant-time authentication to prevent timing attacks
+   * - Always performs password hashing (even with dummy hash if user not found)
+   * - Prevents username enumeration via response time analysis
    */
   server.post('/login', {
     config: {
@@ -100,17 +104,16 @@ export async function authRoutes(server: FastifyInstance): Promise<void> {
       // Find user by email or username
       const user = await userService.findByEmailOrUsername(data.emailOrUsername);
 
-      if (!user) {
-        return reply.status(401).send({
-          error: 'Unauthorized',
-          message: 'Invalid credentials',
-        });
-      }
+      // SECURITY FIX: Use dummy hash if user doesn't exist (constant-time comparison)
+      // This ensures password verification always takes ~same time, preventing timing attacks
+      const DUMMY_PASSWORD_HASH = '$2b$12$dummyhashtopreventtimingattackXOXOXOXOXOXOXOXOXOXOXOXOXOXOX';
+      const passwordHash = user?.password_hash || DUMMY_PASSWORD_HASH;
 
-      // Verify password
-      const isValid = await verifyPassword(data.password, user.password_hash);
+      // Always verify password (even with dummy hash) - constant time operation
+      const isValidPassword = await verifyPassword(data.password, passwordHash);
 
-      if (!isValid) {
+      // Combined validation check (prevents early return timing leak)
+      if (!user || !isValidPassword) {
         return reply.status(401).send({
           error: 'Unauthorized',
           message: 'Invalid credentials',
@@ -313,6 +316,8 @@ export async function authRoutes(server: FastifyInstance): Promise<void> {
   /**
    * DELETE /sessions/:sessionId
    * Revoke a specific session
+   *
+   * SECURITY: Uses atomic check-and-revoke to prevent TOCTOU race conditions
    */
   server.delete('/sessions/:sessionId', {
     preHandler: [authenticate],
@@ -320,17 +325,19 @@ export async function authRoutes(server: FastifyInstance): Promise<void> {
     const { userId } = request.user!;
     const { sessionId } = request.params;
 
-    // Verify the session belongs to the user
-    const session = await sessionService.findById(sessionId);
+    // SECURITY FIX: Atomic ownership check and revocation (prevents TOCTOU)
+    const revoked = await sessionService.revokeSessionIfOwned(
+      sessionId,
+      userId,
+      'User revoked session'
+    );
 
-    if (!session || session.user_id !== userId) {
+    if (!revoked) {
       return reply.status(404).send({
         error: 'Not Found',
         message: 'Session not found',
       });
     }
-
-    await sessionService.revokeSession(sessionId, 'User revoked session');
 
     return {
       message: 'Session revoked successfully',

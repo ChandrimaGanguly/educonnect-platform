@@ -153,6 +153,33 @@ export class SessionService {
   }
 
   /**
+   * Revoke a session atomically (only if owned by user)
+   * Returns true if session was revoked, false if not found or not owned by user
+   *
+   * SECURITY FIX: Atomic check-and-revoke operation prevents TOCTOU race conditions
+   */
+  async revokeSessionIfOwned(
+    sessionId: string,
+    userId: string,
+    reason?: string
+  ): Promise<boolean> {
+    const result = await this.db('sessions')
+      .where({
+        id: sessionId,
+        user_id: userId,
+        is_active: true,
+      })
+      .update({
+        is_active: false,
+        revoked_at: this.db.fn.now(),
+        revocation_reason: reason,
+      })
+      .returning('*');
+
+    return result.length > 0;
+  }
+
+  /**
    * Revoke all sessions for a user
    */
   async revokeAllUserSessions(userId: string, except?: string): Promise<void> {

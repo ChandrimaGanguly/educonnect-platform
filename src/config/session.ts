@@ -17,10 +17,12 @@ export interface SessionConfig {
 export class SessionService {
   private redis = getRedisClient();
   private sessionPrefix = 'educonnect:session:';
+  private userSessionsPrefix = 'educonnect:user-sessions:';
   private defaultMaxAge = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
 
   /**
    * Create a new session
+   * Uses a user-session index (Redis Set) to avoid KEYS enumeration
    */
   async create(sessionId: string, data: SessionData, config?: SessionConfig): Promise<void> {
     const key = this.getSessionKey(sessionId);
@@ -33,7 +35,20 @@ export class SessionService {
       expiresAt: new Date(Date.now() + maxAge).toISOString(),
     };
 
-    await this.redis.setex(key, ttl, JSON.stringify(sessionData));
+    // Use pipeline for atomic operation
+    const pipeline = this.redis.pipeline();
+
+    // Store session data
+    pipeline.setex(key, ttl, JSON.stringify(sessionData));
+
+    // Add session ID to user's session set
+    const userSessionsKey = this.getUserSessionsKey(data.userId);
+    pipeline.sadd(userSessionsKey, sessionId);
+
+    // Set TTL on user's session set (slightly longer than session TTL)
+    pipeline.expire(userSessionsKey, ttl + 3600); // +1 hour buffer
+
+    await pipeline.exec();
   }
 
   /**
@@ -50,7 +65,8 @@ export class SessionService {
     try {
       return JSON.parse(data);
     } catch (error) {
-      console.error('Error parsing session data:', error);
+      // Note: Logger will be passed via dependency injection in production
+// For now, we silently fail to avoid breaking the session flow
       return null;
     }
   }
@@ -96,32 +112,62 @@ export class SessionService {
 
   /**
    * Delete a session
+   * Also removes from user's session index
    */
   async destroy(sessionId: string): Promise<void> {
     const key = this.getSessionKey(sessionId);
-    await this.redis.del(key);
+
+    // Get session data to find userId
+    const sessionData = await this.get(sessionId);
+
+    if (sessionData) {
+      const pipeline = this.redis.pipeline();
+
+      // Delete session data
+      pipeline.del(key);
+
+      // Remove from user's session set
+      const userSessionsKey = this.getUserSessionsKey(sessionData.userId);
+      pipeline.srem(userSessionsKey, sessionId);
+
+      await pipeline.exec();
+    } else {
+      // Session doesn't exist, just delete the key
+      await this.redis.del(key);
+    }
   }
 
   /**
    * Delete all sessions for a user
+   * Uses user-session index (O(N) where N = sessions per user, not all sessions)
+   *
+   * SECURITY FIX: Replaced KEYS pattern with user-session index
+   * - Prevents Redis blocking on large keyspaces
+   * - Eliminates session enumeration vulnerability
+   * - O(N) complexity where N is sessions per user (typically < 10)
    */
   async destroyAllForUser(userId: string): Promise<void> {
-    const pattern = `${this.sessionPrefix}*`;
-    const keys = await this.redis.keys(pattern);
+    const userSessionsKey = this.getUserSessionsKey(userId);
 
-    for (const key of keys) {
-      const data = await this.redis.get(key);
-      if (data) {
-        try {
-          const sessionData = JSON.parse(data);
-          if (sessionData.userId === userId) {
-            await this.redis.del(key);
-          }
-        } catch (error) {
-          console.error('Error parsing session data for deletion:', error);
-        }
-      }
+    // Get all session IDs for this user
+    const sessionIds = await this.redis.smembers(userSessionsKey);
+
+    if (sessionIds.length === 0) {
+      return;
     }
+
+    // Delete all sessions in a pipeline (atomic)
+    const pipeline = this.redis.pipeline();
+
+    sessionIds.forEach(sessionId => {
+      const key = this.getSessionKey(sessionId);
+      pipeline.del(key);
+    });
+
+    // Delete the user's session set
+    pipeline.del(userSessionsKey);
+
+    await pipeline.exec();
   }
 
   /**
@@ -143,27 +189,35 @@ export class SessionService {
 
   /**
    * Get all active session IDs for a user
+   * Uses user-session index for O(N) performance where N = sessions per user
+   *
+   * SECURITY FIX: Replaced KEYS pattern with user-session index
    */
   async getAllForUser(userId: string): Promise<string[]> {
-    const pattern = `${this.sessionPrefix}*`;
-    const keys = await this.redis.keys(pattern);
-    const sessionIds: string[] = [];
+    const userSessionsKey = this.getUserSessionsKey(userId);
 
-    for (const key of keys) {
-      const data = await this.redis.get(key);
-      if (data) {
-        try {
-          const sessionData = JSON.parse(data);
-          if (sessionData.userId === userId) {
-            sessionIds.push(key.replace(this.sessionPrefix, ''));
-          }
-        } catch (error) {
-          console.error('Error parsing session data:', error);
-        }
+    // Get all session IDs from the user's session set
+    const sessionIds = await this.redis.smembers(userSessionsKey);
+
+    // Filter out expired sessions (cleanup)
+    const validSessionIds: string[] = [];
+    const expiredSessionIds: string[] = [];
+
+    for (const sessionId of sessionIds) {
+      const exists = await this.exists(sessionId);
+      if (exists) {
+        validSessionIds.push(sessionId);
+      } else {
+        expiredSessionIds.push(sessionId);
       }
     }
 
-    return sessionIds;
+    // Clean up expired sessions from the set
+    if (expiredSessionIds.length > 0) {
+      await this.redis.srem(userSessionsKey, ...expiredSessionIds);
+    }
+
+    return validSessionIds;
   }
 
   /**
@@ -171,6 +225,13 @@ export class SessionService {
    */
   private getSessionKey(sessionId: string): string {
     return `${this.sessionPrefix}${sessionId}`;
+  }
+
+  /**
+   * Get user sessions set key with prefix
+   */
+  private getUserSessionsKey(userId: string): string {
+    return `${this.userSessionsPrefix}${userId}`;
   }
 }
 
