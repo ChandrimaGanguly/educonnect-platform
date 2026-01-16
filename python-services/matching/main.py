@@ -20,6 +20,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 from shared.config import settings  # noqa: E402
 from shared.database import health_check as db_health  # noqa: E402
 from shared.redis_client import redis_health_check  # noqa: E402
+from matching_algorithm import get_matcher  # noqa: E402
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -95,20 +96,35 @@ async def find_matches(request: MatchRequest) -> MatchResponse:
     return MatchResponse(learner_id=request.learner_id, matches=[])
 
 
-@app.post("/match/score")
-async def score_match(learner_id: str, mentor_id: str) -> Dict[str, str | float]:
+class ScoreRequest(BaseModel):
+    learner_profile: Dict
+    mentor_profile: Dict
+
+
+class ScoreResponse(BaseModel):
+    overall_score: float
+    subject_overlap_score: float
+    availability_overlap_score: float
+    match_reasons: List[str]
+
+
+@app.post("/match/score", response_model=ScoreResponse)
+async def score_match(request: ScoreRequest) -> ScoreResponse:
     """
     Calculate compatibility score between a learner and mentor
 
-    TODO: Implement scoring algorithm
+    Expects learner_profile and mentor_profile with:
+    - learning_goals / subjects: List of subject names
+    - availability: List of dicts with day_of_week, start_time, end_time
     """
-    return {
-        "learner_id": learner_id,
-        "mentor_id": mentor_id,
-        "compatibility_score": 0.0,
-        "availability_score": 0.0,
-        "overall_score": 0.0,
-    }
+    matcher = get_matcher()
+
+    score_data = matcher.calculate_match_score(
+        request.learner_profile,
+        request.mentor_profile
+    )
+
+    return ScoreResponse(**score_data)
 
 
 if __name__ == "__main__":

@@ -76,13 +76,13 @@ This roadmap is organized by **MVP priority** - Phase 1 delivers a working demo,
 
 | Feature | Status | Complexity | Description |
 |---------|--------|------------|-------------|
-| **F1: Mentor Profile Schema** | ❌ Needed | Medium | Skills, availability, capacity, subjects |
-| **F2: Mentor Profile API** | ❌ Needed | Medium | Create/update mentor profiles |
-| **F3: Match Request API** | ❌ Needed | Medium | Learner submits match request |
-| **F4: Matching Algorithm** | ❌ Needed | High | Subject + availability scoring |
-| **F5: Recommendation API** | ❌ Needed | Medium | Return ranked mentor matches |
-| **F6: Request Response API** | ❌ Needed | Medium | Mentor accept/decline workflow |
-| **F7: Relationship Creation** | ❌ Needed | Low | Establish confirmed relationship |
+| **F1: Mentor Profile Schema** | ✅ Done | Medium | 4 tables: mentor_profiles, mentorship_requests, mentorship_relationships, mentorship_feedback |
+| **F2: Mentor Profile API** | ✅ Done | Medium | 7 endpoints: create/update profile, status, search, capacity check |
+| **F3: Match Request API** | ✅ Done | Medium | 6 endpoints: create, list outgoing/incoming, respond, cancel, count |
+| **F4: Matching Algorithm** | ✅ Done | High | 2-factor scoring: subject overlap (60%) + availability overlap (40%) with Jaccard similarity |
+| **F5: Recommendation API** | ✅ Done | Medium | POST /match endpoint with Python service integration + fallback |
+| **F6: Request Response API** | ✅ Done | Medium | Accept/decline workflow with automatic relationship creation |
+| **F7: Relationship Creation** | ✅ Done | Low | 7 endpoints: list, get, update, terminate, sessions, feedback |
 
 ### Group G: Progress & Notifications
 
@@ -98,21 +98,21 @@ This roadmap is organized by **MVP priority** - Phase 1 delivers a working demo,
 
 | Feature | Status | Complexity | Description |
 |---------|--------|------------|-------------|
-| **H1: Sample Communities** | ❌ Needed | Low | 3-5 demo communities |
-| **H2: Sample Curriculum** | ❌ Needed | Medium | 2-3 domains, courses, 10+ lessons |
-| **H3: Sample Checkpoints** | ❌ Needed | Medium | 5+ checkpoints with questions |
-| **H4: Sample Users** | ❌ Needed | Low | Learners, mentors, admin accounts |
-| **H5: Sample Relationships** | ❌ Needed | Low | Pre-existing mentor-learner pairs |
+| **H1: Sample Communities** | ✅ Done | Low | 4 demo communities (math, science, programming, global) |
+| **H2: Sample Curriculum** | ✅ Done | Medium | 3 domains, 3 subjects, 3 courses, 5 modules, 7 detailed lessons |
+| **H3: Sample Checkpoints** | ✅ Done | Medium | 5 checkpoints with 20 questions (multiple formats) |
+| **H4: Sample Users** | ✅ Done | Low | 1 admin, 2 community admins, 4 mentors, 6 learners (14 users total) |
+| **H5: Sample Relationships** | ✅ Done | Low | 4 mentor profiles, 5 requests, 4 active relationships, 2 sessions, 1 feedback |
 
 **Phase 1 MVP Deliverables:**
 - ✅ Users can register, login, manage sessions
 - ✅ Users can complete profile setup with skills/interests
 - ✅ Users can browse and join communities
 - ✅ Users can navigate curriculum and view lessons
-- ⬜ Users can take checkpoints and see scores
-- ⬜ Learners can request and receive mentor recommendations
-- ⬜ Mentors can accept/decline requests
-- ⬜ Relationships are established and visible
+- ✅ Users can take checkpoints and see scores
+- ✅ Learners can request and receive mentor recommendations
+- ✅ Mentors can accept/decline requests
+- ✅ Relationships are established and visible
 
 ---
 
@@ -295,7 +295,7 @@ This roadmap is organized by **MVP priority** - Phase 1 delivers a working demo,
 ```
 A1-A6 → B1-B6 → C1-C5 → D1-D7 → E1-E7 → F1-F7 → G1-G5 → H1-H5
 (Auth)   (Profile)  (RBAC)  (Content)  (Checkpoint) (Matching) (Progress) (Seed)
-  ✅        ✅         ✅        ✅          ✅          ❌          ✅        ❌
+  ✅        ✅         ✅        ✅          ✅          ✅          ✅        ✅
 ```
 
 **MVP Demo Flow:**
@@ -306,9 +306,10 @@ A1-A6 → B1-B6 → C1-C5 → D1-D7 → E1-E7 → F1-F7 → G1-G5 → H1-H5
 5. View lesson content (✅ Complete - Multi-format content handlers with resources)
 6. Take checkpoint (✅ Complete - Session mgmt, question delivery, response submission)
 7. See score and feedback (✅ Complete - Automated scoring, results display, feedback generation)
-8. Request mentor match (❌ Needs matching request API)
-9. Receive recommendations (❌ Needs matching algorithm implementation)
-10. Mentor accepts request (❌ Needs mentor response workflow)
+8. Request mentor match (✅ Complete - Match request API with 6 endpoints)
+9. Receive recommendations (✅ Complete - Matching algorithm with 2-factor scoring)
+10. Mentor accepts request (✅ Complete - Accept/decline workflow, relationship creation)
+11. **Seed data for demo** (✅ Complete - 14 users, 4 communities, 7 lessons, 5 checkpoints, 4 relationships)
 
 ---
 

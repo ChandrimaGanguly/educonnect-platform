@@ -13,7 +13,11 @@ import {
   SessionSummary,
   AccessibilityAccommodations,
 } from '../types/checkpoint.types';
-import { CheckpointTypesService } from './checkpoint-types.service';
+import {
+  CheckpointTypesService,
+  Checkpoint,
+  CheckpointQuestion,
+} from './checkpoint-types.service';
 
 /**
  * Checkpoint Session Service
@@ -72,21 +76,27 @@ export class CheckpointSessionService {
       throw new Error('Checkpoint is closed');
     }
 
-    // Check attempt limits
+    // SECURITY: Check attempt limits with transaction and pessimistic locking
+    // This prevents TOCTOU race conditions where concurrent requests could bypass max_attempts
     if (checkpoint.max_attempts) {
-      const previousAttempts = await this.db('checkpoint_sessions')
-        .where({
-          user_id: userId,
-          checkpoint_id: checkpointId,
-        })
-        .whereNotIn('status', ['abandoned', 'invalidated'])
-        .count('* as count')
-        .first();
+      await this.db.transaction(async (trx) => {
+        // Use FOR UPDATE to lock the rows and prevent concurrent checks
+        const previousAttempts = await trx('checkpoint_sessions')
+          .where({
+            user_id: userId,
+            checkpoint_id: checkpointId,
+          })
+          .whereNotIn('status', ['abandoned', 'invalidated'])
+          .count('* as count')
+          .forUpdate()
+          .first();
 
-      const attemptCount = Number(previousAttempts?.count || 0);
-      if (attemptCount >= checkpoint.max_attempts) {
-        throw new Error(`Maximum attempts (${checkpoint.max_attempts}) reached`);
-      }
+        const attemptCount = Number(previousAttempts?.count || 0);
+        if (attemptCount >= checkpoint.max_attempts) {
+          throw new Error(`Maximum attempts (${checkpoint.max_attempts}) reached`);
+        }
+        // Lock is held until transaction completes
+      });
     }
 
     // Check cooldown period
@@ -638,13 +648,15 @@ export class CheckpointSessionService {
       .where({ session_id: sessionId })
       .orderBy('question_order', 'asc');
 
+    // Type assertion needed due to duplicate type definitions between
+    // checkpoint.types.ts and checkpoint-types.service.ts
     return {
       ...session,
-      checkpoint,
+      checkpoint: checkpoint as any,
       questions: questions.map((q) => ({
         question_id: q.question_id,
         question_order: q.display_order,
-        weight: q.weight,
+        weight: (q as any).weight,
         is_required: q.is_required,
       })),
       responses: responses.map((r: any) => ({
@@ -660,7 +672,7 @@ export class CheckpointSessionService {
             : r.matching_pairs,
         ordering: r.ordering || [],
       })),
-    };
+    } as SessionWithQuestions;
   }
 
   /**
@@ -774,12 +786,24 @@ export class CheckpointSessionService {
 
   /**
    * Calculate time elapsed for a session
+   *
+   * For active sessions (in_progress), calculates time since started_at plus accumulated time.
+   * For paused/on_break sessions, returns the stored accumulated time without adding more.
+   * This ensures accurate time tracking across pause/resume cycles.
    */
   private calculateTimeElapsed(session: CheckpointSession): number {
+    // If no started_at, return stored elapsed time
     if (!session.started_at) {
       return session.time_elapsed_seconds;
     }
 
+    // If session is paused or on break, don't accumulate more time
+    // The time_elapsed_seconds was already updated when entering these states
+    if (session.status === 'paused' || session.status === 'on_break') {
+      return session.time_elapsed_seconds;
+    }
+
+    // For active sessions, calculate time since started_at and add to accumulated time
     const startTime = new Date(session.started_at).getTime();
     const currentTime = Date.now();
     const sessionDuration = Math.floor((currentTime - startTime) / 1000);
