@@ -1,10 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import { healthRoutes } from './health';
 import { authRoutes } from './auth';
-import { profileRoutes } from './profile';
-import { profileSetupRoutes } from './profile-setup';
 import { roleRoutes } from './roles';
-import { communityRoutes } from './community';
 import { communityTrustRoutes } from './community-trust';
 import { notificationRoutes } from './notifications';
 import { accessibilityRoutes } from './accessibility';
@@ -21,17 +18,8 @@ export async function registerRoutes(server: FastifyInstance): Promise<void> {
   // Authentication routes
   await server.register(authRoutes, { prefix: '/api/v1/auth' });
 
-  // User profile routes
-  await server.register(profileRoutes, { prefix: '/api/v1' });
-
-  // Profile setup wizard routes
-  await server.register(profileSetupRoutes, { prefix: '/api/v1' });
-
   // Role and permission routes
   await server.register(roleRoutes, { prefix: '/api/v1' });
-
-  // Community routes
-  await server.register(communityRoutes, { prefix: '/api/v1' });
 
   // Community trust routes
   await server.register(communityTrustRoutes, { prefix: '/api/v1' });
