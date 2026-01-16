@@ -611,7 +611,17 @@ export async function checkpointExecutionRoutes(server: FastifyInstance): Promis
       const response = await getExecutionService().submitResponse(
         {
           session_id: request.params.sessionId,
-          ...data,
+          question_id: data.question_id,
+          response_data: data.response_data,
+          text_response: data.text_response,
+          selected_options: data.selected_options,
+          matching_pairs: data.matching_pairs,
+          ordering: data.ordering,
+          file_submission_id: data.file_submission_id,
+          audio_response_url: data.audio_response_url,
+          flagged_for_review: data.flagged_for_review,
+          time_spent_seconds: data.time_spent_seconds,
+          offline_timestamp: data.offline_timestamp,
         },
         request.user!.userId
       );

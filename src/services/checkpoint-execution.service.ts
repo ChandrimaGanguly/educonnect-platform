@@ -118,7 +118,8 @@ export class CheckpointExecutionService {
     // 3. Fetch all options in one query
     const allOptions = await this.db('assessment_options')
       .whereIn('question_id', questionIds)
-      .orderBy(['question_id', 'display_order'], ['asc', 'asc'])
+      .orderBy('question_id', 'asc')
+      .orderBy('display_order', 'asc')
       .select('*');
 
     // Group options by question_id

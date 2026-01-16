@@ -13,7 +13,11 @@ import {
   SessionSummary,
   AccessibilityAccommodations,
 } from '../types/checkpoint.types';
-import { CheckpointTypesService } from './checkpoint-types.service';
+import {
+  CheckpointTypesService,
+  Checkpoint,
+  CheckpointQuestion,
+} from './checkpoint-types.service';
 
 /**
  * Checkpoint Session Service
@@ -644,13 +648,15 @@ export class CheckpointSessionService {
       .where({ session_id: sessionId })
       .orderBy('question_order', 'asc');
 
+    // Type assertion needed due to duplicate type definitions between
+    // checkpoint.types.ts and checkpoint-types.service.ts
     return {
       ...session,
-      checkpoint,
+      checkpoint: checkpoint as any,
       questions: questions.map((q) => ({
         question_id: q.question_id,
         question_order: q.display_order,
-        weight: q.weight,
+        weight: (q as any).weight,
         is_required: q.is_required,
       })),
       responses: responses.map((r: any) => ({
@@ -666,7 +672,7 @@ export class CheckpointSessionService {
             : r.matching_pairs,
         ordering: r.ordering || [],
       })),
-    };
+    } as SessionWithQuestions;
   }
 
   /**
