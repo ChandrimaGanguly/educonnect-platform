@@ -274,10 +274,11 @@ export class ModuleService {
     }
 
     // Get completed lessons count
-    const [{ count: completedCount }] = await this.db('curriculum_lessons as cl')
-      .leftJoin('lesson_completions as lc', function(this: any) {
+    const db = this.db;
+    const [{ count: completedCount }] = await db('curriculum_lessons as cl')
+      .leftJoin('lesson_completions as lc', function() {
         this.on('cl.id', '=', 'lc.lesson_id')
-          .andOn('lc.user_id', '=', this.client.raw('?', [userId]));
+          .andOn('lc.user_id', '=', db.raw('?', [userId]));
       })
       .where({ 'cl.module_id': moduleId, 'cl.status': 'published' })
       .whereNotNull('lc.id')

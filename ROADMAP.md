@@ -31,12 +31,12 @@ This roadmap is organized by **MVP priority** - Phase 1 delivers a working demo,
 
 | Feature | Status | Complexity | Description |
 |---------|--------|------------|-------------|
-| **B1: User Profile System** | 🔶 Partial | Medium | Profile CRUD, privacy settings, avatar |
-| **B2: Profile Setup Wizard** | ❌ Needed | Medium | Guided setup, learning interests, goals |
-| **B3: Skill Self-Assessment** | ❌ Needed | Medium | Skill questionnaire, baseline levels |
-| **B4: Community CRUD** | ❌ Needed | Medium | Create, read, update, delete communities |
-| **B5: Community Membership** | ❌ Needed | Medium | Join, leave, invite, member listing |
-| **B6: Community Discovery** | ❌ Needed | Low | Browse, search, filter communities |
+| **B1: User Profile System** | ✅ Done | Medium | 18 API endpoints for profile, skills, interests, education, availability with IDOR protection |
+| **B2: Profile Setup Wizard** | ✅ Done | Medium | 6-step guided wizard with bulk operations and status tracking |
+| **B3: Skill Self-Assessment** | ✅ Done | Medium | Integrated questionnaire with proficiency levels (beginner→expert) |
+| **B4: Community CRUD** | ✅ Done | Medium | Full CRUD operations with atomic ownership checks |
+| **B5: Community Membership** | ✅ Done | Medium | 10 endpoints: join/leave with race condition protection, invites, join requests |
+| **B6: Community Discovery** | ✅ Done | Low | Search, filters (type, tags, language, region), pagination |
 
 ### Group C: Role-Based Access Control
 
@@ -44,8 +44,8 @@ This roadmap is organized by **MVP priority** - Phase 1 delivers a working demo,
 |---------|--------|------------|-------------|
 | **C1: RBAC Schema** | ✅ Done | Medium | Roles, permissions, user_community_roles tables |
 | **C2: Default Roles Seed** | ✅ Done | Low | Learner, mentor, admin role definitions |
-| **C3: Permission Middleware** | ❌ Needed | Medium | Route-level permission enforcement |
-| **C4: Role Assignment API** | ❌ Needed | Low | Assign/revoke roles in communities |
+| **C3: Permission Middleware** | ✅ Done | Medium | requirePermissions() and requireRoles() middleware with community-scoped checks |
+| **C4: Role Assignment API** | ✅ Done | Low | Full role assignment/revocation API with validation |
 | **C5: Trust Score Foundation** | ✅ Done | Medium | Trust calculation, trust-based permissions |
 
 ### Group D: Curriculum & Content Delivery
@@ -106,9 +106,9 @@ This roadmap is organized by **MVP priority** - Phase 1 delivers a working demo,
 
 **Phase 1 MVP Deliverables:**
 - ✅ Users can register, login, manage sessions
-- ⬜ Users can complete profile setup with skills/interests
-- ⬜ Users can browse and join communities
-- ⬜ Users can navigate curriculum and view lessons
+- ✅ Users can complete profile setup with skills/interests
+- ✅ Users can browse and join communities
+- ✅ Users can navigate curriculum and view lessons
 - ⬜ Users can take checkpoints and see scores
 - ⬜ Learners can request and receive mentor recommendations
 - ⬜ Mentors can accept/decline requests
@@ -295,37 +295,45 @@ This roadmap is organized by **MVP priority** - Phase 1 delivers a working demo,
 ```
 A1-A6 → B1-B6 → C1-C5 → D1-D7 → E1-E7 → F1-F7 → G1-G5 → H1-H5
 (Auth)   (Profile)  (RBAC)  (Content)  (Checkpoint) (Matching) (Progress) (Seed)
-  ✅        🔶         🔶        ✅          🔶          ❌          ❌        ❌
+  ✅        ✅         ✅        ✅          🔶          ❌          ❌        ❌
 ```
 
 **MVP Demo Flow:**
-1. Register/Login (✅ Complete)
-2. Complete profile setup (🔶 Needs wizard)
-3. Browse and join community (🔶 Partial - APIs exist)
-4. Navigate curriculum (✅ Complete - D2-D6 APIs)
-5. View lesson content (✅ Complete - Lesson API with resources)
-6. Take checkpoint (❌ Needs session mgmt)
-7. See score and feedback (❌ Needs results API)
-8. Request mentor match (❌ Needs matching)
-9. Receive recommendations (❌ Needs algorithm)
-10. Mentor accepts request (❌ Needs workflow)
+1. Register/Login (✅ Complete - JWT auth, MFA, sessions)
+2. Complete profile setup (✅ Complete - 6-step wizard with skills/interests)
+3. Browse and join community (✅ Complete - Search, filters, join/leave workflows)
+4. Navigate curriculum (✅ Complete - Domain→Subject→Course→Module→Lesson APIs)
+5. View lesson content (✅ Complete - Multi-format content handlers with resources)
+6. Take checkpoint (🔶 Partial - Needs session management and question delivery)
+7. See score and feedback (🔶 Partial - Scoring engine exists, needs results display API)
+8. Request mentor match (❌ Needs matching request API)
+9. Receive recommendations (❌ Needs matching algorithm implementation)
+10. Mentor accepts request (❌ Needs mentor response workflow)
 
 ---
 
 ## Implementation Priority Order
 
-### MVP Sprint 1: Community & Profiles
-- B4: Community CRUD
-- B5: Community Membership
-- B6: Community Discovery
-- B2: Profile Setup Wizard
-- B3: Skill Self-Assessment
-- C3: Permission Middleware
+### ✅ MVP Sprint 1: Community & Profiles (COMPLETE)
+- ✅ B1: User Profile System (18 API endpoints with IDOR protection)
+- ✅ B2: Profile Setup Wizard (6-step guided setup)
+- ✅ B3: Skill Self-Assessment (integrated into wizard)
+- ✅ B4: Community CRUD (5 endpoints)
+- ✅ B5: Community Membership (10 endpoints with race condition fixes)
+- ✅ B6: Community Discovery (search, filters, pagination)
+- ✅ C3: Permission Middleware (requirePermissions/requireRoles)
+- ✅ C4: Role Assignment API
 
-### MVP Sprint 2: Content Delivery
-- D2-D6: Curriculum APIs
-- G1: Learning Progress Tracking
-- G4: In-App Notifications (complete)
+### ✅ MVP Sprint 2: Content Delivery (COMPLETE)
+- ✅ D1: Curriculum Schema
+- ✅ D2: Domain API
+- ✅ D3: Subject API
+- ✅ D4: Course API
+- ✅ D5: Module API
+- ✅ D6: Lesson API
+- ✅ D7: Content Handlers (text, video, audio, image, code)
+- 🔶 G1: Learning Progress Tracking (partial - lesson completions exist)
+- 🔶 G4: In-App Notifications (partial - schema exists, needs completion)
 
 ### MVP Sprint 3: Checkpoints
 - E3: Session Management
@@ -353,10 +361,10 @@ A1-A6 → B1-B6 → C1-C5 → D1-D7 → E1-E7 → F1-F7 → G1-G5 → H1-H5
 ## Success Criteria
 
 ### Phase 1 Complete When:
-- [ ] New user can register and complete profile setup
-- [ ] User can browse and join communities
-- [ ] User can navigate curriculum (domain → lesson)
-- [ ] User can view lesson content
+- [x] New user can register and complete profile setup
+- [x] User can browse and join communities
+- [x] User can navigate curriculum (domain → lesson)
+- [x] User can view lesson content
 - [ ] User can complete checkpoint with scoring
 - [ ] User can request mentor matching
 - [ ] System returns mentor recommendations
@@ -364,6 +372,16 @@ A1-A6 → B1-B6 → C1-C5 → D1-D7 → E1-E7 → F1-F7 → G1-G5 → H1-H5
 - [ ] Relationship established and visible
 - [ ] Seed data exists for demonstration
 - [ ] Demo flow completes in <15 minutes
+
+**Security Requirements:**
+- [x] All authentication endpoints secured with JWT
+- [x] IDOR vulnerabilities mitigated with atomic ownership checks
+- [x] Race conditions prevented with pessimistic locking
+- [x] Access control properly enforced on private resources
+- [x] Input validation on all endpoints with Zod schemas
+- [ ] Rate limiting configured appropriately
+- [ ] CSRF protection implemented
+- [ ] SQL injection prevented (using parameterized queries)
 
 ### Phase 2 Complete When:
 - [ ] Content works offline with reliable sync
