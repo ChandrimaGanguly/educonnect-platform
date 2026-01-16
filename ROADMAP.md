@@ -65,12 +65,12 @@ This roadmap is organized by **MVP priority** - Phase 1 delivers a working demo,
 | Feature | Status | Complexity | Description |
 |---------|--------|------------|-------------|
 | **E1: Checkpoint Schema** | ✅ Done | Medium | Templates, question banks, sessions |
-| **E2: Checkpoint Types Service** | 🔶 Partial | Medium | MCQ, true/false, short answer support |
-| **E3: Session Management** | ❌ Needed | High | Start session, timer, integrity checks |
-| **E4: Question Delivery** | ❌ Needed | Medium | Paginated questions, answer tracking |
-| **E5: Response Submission** | ❌ Needed | Medium | Submit answers, validate completeness |
-| **E6: Automated Scoring** | 🔶 Partial | Medium | Score calculation, partial credit |
-| **E7: Results Display** | ❌ Needed | Low | Score, feedback, recommendations |
+| **E2: Checkpoint Types Service** | ✅ Done | Medium | MCQ, true/false, short answer support |
+| **E3: Session Management** | ✅ Done | High | Start session, timer, integrity checks |
+| **E4: Question Delivery** | ✅ Done | Medium | Paginated questions, answer tracking |
+| **E5: Response Submission** | ✅ Done | Medium | Submit answers, validate completeness |
+| **E6: Automated Scoring** | ✅ Done | Medium | Score calculation, partial credit |
+| **E7: Results Display** | ✅ Done | Low | Score, feedback, recommendations |
 
 ### Group F: Basic Mentor Matching
 
@@ -88,10 +88,10 @@ This roadmap is organized by **MVP priority** - Phase 1 delivers a working demo,
 
 | Feature | Status | Complexity | Description |
 |---------|--------|------------|-------------|
-| **G1: Learning Progress Tracking** | ❌ Needed | Medium | Course/module completion tracking |
-| **G2: Progress Dashboard API** | ❌ Needed | Medium | User's overall learning progress |
+| **G1: Learning Progress Tracking** | ✅ Done | Medium | Course/module completion tracking with 3 API endpoints |
+| **G2: Progress Dashboard API** | ✅ Done | Medium | Comprehensive dashboard with stats, courses, and activity feed |
 | **G3: Notification Schema** | ✅ Done | Low | Notifications table structure |
-| **G4: In-App Notifications** | 🔶 Partial | Medium | List, mark read, notification count |
+| **G4: In-App Notifications** | ✅ Done | Medium | Full notification system: list, mark read, preferences, pause/resume |
 | **G5: Audit Logging** | ✅ Done | Low | Immutable action audit trail |
 
 ### Group H: MVP Seed Data
@@ -295,7 +295,7 @@ This roadmap is organized by **MVP priority** - Phase 1 delivers a working demo,
 ```
 A1-A6 → B1-B6 → C1-C5 → D1-D7 → E1-E7 → F1-F7 → G1-G5 → H1-H5
 (Auth)   (Profile)  (RBAC)  (Content)  (Checkpoint) (Matching) (Progress) (Seed)
-  ✅        ✅         ✅        ✅          🔶          ❌          ❌        ❌
+  ✅        ✅         ✅        ✅          ✅          ❌          ✅        ❌
 ```
 
 **MVP Demo Flow:**
@@ -304,8 +304,8 @@ A1-A6 → B1-B6 → C1-C5 → D1-D7 → E1-E7 → F1-F7 → G1-G5 → H1-H5
 3. Browse and join community (✅ Complete - Search, filters, join/leave workflows)
 4. Navigate curriculum (✅ Complete - Domain→Subject→Course→Module→Lesson APIs)
 5. View lesson content (✅ Complete - Multi-format content handlers with resources)
-6. Take checkpoint (🔶 Partial - Needs session management and question delivery)
-7. See score and feedback (🔶 Partial - Scoring engine exists, needs results display API)
+6. Take checkpoint (✅ Complete - Session mgmt, question delivery, response submission)
+7. See score and feedback (✅ Complete - Automated scoring, results display, feedback generation)
 8. Request mentor match (❌ Needs matching request API)
 9. Receive recommendations (❌ Needs matching algorithm implementation)
 10. Mentor accepts request (❌ Needs mentor response workflow)
@@ -332,15 +332,17 @@ A1-A6 → B1-B6 → C1-C5 → D1-D7 → E1-E7 → F1-F7 → G1-G5 → H1-H5
 - ✅ D5: Module API
 - ✅ D6: Lesson API
 - ✅ D7: Content Handlers (text, video, audio, image, code)
-- 🔶 G1: Learning Progress Tracking (partial - lesson completions exist)
-- 🔶 G4: In-App Notifications (partial - schema exists, needs completion)
+- ✅ G1: Learning Progress Tracking (6 API endpoints: module, course, dashboard, activity, stats)
+- ✅ G4: In-App Notifications (7 endpoints: list, unread count, mark read, preferences, pause/resume)
 
-### MVP Sprint 3: Checkpoints
-- E3: Session Management
-- E4: Question Delivery
-- E5: Response Submission
-- E6: Automated Scoring (complete)
-- E7: Results Display
+### ✅ MVP Sprint 3: Checkpoints (COMPLETE)
+- ✅ E1: Checkpoint Schema (migrations, types)
+- ✅ E2: Checkpoint Types Service (format types, templates, accommodations)
+- ✅ E3: Session Management (lifecycle, timer, integrity checks)
+- ✅ E4: Question Delivery (shuffling, accommodations, offline support)
+- ✅ E5: Response Submission (validation, completeness checking)
+- ✅ E6: Automated Scoring (all question types, partial credit, feedback)
+- ✅ E7: Results Display (scores, feedback, performance analytics)
 
 ### MVP Sprint 4: Mentor Matching
 - F1: Mentor Profile Schema
@@ -353,7 +355,7 @@ A1-A6 → B1-B6 → C1-C5 → D1-D7 → E1-E7 → F1-F7 → G1-G5 → H1-H5
 
 ### MVP Sprint 5: Polish & Seed Data
 - H1-H5: All seed data
-- G2: Progress Dashboard
+- ✅ G2: Progress Dashboard (complete)
 - Bug fixes and testing
 
 ---

@@ -12,12 +12,14 @@ import { contentReviewRoutes } from './content-review';
 import { contentAuthoringRoutes } from './content-authoring';
 import { contentRoutes } from './content';
 import { checkpointScoringRoutes } from './checkpoint-scoring';
+import { checkpointExecutionRoutes } from './checkpoint-execution';
 import { textModeRoutes } from './text-mode';
 import { domainRoutes } from './curriculum/domains';
 import { subjectRoutes } from './curriculum/subjects';
 import { courseRoutes } from './curriculum/courses';
 import { moduleRoutes } from './curriculum/modules';
 import { lessonRoutes } from './curriculum/lessons';
+import { progressRoutes } from './progress';
 
 export async function registerRoutes(server: FastifyInstance): Promise<void> {
   // Health check routes
@@ -59,6 +61,9 @@ export async function registerRoutes(server: FastifyInstance): Promise<void> {
   // Checkpoint scoring routes
   await server.register(checkpointScoringRoutes, { prefix: '/api/v1/checkpoints' });
 
+  // Checkpoint execution routes (Phase 1 Group E)
+  await server.register(checkpointExecutionRoutes, { prefix: '/api/v1' });
+
   // Text-first content mode routes
   await server.register(textModeRoutes, { prefix: '/api/v1' });
 
@@ -68,6 +73,9 @@ export async function registerRoutes(server: FastifyInstance): Promise<void> {
   await server.register(courseRoutes, { prefix: '/api/v1/curriculum' });
   await server.register(moduleRoutes, { prefix: '/api/v1/curriculum' });
   await server.register(lessonRoutes, { prefix: '/api/v1/curriculum' });
+
+  // Learning progress routes (Phase 1 Group G)
+  await server.register(progressRoutes, { prefix: '/api/v1' });
 
   server.log.info('Routes registered successfully');
 }
