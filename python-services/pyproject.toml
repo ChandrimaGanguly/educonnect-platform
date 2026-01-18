@@ -42,6 +42,10 @@ strict_equality = true
 module = "tests.*"
 disallow_untyped_defs = false
 
+[[tool.mypy.overrides]]
+module = "pydantic_settings"
+ignore_missing_imports = true
+
 [tool.pylint.messages_control]
 disable = [
     "C0111",  # missing-docstring
