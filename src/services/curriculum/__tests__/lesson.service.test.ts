@@ -287,6 +287,7 @@ describe('LessonService', () => {
           resource_type: 'document',
           file_url: 'https://example.com/doc1.pdf',
           display_order: 0,
+          created_by: testUser.id,
         },
         {
           lesson_id: curriculum.lesson.id,
@@ -294,6 +295,7 @@ describe('LessonService', () => {
           resource_type: 'video',
           file_url: 'https://example.com/video.mp4',
           display_order: 1,
+          created_by: testUser.id,
         },
       ]);
 
