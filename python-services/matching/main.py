@@ -119,10 +119,7 @@ async def score_match(request: ScoreRequest) -> ScoreResponse:
     """
     matcher = get_matcher()
 
-    score_data = matcher.calculate_match_score(
-        request.learner_profile,
-        request.mentor_profile
-    )
+    score_data = matcher.calculate_match_score(request.learner_profile, request.mentor_profile)
 
     return ScoreResponse(**score_data)
 

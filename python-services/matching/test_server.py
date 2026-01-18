@@ -15,6 +15,7 @@ app = FastAPI(
     version="0.1.0",
 )
 
+
 # Request/Response Models
 class ScoreRequest(BaseModel):
     learner_profile: Dict
@@ -56,16 +57,14 @@ async def score_match(request: ScoreRequest) -> ScoreResponse:
     """
     matcher = get_matcher()
 
-    score_data = matcher.calculate_match_score(
-        request.learner_profile,
-        request.mentor_profile
-    )
+    score_data = matcher.calculate_match_score(request.learner_profile, request.mentor_profile)
 
     return ScoreResponse(**score_data)
 
 
 if __name__ == "__main__":
     import uvicorn
+
     print("Starting Matching Test Server on http://localhost:8001")
     print("No database dependencies required")
     uvicorn.run(app, host="0.0.0.0", port=8001)

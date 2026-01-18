@@ -16,11 +16,7 @@ class BasicMatchingAlgorithm:
     Phase 1 simplified matching: 60% subject overlap + 40% availability overlap
     """
 
-    def calculate_match_score(
-        self,
-        learner_profile: Dict,
-        mentor_profile: Dict
-    ) -> Dict:
+    def calculate_match_score(self, learner_profile: Dict, mentor_profile: Dict) -> Dict:
         """
         Calculate compatibility score between learner and mentor
 
@@ -33,14 +29,12 @@ class BasicMatchingAlgorithm:
         """
         # Factor 1: Subject Overlap (60%)
         subject_score = self._calculate_subject_overlap(
-            learner_profile.get('learning_goals', []),
-            mentor_profile.get('subjects', [])
+            learner_profile.get("learning_goals", []), mentor_profile.get("subjects", [])
         )
 
         # Factor 2: Availability Overlap (40%)
         availability_score = self._calculate_availability_overlap(
-            learner_profile.get('availability', []),
-            mentor_profile.get('availability', [])
+            learner_profile.get("availability", []), mentor_profile.get("availability", [])
         )
 
         # Weighted total
@@ -50,16 +44,14 @@ class BasicMatchingAlgorithm:
         match_reasons = self._generate_reasons(subject_score, availability_score)
 
         return {
-            'overall_score': round(overall_score, 2),
-            'subject_overlap_score': round(subject_score, 2),
-            'availability_overlap_score': round(availability_score, 2),
-            'match_reasons': match_reasons
+            "overall_score": round(overall_score, 2),
+            "subject_overlap_score": round(subject_score, 2),
+            "availability_overlap_score": round(availability_score, 2),
+            "match_reasons": match_reasons,
         }
 
     def _calculate_subject_overlap(
-        self,
-        learner_subjects: List[str],
-        mentor_subjects: List[str]
+        self, learner_subjects: List[str], mentor_subjects: List[str]
     ) -> float:
         """
         Calculate Jaccard similarity for subjects
@@ -82,9 +74,7 @@ class BasicMatchingAlgorithm:
         return (intersection / union) * 100
 
     def _calculate_availability_overlap(
-        self,
-        learner_availability: List[Dict],
-        mentor_availability: List[Dict]
+        self, learner_availability: List[Dict], mentor_availability: List[Dict]
     ) -> float:
         """
         Calculate time slot overlap percentage
@@ -102,15 +92,15 @@ class BasicMatchingAlgorithm:
 
         # Extract days of week from availability slots
         learner_days: Set[str] = {
-            slot.get('day_of_week', '').lower()
+            slot.get("day_of_week", "").lower()
             for slot in learner_availability
-            if slot.get('day_of_week')
+            if slot.get("day_of_week")
         }
 
         mentor_days: Set[str] = {
-            slot.get('day_of_week', '').lower()
+            slot.get("day_of_week", "").lower()
             for slot in mentor_availability
-            if slot.get('day_of_week')
+            if slot.get("day_of_week")
         }
 
         if not learner_days:
@@ -120,11 +110,7 @@ class BasicMatchingAlgorithm:
         overlap = len(learner_days & mentor_days)
         return (overlap / len(learner_days)) * 100
 
-    def _generate_reasons(
-        self,
-        subject_score: float,
-        availability_score: float
-    ) -> List[str]:
+    def _generate_reasons(self, subject_score: float, availability_score: float) -> List[str]:
         """
         Generate human-readable match reasons based on scores
         """
