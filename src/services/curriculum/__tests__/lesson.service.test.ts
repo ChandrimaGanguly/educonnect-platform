@@ -283,16 +283,16 @@ describe('LessonService', () => {
       await db('curriculum_resources').insert([
         {
           lesson_id: curriculum.lesson.id,
-          title: 'Resource 1',
+          name: 'Resource 1',
           resource_type: 'document',
-          resource_url: 'https://example.com/doc1.pdf',
+          file_url: 'https://example.com/doc1.pdf',
           display_order: 0,
         },
         {
           lesson_id: curriculum.lesson.id,
-          title: 'Resource 2',
+          name: 'Resource 2',
           resource_type: 'video',
-          resource_url: 'https://example.com/video.mp4',
+          file_url: 'https://example.com/video.mp4',
           display_order: 1,
         },
       ]);
