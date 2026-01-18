@@ -17,10 +17,11 @@ from pydantic import BaseModel
 # Add parent directory to path for shared imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
+from matching_algorithm import get_matcher  # noqa: E402
+
 from shared.config import settings  # noqa: E402
 from shared.database import health_check as db_health  # noqa: E402
 from shared.redis_client import redis_health_check  # noqa: E402
-from matching_algorithm import get_matcher  # noqa: E402
 
 # Initialize FastAPI app
 app = FastAPI(

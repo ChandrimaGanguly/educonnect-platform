@@ -5,9 +5,10 @@ No database dependencies required
 """
 
 from typing import Dict, List
+
 from fastapi import FastAPI
-from pydantic import BaseModel
 from matching_algorithm import get_matcher
+from pydantic import BaseModel
 
 app = FastAPI(
     title="Matching Service Test Server",
