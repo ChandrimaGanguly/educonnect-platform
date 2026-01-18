@@ -393,6 +393,8 @@ export async function cleanCheckpointDatabase(): Promise<void> {
 
   try {
     // Delete checkpoint tables in dependency order (children first)
+    // Note: We DON'T clean checkpoint_categories, checkpoint_format_types, or
+    // checkpoint_accommodation_types as these are reference/seed tables
     const checkpointTables = [
       'checkpoint_responses',
       'checkpoint_session_events',
@@ -401,7 +403,6 @@ export async function cleanCheckpointDatabase(): Promise<void> {
       'checkpoint_question_pools',
       'checkpoints',
       'checkpoint_types',
-      'checkpoint_categories',
     ];
 
     for (const table of checkpointTables) {

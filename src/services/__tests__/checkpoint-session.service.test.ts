@@ -40,14 +40,11 @@ describe('CheckpointSessionService', () => {
     const community = await createTestCommunity(userId);
     communityId = community.id;
 
-    // Create checkpoint category
-    [{ id: categoryId }] = await db('checkpoint_categories').insert({
-      code: 'knowledge',
-      name: 'Knowledge Assessment',
-      description: 'Test knowledge',
-      is_active: true,
-      display_order: 1,
-    }).returning('id');
+    // Get existing checkpoint category (from migration seed data)
+    const category = await db('checkpoint_categories')
+      .where({ code: 'knowledge' })
+      .first();
+    categoryId = category.id;
 
     // Create a test checkpoint
     const checkpoint = await typesService.createCheckpoint(userId, {
