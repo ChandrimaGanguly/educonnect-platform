@@ -1,5 +1,5 @@
-import { getDatabase } from '../database';
 import type { Knex } from 'knex';
+import { getDatabase } from '../database';
 
 /**
  * Audit Log Service

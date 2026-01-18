@@ -8,8 +8,8 @@
  * - Question validation
  */
 
-import { AssessmentBuilderService } from './assessment-builder.service';
 import { getDatabase } from '../database';
+import { AssessmentBuilderService } from './assessment-builder.service';
 
 jest.mock('../database', () => ({
   getDatabase: jest.fn(),

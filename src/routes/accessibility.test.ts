@@ -12,8 +12,8 @@
  */
 
 import { FastifyInstance } from 'fastify';
-import { accessibilityRoutes } from './accessibility';
 import { accessibilityService } from '../services/accessibility.service';
+import { accessibilityRoutes } from './accessibility';
 
 // Mock the accessibility service
 jest.mock('../services/accessibility.service', () => ({

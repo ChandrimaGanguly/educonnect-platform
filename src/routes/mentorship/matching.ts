@@ -9,6 +9,16 @@ const mentorProfileService = new MentorProfileService();
 const userProfileService = new UserProfileService();
 
 /**
+ * Type definition for matching service score response
+ */
+interface ScoreResponse {
+  overall_score: number;
+  subject_overlap_score: number;
+  availability_overlap_score: number;
+  match_reasons: string[];
+}
+
+/**
  * Validate matching service URL to prevent SSRF attacks
  * SECURITY: Only allow connections to whitelisted hosts and ports
  */
@@ -50,14 +60,16 @@ function validateMatchingServiceUrl(url: string): boolean {
 
 /**
  * Validate matching service response structure
+ * Type predicate to narrow unknown type to ScoreResponse
  */
-function isValidScoreResponse(data: any): boolean {
+function isValidScoreResponse(data: unknown): data is ScoreResponse {
   return (
     typeof data === 'object' &&
-    typeof data.overall_score === 'number' &&
-    typeof data.subject_overlap_score === 'number' &&
-    typeof data.availability_overlap_score === 'number' &&
-    Array.isArray(data.match_reasons)
+    data !== null &&
+    typeof (data as any).overall_score === 'number' &&
+    typeof (data as any).subject_overlap_score === 'number' &&
+    typeof (data as any).availability_overlap_score === 'number' &&
+    Array.isArray((data as any).match_reasons)
   );
 }
 

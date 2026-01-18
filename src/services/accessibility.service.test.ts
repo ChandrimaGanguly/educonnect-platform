@@ -11,9 +11,9 @@
  * - Compliance reports
  */
 
-import { AccessibilityService } from './accessibility.service';
-import { getDatabase } from '../database';
 import type { Knex } from 'knex';
+import { getDatabase } from '../database';
+import { AccessibilityService } from './accessibility.service';
 
 // Mock the database module
 jest.mock('../database', () => ({

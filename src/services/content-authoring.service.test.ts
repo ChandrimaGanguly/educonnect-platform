@@ -8,8 +8,8 @@
  * - Content validation
  */
 
-import { ContentAuthoringService } from './content-authoring.service';
 import { getDatabase } from '../database';
+import { ContentAuthoringService } from './content-authoring.service';
 
 // Mock the database module
 jest.mock('../database', () => ({

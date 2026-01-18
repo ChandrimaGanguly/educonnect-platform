@@ -22,6 +22,11 @@ jest.mock('nanoid', () => ({
   nanoid: jest.fn(() => 'test-nanoid-123'),
 }));
 
+// Mock ioredis to use ioredis-mock for tests
+// This prevents Redis connection errors in tests
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+jest.mock('ioredis', () => require('ioredis-mock'));
+
 // Mock console methods to reduce noise in tests
 global.console = {
   ...console,

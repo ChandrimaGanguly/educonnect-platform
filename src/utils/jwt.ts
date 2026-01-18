@@ -1,6 +1,6 @@
 import jwt, { Secret, SignOptions } from 'jsonwebtoken';
-import { env } from '../config';
 import { nanoid } from 'nanoid';
+import { env } from '../config';
 
 export interface JwtPayload {
   userId: string;

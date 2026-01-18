@@ -1,6 +1,6 @@
 import { Knex } from 'knex';
-import { getDatabase } from '../database';
 import { nanoid } from 'nanoid';
+import { getDatabase } from '../database';
 
 /**
  * Content Authoring Service
@@ -452,7 +452,7 @@ export class ContentAuthoringService {
     const { limit = 20, offset = 0 } = options;
 
     const idField = `${contentType}_id`;
-    let query = this.db('content_versions').where({ [idField]: contentId });
+    const query = this.db('content_versions').where({ [idField]: contentId });
 
     const [{ count }] = await query.clone().count('* as count');
     const versions = await query

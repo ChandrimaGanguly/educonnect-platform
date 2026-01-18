@@ -12,8 +12,8 @@
  */
 
 import { Knex } from 'knex';
-import { getDatabase } from '../database';
 import { nanoid } from 'nanoid';
+import { getDatabase } from '../database';
 import {
   ContentItem,
   ContentFormat,
@@ -948,8 +948,8 @@ export class MultiFormatContentService {
     const issues: AccessibilityIssue[] = [];
     let perceivableScore = 100;
     let operableScore = 100;
-    let understandableScore = 100;
-    let robustScore = 100;
+    const understandableScore = 100;
+    const robustScore = 100;
 
     // Check for alt text
     const hasAltText = !!content.alt_text;

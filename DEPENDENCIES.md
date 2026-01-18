@@ -265,6 +265,30 @@ Per the mobile spec requirements, several libraries support low-bandwidth:
 - **passlib** (Python) - Password hashing
 - **bcrypt** (Node) - Password hashing
 
+### Known Security Issues
+
+#### Moderate: fast-jwt Improper iss Claims Validation (GHSA-gm45-q3v2-6cf8)
+
+**Status:** Accepted Risk
+**Affected Package:** `fast-jwt < 5.0.6` (dependency of `@fastify/jwt <= 9.0.1`)
+**Severity:** Moderate
+**CVSS Score:** 5.3
+
+**Description:**
+The fast-jwt library improperly validates JWT issuer (`iss`) claims, potentially allowing token forgery in specific scenarios where the application relies on issuer validation for security decisions.
+
+**Mitigation Plan:**
+- **Short-term:** The application does not currently rely on `iss` claim validation for security decisions. Token validation is performed using signature verification and expiration checks.
+- **Long-term:** Upgrade to `@fastify/jwt >= 10.0.0` which includes `fast-jwt >= 5.0.6`. This requires upgrading to Fastify v5 (breaking change).
+- **Timeline:** Planned for Fastify v5 migration (post-MVP, tracked in technical debt backlog)
+
+**CI/CD Configuration:**
+The CI pipeline is configured to allow moderate vulnerabilities via `--audit-level=high` to prevent false-positive build failures during the MVP phase.
+
+**References:**
+- [GitHub Advisory GHSA-gm45-q3v2-6cf8](https://github.com/advisories/GHSA-gm45-q3v2-6cf8)
+- [Fastify v5 Migration Guide](https://fastify.dev/docs/latest/Guides/Migration-Guide-V5/)
+
 ---
 
 ## Monitoring & Observability

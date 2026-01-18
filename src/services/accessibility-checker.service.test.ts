@@ -10,8 +10,8 @@
  * - Recommendations generation
  */
 
-import { AccessibilityCheckerService } from './accessibility-checker.service';
 import { getDatabase } from '../database';
+import { AccessibilityCheckerService } from './accessibility-checker.service';
 
 jest.mock('../database', () => ({
   getDatabase: jest.fn(),

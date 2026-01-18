@@ -1,6 +1,6 @@
+import type { Knex } from 'knex';
 import { getDatabase } from '../database';
 import { auditService } from './audit';
-import type { Knex } from 'knex';
 
 /**
  * Community Trust Network Service

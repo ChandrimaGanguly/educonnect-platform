@@ -9,8 +9,8 @@
  * - Assessment question testing
  */
 
-import { ContentPreviewService } from './content-preview.service';
 import { getDatabase } from '../database';
+import { ContentPreviewService } from './content-preview.service';
 
 jest.mock('../database', () => ({
   getDatabase: jest.fn(),
