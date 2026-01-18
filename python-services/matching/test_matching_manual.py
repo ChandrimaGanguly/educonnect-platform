@@ -69,7 +69,7 @@ score_1 = matcher.calculate_match_score(learner_profile, mentor_profile_1)
 print(f"\n  📊 Overall Score: {score_1['overall_score']}/100")
 print(f"  📚 Subject Overlap: {score_1['subject_overlap_score']}/100")
 print(f"  📅 Availability Overlap: {score_1['availability_overlap_score']}/100")
-print(f"  💡 Reasons:")
+print("  💡 Reasons:")
 for reason in score_1["match_reasons"]:
     print(f"     - {reason}")
 
@@ -86,7 +86,7 @@ score_2 = matcher.calculate_match_score(learner_profile, mentor_profile_2)
 print(f"\n  📊 Overall Score: {score_2['overall_score']}/100")
 print(f"  📚 Subject Overlap: {score_2['subject_overlap_score']}/100")
 print(f"  📅 Availability Overlap: {score_2['availability_overlap_score']}/100")
-print(f"  💡 Reasons:")
+print("  💡 Reasons:")
 for reason in score_2["match_reasons"]:
     print(f"     - {reason}")
 
@@ -103,7 +103,7 @@ score_3 = matcher.calculate_match_score(learner_profile, mentor_profile_3)
 print(f"\n  📊 Overall Score: {score_3['overall_score']}/100")
 print(f"  📚 Subject Overlap: {score_3['subject_overlap_score']}/100")
 print(f"  📅 Availability Overlap: {score_3['availability_overlap_score']}/100")
-print(f"  💡 Reasons:")
+print("  💡 Reasons:")
 for reason in score_3["match_reasons"]:
     print(f"     - {reason}")
 
