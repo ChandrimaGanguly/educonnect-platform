@@ -1,7 +1,7 @@
-import * as dotenv from 'dotenv';
-import { z } from 'zod';
 import { existsSync } from 'fs';
 import { resolve } from 'path';
+import * as dotenv from 'dotenv';
+import { z } from 'zod';
 
 // Load environment variables from .env.local (preferred) or .env
 const envLocalPath = resolve(process.cwd(), '.env.local');

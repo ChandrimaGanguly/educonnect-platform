@@ -118,7 +118,8 @@ export class CheckpointExecutionService {
     // 3. Fetch all options in one query
     const allOptions = await this.db('assessment_options')
       .whereIn('question_id', questionIds)
-      .orderBy(['question_id', 'display_order'], ['asc', 'asc'])
+      .orderBy('question_id', 'asc')
+      .orderBy('display_order', 'asc')
       .select('*');
 
     // Group options by question_id
@@ -325,52 +326,51 @@ export class CheckpointExecutionService {
     // Validate response structure
     await this.validateResponse(data);
 
-    // Check if response already exists
-    const existingResponse = await this.db('checkpoint_responses')
-      .where({
+    const now = new Date();
+
+    // Use upsert pattern to handle race conditions atomically
+    // This eliminates the check-then-act race condition
+    const [response] = await this.db('checkpoint_responses')
+      .insert({
         session_id: data.session_id,
         question_id: data.question_id,
+        question_order: questionData.display_order,
+        response_data: data.response_data || {},
+        text_response: data.text_response,
+        selected_options: data.selected_options || [],
+        matching_pairs: data.matching_pairs || {},
+        ordering: data.ordering || [],
+        file_submission_id: data.file_submission_id,
+        audio_response_url: data.audio_response_url,
+        status: 'answered' as ResponseStatus,
+        flagged_for_review: data.flagged_for_review || false,
+        answered_at: now,
+        first_viewed_at: now,
+        time_spent_seconds: data.time_spent_seconds || 0,
+        offline_answered_at: data.offline_timestamp ? new Date(data.offline_timestamp) : undefined,
+        synced: !data.offline_timestamp,
+        points_possible: questionData.weight,
+        updated_at: now,
       })
-      .first();
-
-    const now = new Date();
-    const responseData = {
-      response_data: data.response_data || {},
-      text_response: data.text_response,
-      selected_options: data.selected_options || [],
-      matching_pairs: data.matching_pairs || {},
-      ordering: data.ordering || [],
-      file_submission_id: data.file_submission_id,
-      audio_response_url: data.audio_response_url,
-      status: 'answered' as ResponseStatus,
-      flagged_for_review: data.flagged_for_review || false,
-      answered_at: now,
-      time_spent_seconds: data.time_spent_seconds || 0,
-      offline_answered_at: data.offline_timestamp ? new Date(data.offline_timestamp) : undefined,
-      synced: !data.offline_timestamp,
-      updated_at: now,
-    };
-
-    let response;
-    if (existingResponse) {
-      // Update existing response
-      [response] = await this.db('checkpoint_responses')
-        .where({ id: existingResponse.id })
-        .update(responseData)
-        .returning('*');
-    } else {
-      // Create new response
-      [response] = await this.db('checkpoint_responses')
-        .insert({
-          session_id: data.session_id,
-          question_id: data.question_id,
-          question_order: questionData.display_order,
-          ...responseData,
-          first_viewed_at: now,
-          points_possible: questionData.weight,
-        })
-        .returning('*');
-    }
+      .onConflict(['session_id', 'question_id'])
+      .merge({
+        // On conflict, update these fields
+        response_data: data.response_data || {},
+        text_response: data.text_response,
+        selected_options: data.selected_options || [],
+        matching_pairs: data.matching_pairs || {},
+        ordering: data.ordering || [],
+        file_submission_id: data.file_submission_id,
+        audio_response_url: data.audio_response_url,
+        status: 'answered' as ResponseStatus,
+        flagged_for_review: data.flagged_for_review || false,
+        answered_at: now,
+        time_spent_seconds: data.time_spent_seconds || 0,
+        offline_answered_at: data.offline_timestamp ? new Date(data.offline_timestamp) : undefined,
+        synced: !data.offline_timestamp,
+        updated_at: now,
+      })
+      .returning('*');
 
     // Update session progress
     await this.updateSessionProgress(data.session_id);

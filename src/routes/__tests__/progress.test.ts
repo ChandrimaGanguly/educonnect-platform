@@ -284,11 +284,22 @@ describe('Progress Routes', () => {
     it('should respect recentActivityLimit query param', async () => {
       const db = getDatabase();
 
-      // Create multiple lesson completions
+      // Create multiple lessons and complete each one
       for (let i = 0; i < 15; i++) {
+        const [lesson] = await db('curriculum_lessons').insert({
+          module_id: curriculum.module.id,
+          name: `Test Lesson ${i}`,
+          slug: `test-lesson-${i}-${Date.now()}`,
+          description: 'A test lesson',
+          lesson_type: 'text',
+          status: 'published',
+          display_order: i,
+          created_by: userId,
+        }).returning('*');
+
         await db('lesson_completions').insert({
           user_id: userId,
-          lesson_id: curriculum.lesson.id,
+          lesson_id: lesson.id,
           completed_at: new Date(Date.now() - i * 1000),
           time_spent_seconds: 100,
         });
@@ -366,11 +377,22 @@ describe('Progress Routes', () => {
     it('should respect limit query param', async () => {
       const db = getDatabase();
 
-      // Create 5 completions (since we can only complete each lesson once, we'll just insert duplicates for testing)
+      // Create 5 lessons and complete each one
       for (let i = 0; i < 5; i++) {
+        const [lesson] = await db('curriculum_lessons').insert({
+          module_id: curriculum.module.id,
+          name: `Activity Test Lesson ${i}`,
+          slug: `activity-test-lesson-${i}-${Date.now()}`,
+          description: 'A test lesson for activity',
+          lesson_type: 'text',
+          status: 'published',
+          display_order: i + 20, // Offset to avoid conflicts
+          created_by: userId,
+        }).returning('*');
+
         await db('lesson_completions').insert({
           user_id: userId,
-          lesson_id: curriculum.lesson.id,
+          lesson_id: lesson.id,
           completed_at: new Date(Date.now() - i * 1000),
           time_spent_seconds: 100,
         });

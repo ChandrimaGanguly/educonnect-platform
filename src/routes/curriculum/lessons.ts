@@ -100,7 +100,7 @@ export async function lessonRoutes(server: FastifyInstance): Promise<void> {
 
         return { lesson };
       } else {
-        const lesson = await lessonService.getLessonById(id);
+        let lesson: any = await lessonService.getLessonById(id);
 
         if (!lesson) {
           return reply.status(404).send({
@@ -109,7 +109,18 @@ export async function lessonRoutes(server: FastifyInstance): Promise<void> {
           });
         }
 
-        return { lesson };
+        // Create a new object with only the fields we want (excluding resources)
+        // This ensures resources is never included in the response when include_resources=false
+        const filteredLesson = Object.keys(lesson).reduce((acc: any, key) => {
+          if (key !== 'resources') {
+            acc[key] = lesson[key];
+          }
+          return acc;
+        }, {});
+
+        request.log.debug({ hasResources: 'resources' in lesson, hasInFiltered: 'resources' in filteredLesson }, 'Lesson resource check');
+
+        return { lesson: filteredLesson };
       }
     } catch (error: any) {
       if (error.name === 'ZodError') {

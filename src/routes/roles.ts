@@ -1,7 +1,7 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import { z } from 'zod';
 import { RbacService } from '../services/rbac.service';
 import { authenticate, requirePermissions } from '../middleware/auth';
-import { z } from 'zod';
 
 // Singleton service
 const rbacService = new RbacService();

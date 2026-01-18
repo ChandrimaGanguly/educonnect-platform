@@ -1,10 +1,10 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { ApolloServer } from '@apollo/server';
 
-import { typeDefs } from './schema';
-import { resolvers } from './resolvers';
 import { verifyToken } from '../utils/jwt';
 import { SessionService } from '../services/session.service';
+import { typeDefs } from './schema';
+import { resolvers } from './resolvers';
 
 export async function registerGraphQL(app: FastifyInstance): Promise<void> {
   const server = new ApolloServer({

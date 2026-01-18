@@ -182,6 +182,7 @@ describe('ModuleService', () => {
           subject_id: curriculum.subject.id,
           name: 'Empty Course',
           slug: 'empty-course-' + Math.random().toString(36).substring(2, 15),
+          description: 'An empty course for testing',
           status: 'published',
           created_by: testUser.id,
         })
@@ -322,7 +323,7 @@ describe('ModuleService', () => {
       const curriculum = await createTestCurriculum(testUser.id);
       const emptyModule = await createTestModule(curriculum.course.id, testUser.id, {
         unlock_type: 'sequential',
-        display_order: 0,
+        display_order: -1, // Make it explicitly first so it's always unlocked
       });
 
       const isUnlocked = await moduleService.isModuleUnlocked(emptyModule.id, testUser.id);

@@ -191,6 +191,8 @@ describe('LessonService', () => {
           course_id: curriculum.course.id,
           name: 'Empty Module',
           slug: 'empty-module-' + Math.random().toString(36).substring(2, 15),
+          description: 'A module with no lessons for testing',
+          display_order: 0,
           status: 'published',
           created_by: testUser.id,
         })
@@ -283,17 +285,21 @@ describe('LessonService', () => {
       await db('curriculum_resources').insert([
         {
           lesson_id: curriculum.lesson.id,
-          title: 'Resource 1',
+          name: 'Resource 1',
           resource_type: 'document',
-          resource_url: 'https://example.com/doc1.pdf',
+          file_url: 'https://example.com/doc1.pdf',
           display_order: 0,
+          status: 'published',
+          created_by: testUser.id,
         },
         {
           lesson_id: curriculum.lesson.id,
-          title: 'Resource 2',
+          name: 'Resource 2',
           resource_type: 'video',
-          resource_url: 'https://example.com/video.mp4',
+          file_url: 'https://example.com/video.mp4',
           display_order: 1,
+          status: 'published',
+          created_by: testUser.id,
         },
       ]);
 
@@ -354,12 +360,14 @@ describe('LessonService', () => {
       const curriculum = await createTestCurriculum(testUser.id);
 
       // First completion
-      await lessonService.markLessonComplete(curriculum.lesson.id, testUser.id, 120);
+      const first = await lessonService.markLessonComplete(curriculum.lesson.id, testUser.id, 120);
 
-      // Second completion should throw or handle gracefully
-      await expect(
-        lessonService.markLessonComplete(curriculum.lesson.id, testUser.id, 150)
-      ).rejects.toThrow();
+      // Second completion should return the existing completion (not throw)
+      const second = await lessonService.markLessonComplete(curriculum.lesson.id, testUser.id, 150);
+
+      expect(second).toBeDefined();
+      expect(second.id).toBe(first.id);
+      expect(second.time_spent_seconds).toBe(120); // Original time, not updated
     });
   });
 

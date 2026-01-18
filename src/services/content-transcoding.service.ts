@@ -10,8 +10,8 @@
  */
 
 import { Knex } from 'knex';
-import { getDatabase } from '../database';
 import { nanoid } from 'nanoid';
+import { getDatabase } from '../database';
 import {
   ContentItem,
   ContentVariant,

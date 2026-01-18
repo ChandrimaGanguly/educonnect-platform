@@ -16,6 +16,10 @@ export async function up(knex: Knex): Promise<void> {
     // Metadata for additional tracking information
     table.json('metadata');
 
+    // Timestamps
+    table.timestamp('created_at').notNullable().defaultTo(knex.fn.now());
+    table.timestamp('updated_at').notNullable().defaultTo(knex.fn.now());
+
     // Unique constraint: one completion record per user per lesson
     table.unique(['user_id', 'lesson_id']);
 

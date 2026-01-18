@@ -22,6 +22,11 @@ jest.mock('nanoid', () => ({
   nanoid: jest.fn(() => 'test-nanoid-123'),
 }));
 
+// Mock ioredis to use ioredis-mock for tests
+// This prevents Redis connection errors in tests
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+jest.mock('ioredis', () => require('ioredis-mock'));
+
 // Mock console methods to reduce noise in tests
 global.console = {
   ...console,
@@ -31,3 +36,14 @@ global.console = {
   warn: jest.fn(),
   error: jest.fn(),
 };
+
+// Clean database after each test to prevent state pollution
+afterEach(async () => {
+  try {
+    const { cleanAllTestData } = await import('./helpers');
+    await cleanAllTestData();
+  } catch (error) {
+    // Silently ignore cleanup errors during test runs
+    // Tests will fail on their own assertions if data conflicts occur
+  }
+});

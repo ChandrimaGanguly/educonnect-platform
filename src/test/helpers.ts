@@ -384,3 +384,45 @@ export async function cleanCurriculumDatabase(): Promise<void> {
     throw error;
   }
 }
+
+/**
+ * Clean checkpoint/assessment tables
+ */
+export async function cleanCheckpointDatabase(): Promise<void> {
+  const db = getDatabase();
+
+  try {
+    // Delete checkpoint tables in dependency order (children first)
+    // Note: We DON'T clean checkpoint_categories, checkpoint_format_types, or
+    // checkpoint_accommodation_types as these are reference/seed tables
+    const checkpointTables = [
+      'checkpoint_responses',
+      'checkpoint_session_events',
+      'checkpoint_sessions',
+      'checkpoint_questions',
+      'checkpoint_question_pools',
+      'checkpoints',
+      'checkpoint_types',
+    ];
+
+    for (const table of checkpointTables) {
+      try {
+        await db(table).del();
+      } catch (error) {
+        console.warn(`Warning: Could not clean table ${table}:`, error);
+      }
+    }
+  } catch (error) {
+    console.error('Error in cleanCheckpointDatabase:', error);
+    throw error;
+  }
+}
+
+/**
+ * Clean all test data - comprehensive cleanup
+ */
+export async function cleanAllTestData(): Promise<void> {
+  await cleanCheckpointDatabase();
+  await cleanCurriculumDatabase();
+  await cleanDatabase();
+}

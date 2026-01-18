@@ -17,6 +17,7 @@ __pycache__/
 env/
 venv/
 .venv/
+educonnect-venv/
 ENV/
 *.egg-info/
 .eggs/

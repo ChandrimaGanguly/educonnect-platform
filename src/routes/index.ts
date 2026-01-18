@@ -20,6 +20,10 @@ import { courseRoutes } from './curriculum/courses';
 import { moduleRoutes } from './curriculum/modules';
 import { lessonRoutes } from './curriculum/lessons';
 import { progressRoutes } from './progress';
+import { mentorProfileRoutes } from './mentorship/mentor-profiles';
+import { mentorshipRequestRoutes } from './mentorship/requests';
+import { mentorshipRelationshipRoutes } from './mentorship/relationships';
+import { matchingRoutes } from './mentorship/matching';
 
 export async function registerRoutes(server: FastifyInstance): Promise<void> {
   // Health check routes
@@ -76,6 +80,12 @@ export async function registerRoutes(server: FastifyInstance): Promise<void> {
 
   // Learning progress routes (Phase 1 Group G)
   await server.register(progressRoutes, { prefix: '/api/v1' });
+
+  // Mentorship routes (Phase 1 Group F)
+  await server.register(mentorProfileRoutes, { prefix: '/api/v1/mentorship' });
+  await server.register(mentorshipRequestRoutes, { prefix: '/api/v1/mentorship' });
+  await server.register(mentorshipRelationshipRoutes, { prefix: '/api/v1/mentorship' });
+  await server.register(matchingRoutes, { prefix: '/api/v1/mentorship' });
 
   server.log.info('Routes registered successfully');
 }

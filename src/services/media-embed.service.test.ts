@@ -9,11 +9,11 @@
  * - Embed code generation
  */
 
-import { MediaEmbedService } from './media-embed.service';
-import { getDatabase } from '../database';
-import { storageConfig } from '../config/storage';
 import crypto from 'crypto';
 import fs from 'fs/promises';
+import { getDatabase } from '../database';
+import { storageConfig } from '../config/storage';
+import { MediaEmbedService } from './media-embed.service';
 
 jest.mock('../database', () => ({
   getDatabase: jest.fn(),

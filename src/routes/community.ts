@@ -339,7 +339,11 @@ export async function communityRoutes(server: FastifyInstance): Promise<void> {
       });
     } else {
       // Create join request for private communities
-      const joinRequest = await communityService.createJoinRequest(communityId, userId, body.message);
+      const joinRequest = await communityService.createJoinRequest(
+        communityId,
+        userId,
+        body?.message || null
+      );
 
       return reply.status(202).send({
         message: 'Join request submitted and pending approval',

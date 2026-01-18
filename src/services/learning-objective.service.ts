@@ -562,7 +562,7 @@ export class LearningObjectiveService {
    */
   generateObjectiveCode(communityId: string, parentCode?: string): Promise<string> {
     return this.db.transaction(async (trx) => {
-      let prefix = parentCode ? `${parentCode}.` : 'LO-';
+      const prefix = parentCode ? `${parentCode}.` : 'LO-';
 
       // Find highest existing code with this prefix
       const existing = await trx('learning_objectives')

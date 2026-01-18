@@ -8,8 +8,8 @@
  * - Bloom's taxonomy helpers
  */
 
-import { LearningObjectiveService } from './learning-objective.service';
 import { getDatabase } from '../database';
+import { LearningObjectiveService } from './learning-objective.service';
 
 jest.mock('../database', () => ({
   getDatabase: jest.fn(),

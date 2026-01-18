@@ -218,7 +218,7 @@ describe('DomainService', () => {
         community_id: null,
       });
 
-      const result = await domainService.getDomainBySlug('math', community.id);
+      const result = await domainService.getDomainBySlug(community.id, 'math');
 
       expect(result).toBeDefined();
       expect(result!.community_id).toBe(community.id);
@@ -235,7 +235,7 @@ describe('DomainService', () => {
         community_id: null,
       });
 
-      const result = await domainService.getDomainBySlug('math', null);
+      const result = await domainService.getDomainBySlug(null, 'math');
 
       expect(result).toBeDefined();
       expect(result!.community_id).toBeNull();
@@ -255,7 +255,7 @@ describe('DomainService', () => {
         community_id: community1.id,
       });
 
-      const result = await domainService.getDomainBySlug('math', community2.id);
+      const result = await domainService.getDomainBySlug(community2.id, 'math');
 
       expect(result).toBeNull();
     });

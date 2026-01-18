@@ -181,6 +181,7 @@ export interface CheckpointQuestion {
   format_type_id: string;
   display_order: number;
   points_override: number | null;
+  weight: number;  // Computed from points_override or question points
   is_required: boolean;
   is_bonus: boolean;
   format_config: Record<string, any> | null;
@@ -967,7 +968,8 @@ export class CheckpointTypesService {
       .where('cq.is_bonus', false)
       .select(this.db.raw('SUM(COALESCE(cq.points_override, aq.points)) as total_points'));
 
-    const totalPoints = (result[0] as unknown as { total_points: number })?.total_points || 0;
+    const totalPointsRaw = (result[0] as unknown as { total_points: string | number })?.total_points || 0;
+    const totalPoints = parseInt(String(totalPointsRaw), 10);
 
     await this.db('checkpoints')
       .where({ id: checkpointId })
@@ -1319,10 +1321,20 @@ export class CheckpointTypesService {
 
   private formatCheckpointQuestion(row: any): CheckpointQuestion {
     return {
-      ...row,
+      id: row.id,
+      checkpoint_id: row.checkpoint_id,
+      question_id: row.question_id,
+      format_type_id: row.format_type_id,
+      display_order: row.display_order,
+      points_override: row.points_override,
+      weight: row.points_override || 0,
+      is_required: row.is_required !== false,
+      is_bonus: row.is_bonus !== false,
       format_config: row.format_config
         ? (typeof row.format_config === 'string' ? JSON.parse(row.format_config) : row.format_config)
         : null,
+      created_at: row.created_at,
+      updated_at: row.updated_at,
     };
   }
 

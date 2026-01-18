@@ -135,7 +135,7 @@ export class MentorshipFeedbackService {
           'COUNT(CASE WHEN mf.would_recommend = true THEN 1 END) as recommend_count'
         )
       )
-      .first();
+      .first() as any;
 
     if (!feedback || feedback.total_count === 0) {
       return {

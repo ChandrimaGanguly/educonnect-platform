@@ -40,14 +40,11 @@ describe('CheckpointSessionService', () => {
     const community = await createTestCommunity(userId);
     communityId = community.id;
 
-    // Create checkpoint category
-    [{ id: categoryId }] = await db('checkpoint_categories').insert({
-      code: 'knowledge',
-      name: 'Knowledge Assessment',
-      description: 'Test knowledge',
-      is_active: true,
-      display_order: 1,
-    }).returning('id');
+    // Get existing checkpoint category (from migration seed data)
+    const category = await db('checkpoint_categories')
+      .where({ code: 'knowledge' })
+      .first();
+    categoryId = category.id;
 
     // Create a test checkpoint
     const checkpoint = await typesService.createCheckpoint(userId, {
@@ -57,7 +54,6 @@ describe('CheckpointSessionService', () => {
       category_id: categoryId,
       passing_score: 70,
       allow_pause: true,
-      status: 'draft',
     });
 
     // Publish the checkpoint
@@ -321,6 +317,161 @@ describe('CheckpointSessionService', () => {
       // Check session is flagged
       const updatedSession = await sessionService.getSession(session.id);
       expect(updatedSession!.integrity_flagged).toBe(true);
+    });
+  });
+
+  describe('Edge Cases and Concurrency', () => {
+    it('should handle multiple pause/resume cycles correctly', async () => {
+      const session = await sessionService.createSession(userId, checkpointId, {
+        checkpoint_id: checkpointId,
+      });
+      const started = await sessionService.startSession(session.id);
+
+      // Wait a bit
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // First pause
+      const paused1 = await sessionService.pauseSession(started.id);
+      const elapsed1 = paused1.time_elapsed_seconds;
+      expect(elapsed1).toBeGreaterThan(0);
+
+      // Resume
+      const resumed1 = await sessionService.resumeSession(paused1.id);
+
+      // Wait a bit more
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Second pause
+      const paused2 = await sessionService.pauseSession(resumed1.id);
+      const elapsed2 = paused2.time_elapsed_seconds;
+
+      // Time should have accumulated
+      expect(elapsed2).toBeGreaterThan(elapsed1);
+    });
+
+    it('should not accumulate time while paused', async () => {
+      const session = await sessionService.createSession(userId, checkpointId, {
+        checkpoint_id: checkpointId,
+      });
+      const started = await sessionService.startSession(session.id);
+
+      // Pause immediately
+      const paused = await sessionService.pauseSession(started.id);
+      const elapsedAtPause = paused.time_elapsed_seconds;
+
+      // Wait while paused
+      await new Promise(resolve => setTimeout(resolve, 200));
+
+      // Get session again - elapsed time should not have changed
+      const sessionWhilePaused = await sessionService.getSession(paused.id);
+      expect(sessionWhilePaused!.time_elapsed_seconds).toBe(elapsedAtPause);
+    });
+
+    it('should respect time limits with accommodations', async () => {
+      // Create accommodation with extended time
+      const [accommodation] = await db('learner_accessibility_profiles').insert({
+        user_id: userId,
+        community_id: communityId,
+        extended_time: true,
+        time_multiplier: 1.5,
+        break_allowances: false,
+        is_approved: true,
+        approved_by: userId,
+        approved_at: new Date(),
+      }).returning('*');
+
+      // Update checkpoint with time limit
+      await db('checkpoints')
+        .where({ id: checkpointId })
+        .update({ time_limit_minutes: 60 });
+
+      const session = await sessionService.createSession(userId, checkpointId, {
+        checkpoint_id: checkpointId,
+      });
+
+      // Time limit should be 60 * 1.5 = 90 minutes = 5400 seconds
+      expect(session.time_limit_seconds).toBe(5400);
+    });
+
+    it('should validate break accommodations are approved', async () => {
+      const session = await sessionService.createSession(userId, checkpointId, {
+        checkpoint_id: checkpointId,
+      });
+      const started = await sessionService.startSession(session.id);
+
+      // Try to start break without accommodation
+      await expect(
+        sessionService.startBreak(started.id)
+      ).rejects.toThrow('Breaks are not enabled');
+    });
+
+    it('should handle session abandonment correctly', async () => {
+      const session = await sessionService.createSession(userId, checkpointId, {
+        checkpoint_id: checkpointId,
+      });
+      const started = await sessionService.startSession(session.id);
+
+      const abandoned = await sessionService.abandonSession(started.id, 'user');
+
+      expect(abandoned.status).toBe('abandoned');
+      expect(abandoned.ended_at).toBeDefined();
+      expect(abandoned.time_elapsed_seconds).toBeGreaterThanOrEqual(0);
+    });
+
+    it('should handle timeout correctly', async () => {
+      const session = await sessionService.createSession(userId, checkpointId, {
+        checkpoint_id: checkpointId,
+      });
+      const started = await sessionService.startSession(session.id);
+
+      const timedOut = await sessionService.abandonSession(started.id, 'timeout');
+
+      expect(timedOut.status).toBe('timed_out');
+      expect(timedOut.ended_at).toBeDefined();
+    });
+
+    it('should prevent starting already started session', async () => {
+      const session = await sessionService.createSession(userId, checkpointId, {
+        checkpoint_id: checkpointId,
+      });
+      await sessionService.startSession(session.id);
+
+      // Try to start again
+      await expect(
+        sessionService.startSession(session.id)
+      ).rejects.toThrow('can only be started from initializing state');
+    });
+
+    it('should track breaks taken correctly', async () => {
+      // Create accommodation with breaks
+      await db('learner_accessibility_profiles').insert({
+        user_id: userId,
+        community_id: communityId,
+        extended_time: false,
+        break_allowances: true,
+        break_frequency_minutes: 30,
+        break_duration_minutes: 5,
+        is_approved: true,
+        approved_by: userId,
+        approved_at: new Date(),
+      });
+
+      const session = await sessionService.createSession(userId, checkpointId, {
+        checkpoint_id: checkpointId,
+      });
+      const started = await sessionService.startSession(session.id);
+
+      // Start break
+      const onBreak = await sessionService.startBreak(started.id);
+      expect(onBreak.status).toBe('on_break');
+      expect(onBreak.break_started_at).toBeDefined();
+
+      // End break
+      const afterBreak = await sessionService.endBreak(onBreak.id);
+      expect(afterBreak.status).toBe('in_progress');
+      expect(afterBreak.breaks_taken).toBe(1);
+      expect(afterBreak.total_break_seconds).toBeGreaterThan(0);
+      expect(afterBreak.break_started_at).toBeNull();
     });
   });
 });
